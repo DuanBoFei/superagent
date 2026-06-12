@@ -121,12 +121,13 @@
 
 ## Group 3: Query loop (depends on all Group 2)
 
-### T-07: Implement query loop
+### T-07: Implement query loop ✅
 | | |
 |---|---|
 | **Source** | spec §Business Flow diagram + §States |
 | **Dependencies** | T-02, T-03, T-04, T-05, T-06 |
-| **Verification** | `pnpm vitest run --reporter=verbose tests/runtime/query-loop.test.ts` |
+| **Verification** | `pnpm vitest run --reporter=verbose tests/runtime/query-loop.test.ts` — all pass (4 tests) |
+| **Status** | Complete |
 
 **What to do:**
 - Create `src/runtime/query-loop.ts`
