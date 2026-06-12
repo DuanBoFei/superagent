@@ -3,13 +3,13 @@ import { ConfigError } from "./types";
 import { defaults } from "./defaults";
 import type { Config } from "./types";
 
-const permissionsSchema = z.object({
+export const permissionsSchema = z.object({
   autoApprove: z.array(z.string()),
   deny: z.array(z.string()),
   askTimeout: z.number().int().min(5).max(300),
 });
 
-const configSchema = z.object({
+export const configSchema = z.object({
   apiKey: z.string().min(1),
   model: z.string(),
   baseUrl: z.string().url(),

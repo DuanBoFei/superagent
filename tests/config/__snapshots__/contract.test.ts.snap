@@ -1,0 +1,17 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Config schema contract > field type map matches snapshot 1`] = `
+{
+  "apiKey": "string",
+  "baseUrl": "string",
+  "fallbackBaseUrl": "string",
+  "fallbackModel": "string",
+  "maxTurns": "number",
+  "model": "string",
+  "permissions": "object",
+  "permissions.askTimeout": "number",
+  "permissions.autoApprove": "array",
+  "permissions.deny": "array",
+  "rulesFile": "string",
+}
+`;
