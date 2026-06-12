@@ -88,12 +88,13 @@
   - Partial failure: returns all results (success + failure), marks failed ones with `success: false`
   - Report consecutive identical calls: if the same (toolName + args) seen 3+ times in this turn, inject warning into results
 
-### T-05: Implement turn lifecycle emitter
+### T-05: Implement turn lifecycle emitter ✅
 | | |
 |---|---|
 | **Source** | spec §Turn Lifecycle Events table |
 | **Dependencies** | T-01 |
 | **Verification** | `pnpm vitest run tests/runtime/turn-lifecycle.test.ts` — all pass |
+| **Status** | Complete (7 tests) |
 
 **What to do:**
 - Create `src/runtime/turn-lifecycle.ts`
