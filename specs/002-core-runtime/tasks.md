@@ -27,12 +27,13 @@
 
 ## Group 2: Core modules (parallel — depend on T-01)
 
-### T-02: Implement state machine
+### T-02: Implement state machine ✅
 | | |
 |---|---|
 | **Source** | spec §States diagram |
 | **Dependencies** | T-01 |
 | **Verification** | `pnpm vitest run tests/runtime/state-machine.test.ts` — all pass |
+| **Status** | Complete (17 tests) |
 
 **What to do:**
 - Create `src/runtime/state-machine.ts`
