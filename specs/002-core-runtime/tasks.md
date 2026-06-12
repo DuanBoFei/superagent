@@ -104,12 +104,13 @@
   - `off(type: string, handler: Function)` — unregister
 - No external EventEmitter dependency — custom 20-line implementation
 
-### T-06: Create stub modules
+### T-06: Create stub modules ✅
 | | |
 |---|---|
 | **Source** | plan §4 (Stub interfaces table) |
 | **Dependencies** | T-01 |
 | **Verification** | Each stub file exports the expected function signature |
+| **Status** | Complete (6 stubs, 6 tests) |
 
 **What to do:**
 - Create `src/runtime/stubs/` directory

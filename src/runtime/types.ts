@@ -66,6 +66,16 @@ export interface TurnContext {
   }>;
 }
 
+export interface Prompt {
+  system: string;
+  messages: Message[];
+}
+
+export interface PermissionResult {
+  allowed: boolean;
+  reason?: string;
+}
+
 export interface Token {
   type: "text" | "tool_use";
   content?: string;
