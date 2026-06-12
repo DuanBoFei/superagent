@@ -72,12 +72,13 @@
   - On stream end, yields `{ type: "turn_end", ... }` if no tool calls, or signals "ready for tool dispatch"
 - Handle malformed tool calls: if JSON args parse fails, yield `{ type: "error", message: "Invalid tool arguments" }`
 
-### T-04: Implement tool dispatcher adapter
+### T-04: Implement tool dispatcher adapter ✅
 | | |
 |---|---|
 | **Source** | spec §Business Flow (dispatch tools step) |
 | **Dependencies** | T-01 |
 | **Verification** | `pnpm vitest run tests/runtime/tool-dispatcher.test.ts` — all pass |
+| **Status** | Complete (5 tests) |
 
 **What to do:**
 - Create `src/runtime/tool-dispatcher.ts`
