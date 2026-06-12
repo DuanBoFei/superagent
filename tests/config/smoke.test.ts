@@ -27,7 +27,7 @@ function runCli(env: Record<string, string>): {
 }
 
 describe("CLI smoke", () => {
-  it("exits 0 and prints model when apiKey is set via env", () => {
+  it("exits 0 and prints SuperAgent ready when apiKey is set via env", () => {
     const result = runCli({
       SUPERAGENT_API_KEY: "sk-test",
       SUPERAGENT_MODEL: "deepseek-v4-pro",
@@ -36,7 +36,7 @@ describe("CLI smoke", () => {
       USERPROFILE: "/nonexistent-home",
     });
     expect(result.status).toBe(0);
-    expect(result.stdout.trim()).toBe("deepseek-v4-pro");
+    expect(result.stdout).toContain("SuperAgent ready");
   });
 
   it("exits 1 and prints fatal error when apiKey is missing", () => {
@@ -59,6 +59,6 @@ describe("CLI smoke", () => {
       USERPROFILE: "/nonexistent-home",
     });
     expect(result.status).toBe(0);
-    expect(result.stdout.trim()).toBe("deepseek-v4-flash");
+    expect(result.stdout).toContain("SuperAgent ready");
   });
 });

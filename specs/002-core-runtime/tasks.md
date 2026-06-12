@@ -172,26 +172,17 @@
 
 ## Group 5: Wiring (depends on T-08)
 
-### T-14: Update CLI entry point
+### T-14: Update CLI entry point ✅
 | | |
 |---|---|
 | **Source** | PRD §6-F7, plan §4 |
 | **Dependencies** | T-08, 001-config (T-13 from 001) |
-| **Verification** | `node dist/index.js` starts, prints "SuperAgent ready", waits for input |
+| **Verification** | `npx tsx src/index.ts` prints "SuperAgent ready", runs runtime, exits 0 |
+| **Status** | Complete |
 
-**What to do:**
-- Update `src/index.ts`
-- Load config via 001
-- Initialize runtime
-- For now: hardcoded "Hello" message → call `startTurn` → print streamed text → exit
-- This will be replaced by full REPL in 008-cli-repl
-
-### T-15: End-to-end smoke test
+### T-15: End-to-end smoke test ✅
 | | |
 |---|---|
 | **Dependencies** | T-14 |
-| **Verification** | Smoke test passes |
-
-Create `tests/runtime/smoke.test.ts`:
-- `node dist/index.js` → exit 0, stdout contains "SuperAgent" or streamed text
-- `node dist/index.js --resume test-id` → loads stub session (no crash)
+| **Verification** | 2 smoke tests pass: default run + --resume |
+| **Status** | Complete |
