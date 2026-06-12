@@ -54,12 +54,13 @@
   - Any state + "unknown" → ERROR (fallback)
 - Guard: if transition not in map → return ERROR with reason
 
-### T-03: Implement stream handler
+### T-03: Implement stream handler ✅
 | | |
 |---|---|
 | **Source** | spec §Business Flow (stream response step) |
 | **Dependencies** | T-01 |
 | **Verification** | `pnpm vitest run tests/runtime/stream-handler.test.ts` — all pass |
+| **Status** | Complete (5 tests) |
 
 **What to do:**
 - Create `src/runtime/stream-handler.ts`
