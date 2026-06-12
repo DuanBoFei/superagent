@@ -148,84 +148,25 @@
 
 ## Group 4: Public API + Tests (parallel — depend on T-07)
 
-### T-08: Implement runtime public API
+### T-08: Implement runtime public API ✅
 | | |
 |---|---|
 | **Source** | spec §Integration Contract |
 | **Dependencies** | T-07, 001-config |
-| **Verification** | `pnpm vitest run tests/runtime/runtime.test.ts` |
+| **Verification** | `pnpm vitest run tests/runtime/runtime.test.ts` — all pass (4 tests) |
+| **Status** | Complete |
 
-**What to do:**
-- Create `src/runtime/runtime.ts`
-- Implement `startTurn(userMessage: string): AsyncGenerator<TurnEvent>`
-  - Creates/updates SessionState
-  - Delegates to query loop
-  - Sets up SIGINT handler (process.once('SIGINT', ...) sets interruptFlag)
-- Implement `resumeSession(sessionId: string): AsyncGenerator<TurnEvent>`
-  - Loads saved state from 009 stub
-  - Injects "continue where you left off" system message
-  - Delegates to query loop
+### T-09: Unit tests — state machine ✅ (written with T-02)
 
-### T-09: Unit tests — state machine
-| | |
-|---|---|
-| **Dependencies** | T-02 |
-| **Verification** | All assertions pass |
+### T-09: Unit tests — state machine ✅ (17 tests, written with T-02)
 
-Create `tests/runtime/state-machine.test.ts`:
-- All 8 states can transition as defined
-- Unknown event → ERROR state
-- Invalid transition (e.g., IDLE + "next_turn") → ERROR
-- ERROR → IDLE recovery works
-- All valid transitions return correct next state
+### T-10: Unit tests — stream handler ✅ (5 tests, written with T-03)
 
-### T-10: Unit tests — stream handler
-| | |
-|---|---|
-| **Dependencies** | T-03 |
-| **Verification** | All assertions pass |
+### T-11: Unit tests — tool dispatcher ✅ (5 tests, written with T-04)
 
-Create `tests/runtime/stream-handler.test.ts`:
-- Plain text stream → yields text events only
-- Tool call stream → yields tool_call events with parsed args
-- Mixed stream (text + tool) → yields text then tool_call events
-- Malformed tool JSON → yields error event (not crash)
+### T-12: Integration test — query loop with stubs ✅ (4 tests, written with T-07)
 
-### T-11: Unit tests — tool dispatcher
-| | |
-|---|---|
-| **Dependencies** | T-04 |
-| **Verification** | All assertions pass |
-
-Create `tests/runtime/tool-dispatcher.test.ts`:
-- Empty calls → empty results
-- Single call → single result
-- Mixed success/failure → partial results returned
-- 3 consecutive identical calls → warning injected
-
-### T-12: Integration test — query loop with stubs
-| | |
-|---|---|
-| **Dependencies** | T-07 |
-| **Verification** | All assertions pass |
-
-Create `tests/runtime/query-loop.test.ts`:
-- Text-only message → loop completes in 1 turn, yields text event
-- maxTurns=2 → loop stops after 2, yields turn_end with "max reached"
-- Interrupt flag set mid-loop → loop breaks, yields turn_end with "interrupted"
-- Simulated tool call → tool_call + tool_result events yielded
-
-### T-13: Integration test — runtime with stubs
-| | |
-|---|---|
-| **Dependencies** | T-08 |
-| **Verification** | All assertions pass |
-
-Create `tests/runtime/runtime.test.ts`:
-- `startTurn("hello")` → returns AsyncGenerator, yields text, completes
-- Ctrl+C during execution → interrupt flag set, turn ends gracefully
-- `resumeSession("test-id")` → loads stub state, continues
-- Two consecutive turns → turnNumber increments to 2
+### T-13: Integration test — runtime with stubs ✅ (4 tests, written with T-08)
 
 ---
 
