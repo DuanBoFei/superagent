@@ -1,0 +1,6 @@
+node_modules/
+dist/
+.env.local
+.credentials.yaml
+*.log
+.claude/cache/

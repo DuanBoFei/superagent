@@ -1,0 +1,22 @@
+{
+  "mcpServers": {
+    "muyu-search": {
+      "command": "python",
+      "args": ["-m", "muyu_search.server"],
+      "env": {
+        "PYTHONPATH": "mcp/muyu-search-mcp/src",
+        "MUYU_API_KEY": "sk-or-v1-****",
+        "MUYU_PROVIDER": "openrouter"
+      }
+    }
+  },
+  "statusLine": {
+    "contextValue": "both",
+    "showCost": true,
+    "showDuration": true,
+    "showSessionTokens": true,
+    "showTodos": true,
+    "showAgents": true,
+    "showTools": true
+  }
+}

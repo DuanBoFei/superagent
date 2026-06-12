@@ -1,0 +1,3 @@
+[console_scripts]
+muyu-search = muyu_search.server:main
+muyu-search-setup = muyu_search.setup_wizard:main
