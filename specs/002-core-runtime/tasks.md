@@ -8,12 +8,13 @@
 
 ## Group 1: Foundation (serial)
 
-### T-01: Define runtime types
+### T-01: Define runtime types ✅
 | | |
 |---|---|
 | **Source** | spec §States, spec §Integration Contract |
 | **Dependencies** | 001-config (types only) |
 | **Verification** | `tsc --noEmit` passes; State enum has all 8 states |
+| **Status** | Complete |
 
 **What to do:**
 - Create `src/runtime/types.ts`

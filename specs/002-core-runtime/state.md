@@ -1,10 +1,10 @@
 # 实施进度 · Core Runtime
 
 ## 当前任务
-[>] T01 · Define runtime types + state machine
+[>] T02 · Implement state machine
 
 ## 已完成
-（无）
+- [x] T01 · Define runtime types (State enum, TurnEvent, SessionState, TurnContext)
 
 ## 阻塞项
 （无）
