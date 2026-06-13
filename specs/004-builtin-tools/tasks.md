@@ -82,19 +82,19 @@ Create `src/tools/task.ts`:
 
 ## Group 3: Write tools (parallel — depend on T-01)
 
-### T-06: Implement Write tool
+### T-06: Implement Write tool ✅
 | | |
 |---|---|
 | **Dependencies** | T-01 |
-| **Verification** | Tests pass: new file, overwrite, parent missing, large content |
+| **Verification** | ✅ Tests pass: new file, overwrite, parent missing, large content |
 
 Create `src/tools/write.ts`:
-- Resolve path, check within project
-- Parent directory must exist (error if not)
-- If file exists: read old content for diff (store for 008-cli-repl)
-- Write content via fs.writeFileSync
-- Validate content ≤ 1MB
-- Return `{ bytes_written, lines_written }`
+- ✅ Resolve path, check within project
+- ✅ Parent directory must exist (error if not)
+- ✅ If file exists: read old content for diff (store for 008-cli-repl)
+- ✅ Write content via fs.writeFileSync
+- ✅ Validate content ≤ 1MB
+- ✅ Return `{ bytes_written, lines_written }`
 
 ### T-07: Implement Edit tool
 | | |

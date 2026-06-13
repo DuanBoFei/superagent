@@ -1,7 +1,7 @@
 # 实施进度 · Built-in Tools
 
 ## 当前任务
-[>] T06 · Implement Write tool
+[>] T07 · Implement Edit tool
 
 ## 已完成
 - [x] T01 · Define tool interface + types
@@ -9,6 +9,7 @@
 - [x] T03 · Implement Grep tool
 - [x] T04 · Implement Glob tool
 - [x] T05 · Implement Task tool
+- [x] T06 · Implement Write tool
 
 ## 阻塞项
 （无）
