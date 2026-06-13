@@ -35,18 +35,18 @@ Create `src/models/client.ts` with:
 - ✅ Extracts `delta.content`, `delta.tool_calls`, `usage` from OpenAI-compatible format
 - ✅ Yields TokenChunk for text, tool_use, and end (with usage)
 
-### T-03: Implement retry logic
+### T-03: Implement retry logic ✅
 | | |
 |---|---|
 | **Dependencies** | T-01 |
-| **Verification** | Unit test passes |
+| **Verification** | ✅ `tests/models/retry.test.ts` passes |
 
 Create `src/models/retry.ts`:
-- `withRetry(fn, options): Promise<T>` where options = `{ maxRetries, baseDelay, onRetry }`
-- 429 strategy: read `Retry-After` header, max 3 retries
-- 5xx strategy: wait 2s, max 1 retry
-- Timeout: AbortController with configurable timeout, max 1 retry
-- Non-retryable errors: 401, 403, 400 — throw immediately
+- ✅ `withRetry(fn, options): Promise<T>` where options = `{ maxRetries, baseDelay, onRetry }`
+- ✅ 429 strategy: read `Retry-After` header, max 3 retries
+- ✅ 5xx strategy: wait 2s, max 1 retry
+- ✅ Timeout: AbortController with configurable timeout, max 1 retry
+- ✅ Non-retryable errors: 401, 403, 400 — throw immediately
 
 ### T-04: Implement fallback orchestrator
 | | |

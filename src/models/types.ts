@@ -42,10 +42,20 @@ export interface ModelConfig {
 
 export class ModelError extends Error {
   code: string;
+  status?: number;
+  headers?: Headers;
+  errors?: unknown[];
 
-  constructor(code: string, message: string) {
+  constructor(
+    code: string,
+    message: string,
+    details?: { status?: number; headers?: Headers; errors?: unknown[] },
+  ) {
     super(message);
     this.name = "ModelError";
     this.code = code;
+    this.status = details?.status;
+    this.headers = details?.headers;
+    this.errors = details?.errors;
   }
 }
