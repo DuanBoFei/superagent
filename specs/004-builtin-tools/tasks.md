@@ -110,19 +110,19 @@ Create `src/tools/edit.ts`:
 - ✅ = 1 or replace_all → replace and write
 - ✅ Return `{ replacements: [{ line_start, line_end }] }`
 
-### T-08: Implement Bash tool
+### T-08: Implement Bash tool ✅
 | | |
 |---|---|
 | **Dependencies** | T-01 |
-| **Verification** | Tests pass: normal exit, non-zero exit, timeout, empty command |
+| **Verification** | ✅ Tests pass: normal exit, non-zero exit, timeout, empty command |
 
 Create `src/tools/bash.ts`:
-- Use `child_process.exec` with cwd = workingDirectory
-- env: inherit process.env + `SUPERAGENT_MODE=true`
-- Timeout: setTimeout + process.kill after N ms (default 120s)
-- Capture stdout + stderr (max 100KB each)
-- Return `{ stdout, stderr, exit_code, killed_by_timeout }`
-- Empty command → error
+- ✅ Use `child_process.exec` with cwd = workingDirectory
+- ✅ env: inherit process.env + `SUPERAGENT_MODE=true`
+- ✅ Timeout: setTimeout + process.kill after N ms (default 120s)
+- ✅ Capture stdout + stderr (max 100KB each)
+- ✅ Return `{ stdout, stderr, exit_code, killed_by_timeout }`
+- ✅ Empty command → error
 
 ### T-09: Implement WebSearch tool
 | | |

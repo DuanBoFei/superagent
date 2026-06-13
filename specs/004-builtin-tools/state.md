@@ -1,7 +1,7 @@
 # 实施进度 · Built-in Tools
 
 ## 当前任务
-[>] T08 · Implement Bash tool
+[>] T09 · Implement WebSearch tool
 
 ## 已完成
 - [x] T01 · Define tool interface + types
@@ -11,6 +11,7 @@
 - [x] T05 · Implement Task tool
 - [x] T06 · Implement Write tool
 - [x] T07 · Implement Edit tool
+- [x] T08 · Implement Bash tool
 
 ## 阻塞项
 （无）
