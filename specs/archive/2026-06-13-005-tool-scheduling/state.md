@@ -1,7 +1,7 @@
 # 实施进度 · Tool Scheduling
 
-## 当前任务
-（全部完成）
+## 状态
+✅ **已合并** · `v0.1.0-005-tool-scheduling` · 2026-06-13
 
 ## 已完成
 - [x] T01 · Define scheduling types
@@ -16,6 +16,12 @@
 
 ## 阻塞项
 （无）
+
+## 测试结果
+193 tests · 0 failed · 1 skipped · vitest
+
+## 标签
+`v0.1.0-005-tool-scheduling` @ `235d276`
 
 ## 最后更新
 2026-06-13
