@@ -2,7 +2,7 @@ import { createScheduler } from "../scheduling/scheduler";
 import { createToolRegistry, registerTool } from "../tools/registry";
 import { registerAllTools } from "../tools/index";
 import type { ToolCall, ToolResult } from "./types";
-import type { PermissionSystem } from "../scheduling/types";
+import { permissionSystem } from "./stubs/permission";
 
 const registry = createToolRegistry();
 registerAllTools(registry);
@@ -16,11 +16,7 @@ export function dispatchTools(calls: ToolCall[]): Promise<ToolResult[]> {
     id: nextId++,
   }));
 
-  const permission: PermissionSystem = {
-    checkPermission: () => ({ allowed: true }),
-  };
-
-  const scheduler = createScheduler(registry, permission);
+  const scheduler = createScheduler(registry, permissionSystem);
   return scheduler.dispatchTools(schedulingCalls).then((results) =>
     results.map((r) => ({
       name: r.name,

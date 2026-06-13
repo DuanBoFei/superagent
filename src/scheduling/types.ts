@@ -21,5 +21,5 @@ export interface PermissionSystem {
   checkPermission(
     toolName: string,
     args: Record<string, unknown>,
-  ): { allowed: boolean; reason?: string };
+  ): Promise<"approved" | "denied">;
 }
