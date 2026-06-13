@@ -65,18 +65,18 @@ Create `src/tools/glob.ts`:
 - ✅ Return file list (≤ 1000)
 - ✅ Block patterns that escape project root
 
-### T-05: Implement Task tool
+### T-05: Implement Task tool ✅
 | | |
 |---|---|
 | **Dependencies** | T-01 |
-| **Verification** | Tests pass: create, update, complete, list, > 20 warning |
+| **Verification** | ✅ Tests pass: create, update, complete, list, > 20 warning |
 
 Create `src/tools/task.ts`:
-- In-memory task array (scoped to session)
-- Operations: create, update (by id), list
-- Auto-assign IDs if not provided
-- > 20 tasks → warning in output
-- Return formatted task list after each operation
+- ✅ In-memory task array (scoped to session)
+- ✅ Operations: create, update (by id), list
+- ✅ Auto-assign IDs if not provided
+- ✅ > 20 tasks → warning in output
+- ✅ Return formatted task list after each operation
 
 ---
 
