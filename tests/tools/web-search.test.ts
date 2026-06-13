@@ -10,6 +10,7 @@ const context: ToolContext = {
 afterEach(() => {
   vi.unstubAllEnvs();
   vi.unstubAllGlobals();
+  vi.useRealTimers();
 });
 
 describe("WebSearch tool", () => {
@@ -76,5 +77,42 @@ describe("WebSearch tool", () => {
 
     expect(result.output).toBe("");
     expect(result.error).toBe("query must not be empty");
+  });
+
+  it("returns graceful degradation when fetch exceeds timeout", async () => {
+    vi.stubEnv("SUPERAGENT_WEBSEARCH_API_KEY", "test-key");
+    vi.stubEnv("SUPERAGENT_WEBSEARCH_ENDPOINT", "https://search.example.test/query");
+
+    vi.useFakeTimers();
+
+    // A fetch that never settles on its own, but rejects when the abort signal fires
+    vi.stubGlobal(
+      "fetch",
+      vi.fn((_url, options) => {
+        return new Promise((_resolve, reject) => {
+          const signal = options?.signal as AbortSignal | undefined;
+          if (signal?.aborted) {
+            reject(new Error("Aborted"));
+            return;
+          }
+          const onAbort = () => {
+            signal?.removeEventListener("abort", onAbort);
+            reject(new Error("Aborted"));
+          };
+          signal?.addEventListener("abort", onAbort);
+        });
+      }),
+    );
+
+    const resultPromise = webSearchTool({ query: "timeout test" }, context);
+
+    // Advance past the 30s timeout so the AbortController fires
+    await vi.advanceTimersByTimeAsync(35_000);
+
+    const result = await resultPromise;
+
+    expect(result.output).toBe("Search unavailable: request failed");
+    expect(result.error).toBeUndefined();
+    expect(result.metadata).toMatchObject({ results: [], note: "request failed" });
   });
 });

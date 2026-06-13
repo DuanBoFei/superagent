@@ -20,5 +20,11 @@
 ## 部署
 本地 merge。Tag: `v0.1.0-004-builtin-tools`。
 
+## 收尾补测 (2026-06-13)
+- test-routing-advisor 判定: 单后端，命中 1 个结构性缺口
+- 🔧 韧性/故障注入 → WebSearch AbortController 30s 超时路径无专项测试
+- 补测: `tests/tools/web-search.test.ts` +1 test（fake timers + hanging fetch → abort → graceful degradation）
+- 结果: 178 passed, 0 failed（实现已正确处理，仅缺覆盖，补后即绿）
+
 ## Spec 冻结
 本 spec 目录冻结，需求变更开新编号。

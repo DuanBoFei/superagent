@@ -18,6 +18,7 @@
 - [x] T09 · Implement WebSearch tool
 - [x] T10-T15 · Unit tests coverage reconciliation
 - [x] T16 · Register all tools + registry integration test
+- [x] 收尾补测 · WebSearch 超时韧性测试 (test-routing-advisor → backend-testing 闭环)
 
 ## 验证
 - [x] `tests/tools/` · 47 passed (9 files)
