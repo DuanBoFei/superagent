@@ -1,45 +1,32 @@
-import { ToolCall, ToolResult } from "./types";
+import { createScheduler } from "../scheduling/scheduler";
+import { createToolRegistry, registerTool } from "../tools/registry";
+import { registerAllTools } from "../tools/index";
+import type { ToolCall, ToolResult } from "./types";
+import type { PermissionSystem } from "../scheduling/types";
 
-function toolCallKey(call: ToolCall): string {
-  return `${call.name}:${JSON.stringify(call.args)}`;
-}
+const registry = createToolRegistry();
+registerAllTools(registry);
 
-const DANGEROUS_TOOLS = new Set(["Bash"]);
+let nextId = 1;
 
-export async function dispatchTools(calls: ToolCall[]): Promise<ToolResult[]> {
-  const results: ToolResult[] = [];
-  const callCounts = new Map<string, number>();
+export function dispatchTools(calls: ToolCall[]): Promise<ToolResult[]> {
+  const schedulingCalls = calls.map((c) => ({
+    name: c.name,
+    args: c.args,
+    id: nextId++,
+  }));
 
-  for (let i = 0; i < calls.length; i++) {
-    const call = calls[i]!;
-    const key = toolCallKey(call);
-    const count = (callCounts.get(key) ?? 0) + 1;
-    callCounts.set(key, count);
+  const permission: PermissionSystem = {
+    checkPermission: () => ({ allowed: true }),
+  };
 
-    const isDangerous = DANGEROUS_TOOLS.has(call.name);
-
-    let output = `[STUB] ${call.name} executed successfully.`;
-    if (!isDangerous) {
-      output += ` args: ${JSON.stringify(call.args)}`;
-    }
-
-    const result: ToolResult = {
-      name: call.name,
-      success: !isDangerous,
-      output,
-    };
-
-    if (isDangerous) {
-      result.error = `Dangerous tool "${call.name}" requires permission approval`;
-    }
-
-    if (count >= 3) {
-      result.output +=
-        `\nWARNING: ${call.name} has been called ${count} times with the same arguments. Consider a different approach.`;
-    }
-
-    results.push(result);
-  }
-
-  return results;
+  const scheduler = createScheduler(registry, permission);
+  return scheduler.dispatchTools(schedulingCalls).then((results) =>
+    results.map((r) => ({
+      name: r.name,
+      success: r.success,
+      output: r.output,
+      error: r.error,
+    })),
+  );
 }

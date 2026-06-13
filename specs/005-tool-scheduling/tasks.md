@@ -95,13 +95,13 @@ Create `tests/scheduling/scheduler.test.ts`:
 - Full pipeline: partition → execute → ordered results
 - 12 tools → only first 8 executed
 
-### T-08: Integration — wire to 002 stub
+### T-08: Integration — wire to 002 stub ✅
 | | |
 |---|---|
 | **Dependencies** | T-04 |
 Replace `src/runtime/stubs/tools.ts` dispatch with real scheduler.
 
-### T-09: Re-run 002 integration tests
+### T-09: Re-run 002 integration tests ✅
 | | |
 |---|---|
 | **Dependencies** | T-08 |
