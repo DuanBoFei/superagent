@@ -8,6 +8,12 @@ export interface PermissionEvent {
   timestamp: number;
 }
 
+export interface PermissionsConfig {
+  autoApprove: string[];
+  deny: string[];
+  askTimeout: number;
+}
+
 export type PromptFn = (
   toolName: string,
   command: string,
