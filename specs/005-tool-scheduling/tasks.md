@@ -8,14 +8,14 @@
 
 ## Group 1: Foundation (serial)
 
-### T-01: Define scheduling types
+### T-01: Define scheduling types ✅
 | | |
 |---|---|
 | **Source** | spec §Integration Contract |
 | **Dependencies** | 004-builtin-tools (types only) |
 | **Verification** | `tsc --noEmit` |
 
-Create `src/scheduling/types.ts`:
+✅ Create `src/scheduling/types.ts`:
 - `ToolCall { name, args, id }`
 - `ToolResult { id, name, output, error?, success }`
 - `BatchPlan { concurrent: ToolCall[], serial: ToolCall[] }`
