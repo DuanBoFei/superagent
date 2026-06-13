@@ -1,10 +1,10 @@
 # 实施进度 · Built-in Tools
 
 ## 当前任务
-[>] T01 · Define tool interface + types
+[>] T02 · Implement Read tool
 
 ## 已完成
-（无）
+- [x] T01 · Define tool interface + types
 
 ## 阻塞项
 （无）

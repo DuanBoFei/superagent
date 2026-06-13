@@ -8,17 +8,17 @@
 
 ## Group 1: Foundation (serial)
 
-### T-01: Define tool types + registry
+### T-01: Define tool types + registry ✅
 | | |
 |---|---|
 | **Source** | spec §Integration Contract, spec §Tool Catalog |
 | **Dependencies** | None |
-| **Verification** | `tsc --noEmit`; registry test passes |
+| **Verification** | ✅ `tsc --noEmit`; `tests/tools/registry.test.ts` passes |
 
 **What to do:**
-- Create `src/tools/types.ts`: ToolFunction, ToolContext, ToolResult
-- Create `src/tools/registry.ts`: `registerTool()`, `getTool()`, `listTools()`, `isConcurrencySafe()`
-- Registry uses Map<string, { fn, schema, concurrencySafe }>
+- ✅ Create `src/tools/types.ts`: ToolFunction, ToolContext, ToolResult
+- ✅ Create `src/tools/registry.ts`: `registerTool()`, `getTool()`, `listTools()`, `isConcurrencySafe()`
+- ✅ Registry uses Map<string, { fn, schema, concurrencySafe }>
 
 ---
 
