@@ -54,7 +54,7 @@ Create `src/scheduling/executor.ts`:
 
 ## Group 3: Public API + Tests (parallel)
 
-### T-04: Implement scheduler public API
+### T-04: Implement scheduler public API ✅
 | | |
 |---|---|
 | **Dependencies** | T-03 |
@@ -87,7 +87,7 @@ Create `tests/scheduling/executor.test.ts`:
 - Results in declaration order regardless of execution order
 - Tool throws → caught, error result returned
 
-### T-07: Integration test — scheduler
+### T-07: Integration test — scheduler ✅
 | | |
 |---|---|
 | **Dependencies** | T-04 |
