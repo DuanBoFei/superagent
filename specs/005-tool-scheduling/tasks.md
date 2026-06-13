@@ -24,13 +24,13 @@
 
 ## Group 2: Core modules (parallel — depend on T-01)
 
-### T-02: Implement partitioner
+### T-02: Implement partitioner ✅
 | | |
 |---|---|
 | **Dependencies** | T-01, 004 (registry interface) |
 | **Verification** | Unit test: correct partition for mixed batch |
 
-Create `src/scheduling/partitioner.ts`:
+✅ Create `src/scheduling/partitioner.ts`:
 - `partition(calls: ToolCall[], registry: ToolRegistry): BatchPlan`
 - Query `registry.isConcurrencySafe(name)` for each tool
 - true → concurrent group
@@ -66,11 +66,11 @@ Create `src/scheduling/scheduler.ts`:
 - Call partitioner → executor
 - Return results
 
-### T-05: Unit tests — partitioner
+### T-05: Unit tests — partitioner ✅
 | | |
 |---|---|
 | **Dependencies** | T-02 |
-Create `tests/scheduling/partitioner.test.ts`:
+✅ Create `tests/scheduling/partitioner.test.ts`:
 - All safe tools → all in concurrent group
 - All unsafe → all in serial group
 - Mixed → correct partition

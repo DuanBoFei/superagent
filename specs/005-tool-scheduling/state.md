@@ -1,10 +1,12 @@
 # 实施进度 · Tool Scheduling
 
 ## 当前任务
-[>] T02 · Implement partitioner
+[>] T03 · Implement executor
 
 ## 已完成
 - [x] T01 · Define scheduling types
+- [x] T02 · Implement partitioner
+- [x] T05 · Unit tests — partitioner
 
 ## 阻塞项
 （无）
