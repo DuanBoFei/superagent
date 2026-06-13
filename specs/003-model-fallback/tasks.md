@@ -64,16 +64,16 @@ Create `src/models/fallback.ts`:
 
 ## Group 3: Public API + Tests (parallel)
 
-### T-05: Implement sendMessage() public API
+### T-05: Implement sendMessage() public API ✅
 | | |
 |---|---|
 | **Dependencies** | T-04, 001-config |
-| **Verification** | Integration test passes |
+| **Verification** | ✅ `tests/models/provider.test.ts` passes |
 
 Create `src/models/provider.ts`:
-- `sendMessage(prompt: Prompt): AsyncGenerator<TokenChunk>`
-- Reads config from 001
-- Delegates to fallback orchestrator
+- ✅ `sendMessage(prompt: Prompt): AsyncGenerator<TokenChunk>`
+- ✅ Reads config from 001
+- ✅ Delegates to fallback orchestrator
 - Replaces stub at `src/runtime/stubs/model.ts`
 
 ### T-06: Unit tests — SSE parser
