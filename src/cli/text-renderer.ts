@@ -1,12 +1,11 @@
 import type { TerminalConfig } from "./types";
+import { stringWidth } from "./wcwidth";
 
 export function renderText(content: string, config: TerminalConfig): void {
   let col = 0;
   let word = "";
 
-  for (let i = 0; i < content.length; i++) {
-    const ch = content[i]!;
-
+  for (const ch of content) {
     if (ch === "\n") {
       flushWord(word, col, config);
       process.stdout.write("\n");
@@ -39,13 +38,13 @@ function flushWord(
   if (word.length === 0) return;
 
   const width = config.width > 0 ? config.width : 80;
+  const wordW = stringWidth(word);
 
-  if (col > 0 && col + 1 + word.length > width) {
+  if (col > 0 && col + 1 + wordW > width) {
     process.stdout.write("\n  ");
     col = 2;
   }
 
-  // Split long words that exceed terminal width
   let remaining = word;
   while (remaining.length > 0) {
     const available = width - col;
@@ -53,10 +52,29 @@ function flushWord(
       process.stdout.write("\n  ");
       col = 2;
     }
-    const chunkLen = Math.min(remaining.length, col === 2 ? width - 2 : width - col);
-    const chunk = remaining.slice(0, chunkLen);
-    process.stdout.write(chunk);
-    remaining = remaining.slice(chunkLen);
-    col += chunk.length;
+    const maxCols = col === 2 ? width - 2 : width - col;
+    const { slice, width: used } = takeFit(remaining, maxCols);
+    process.stdout.write(slice);
+    remaining = remaining.slice(slice.length);
+    col += used;
   }
+}
+
+function takeFit(
+  s: string,
+  maxCols: number,
+): { slice: string; width: number } {
+  let w = 0;
+  let i = 0;
+  for (const ch of s) {
+    const cw = stringWidth(ch);
+    if (w + cw > maxCols) break;
+    w += cw;
+    i += ch.length;
+  }
+  if (i === 0) {
+    const ch = [...s][0]!;
+    return { slice: ch, width: stringWidth(ch) };
+  }
+  return { slice: s.slice(0, i), width: w };
 }
