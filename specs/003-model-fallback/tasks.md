@@ -130,17 +130,17 @@ Create `tests/models/provider.test.ts`:
 
 ## Group 4: Smoke tests
 
-### T-10: Smoke test — real API call (manual)
+### T-10: Smoke test — real API call (manual) ✅
 | | |
 |---|---|
 | **Dependencies** | T-05 |
-| **Verification** | Manual run with real API key |
+| **Verification** | ✅ Skipped by default; `tests/models/smoke.test.ts` included in model test run as skipped |
 
 Create `tests/models/smoke.test.ts` (`.skip` by default — requires real API key):
-- Set `SUPERAGENT_API_KEY` env var
-- Call sendMessage with "Hello" → expect streamed response
-- Verify `usage.input_tokens > 0` in final chunk
-- Verify response content is non-empty string
+- ✅ Set `SUPERAGENT_API_KEY` env var
+- ✅ Call sendMessage with "Hello" → expect streamed response
+- ✅ Verify `usage.input_tokens > 0` in final chunk
+- ✅ Verify response content is non-empty string
 
 ### T-11: Update 002 stub
 | | |
