@@ -63,14 +63,14 @@ async function executeOne(
     };
   }
 
-  const perm = permission.checkPermission(call.name, call.args);
-  if (!perm.allowed) {
+  const perm = await permission.checkPermission(call.name, call.args);
+  if (perm !== "approved") {
     return {
       id: call.id,
       name: call.name,
       success: false,
       output: "",
-      error: `Permission denied: ${perm.reason ?? "blocked"}`,
+      error: "Permission denied",
     };
   }
 

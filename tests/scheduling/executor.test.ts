@@ -6,7 +6,7 @@ import type { BatchPlan, ToolCall, ToolResult, PermissionSystem } from "../../sr
 import type { ToolContext } from "../../src/tools/types";
 
 const alwaysAllow: PermissionSystem = {
-  checkPermission: () => ({ allowed: true }),
+  checkPermission: async () => "approved",
 };
 
 function toolWithDelay(ms: number, output: string) {
@@ -124,12 +124,12 @@ describe("executor", () => {
     registerTool(registry, "Tool1", toolWithDelay(0, "ok"), schema, true);
 
     const deny: PermissionSystem = {
-      checkPermission: () => ({ allowed: false, reason: "blocked" }),
+      checkPermission: async () => "denied",
     };
 
     const results = await executeBatch(buildPlan(1), registry, deny);
     expect(results[0].success).toBe(false);
-    expect(results[0].error).toContain("blocked");
+    expect(results[0].error).toContain("Permission denied");
   });
 
   it("executes mixed batch: concurrent first, then serial", async () => {

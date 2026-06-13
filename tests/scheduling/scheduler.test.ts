@@ -6,7 +6,7 @@ import type { PermissionSystem, ToolCall, ToolResult } from "../../src/schedulin
 import type { ToolContext } from "../../src/tools/types";
 
 const alwaysAllow: PermissionSystem = {
-  checkPermission: () => ({ allowed: true }),
+  checkPermission: async () => "approved",
 };
 
 const schema = z.object({});
