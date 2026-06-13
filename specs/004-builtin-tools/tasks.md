@@ -141,41 +141,42 @@ Create `src/tools/web-search.ts`:
 
 ## Group 4: Tests for all tools (parallel)
 
-### T-10: Unit tests — Read
+### T-10: Unit tests — Read ✅
 | | |
 |---|---|
 | **Dependencies** | T-02 |
-Create `tests/tools/read.test.ts` — standard file, offset, missing, binary, large.
+✅ `tests/tools/read.test.ts` covers standard file, offset, missing, binary, large.
 
-### T-11: Unit tests — Grep
+### T-11: Unit tests — Grep ✅
 | | |
 |---|---|
 | **Dependencies** | T-03 |
-Create `tests/tools/grep.test.ts` — found, not found, regex error, truncation.
+✅ `tests/tools/grep.test.ts` covers found, not found, regex error, truncation.
 
-### T-12: Unit tests — Glob
+### T-12: Unit tests — Glob ✅
 | | |
 |---|---|
 | **Dependencies** | T-04 |
-Create `tests/tools/glob.test.ts` — match, empty, escape blocked, mtime sort.
+✅ `tests/tools/glob.test.ts` covers match, empty, escape blocked, mtime sort.
 
-### T-13: Unit tests — Task
+### T-13: Unit tests — Task ✅
 | | |
 |---|---|
 | **Dependencies** | T-05 |
-Create `tests/tools/task.test.ts` — CRUD, list, > 20 warning.
+✅ `tests/tools/task.test.ts` covers CRUD, list, > 20 warning.
 
-### T-14: Unit tests — Write + Edit
+### T-14: Unit tests — Write + Edit ✅
 | | |
 |---|---|
 | **Dependencies** | T-06, T-07 |
-Create `tests/tools/write.test.ts` + `tests/tools/edit.test.ts` — full coverage.
+✅ `tests/tools/write.test.ts` and `tests/tools/edit.test.ts` provide full coverage.
 
-### T-15: Unit tests — Bash + WebSearch
+### T-15: Unit tests — Bash + WebSearch ✅
 | | |
 |---|---|
 | **Dependencies** | T-08, T-09 |
-Create `tests/tools/bash.test.ts` + `tests/tools/web-search.test.ts`.
+✅ `tests/tools/bash.test.ts` and `tests/tools/web-search.test.ts` cover normal exit, non-zero exit, timeout, empty command, results returned, request failure, no API key.
+
 
 ---
 
