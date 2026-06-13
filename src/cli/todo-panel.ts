@@ -1,4 +1,5 @@
 import type { TaskItem, TerminalConfig } from "./types";
+import { stringWidth } from "./wcwidth";
 
 const BOLD = "\x1b[1m";
 const DIM = "\x1b[2m";
@@ -13,6 +14,7 @@ export function renderTodoPanel(
   if (tasks.length === 0) return;
 
   const width = config.width > 0 ? config.width : 80;
+  const PREFIX_W = 5; // "  [X] "
 
   process.stdout.write(`\n${BOLD}Tasks${RESET}\n`);
 
@@ -34,10 +36,8 @@ export function renderTodoPanel(
         break;
     }
 
-    const line = `  [${style}${icon}${RESET}] ${task.subject}`;
-    const truncated =
-      line.length > width ? line.slice(0, width - 3) + "..." : line;
-    process.stdout.write(`${truncated}\n`);
+    const subject = truncateSubject(task.subject, width - PREFIX_W);
+    process.stdout.write(`  [${style}${icon}${RESET}] ${subject}\n`);
   }
 
   if (tasks.length > 20) {
@@ -45,4 +45,17 @@ export function renderTodoPanel(
       DIM + `  ... and ${tasks.length - 20} more tasks` + RESET + "\n",
     );
   }
+}
+
+function truncateSubject(s: string, maxWidth: number): string {
+  if (stringWidth(s) <= maxWidth) return s;
+  let w = 0;
+  let idx = 0;
+  for (const cp of [...s]) {
+    const cw = stringWidth(cp);
+    if (w + cw > maxWidth - 3) break;
+    w += cw;
+    idx += cp.length;
+  }
+  return s.slice(0, idx) + "...";
 }
