@@ -96,19 +96,19 @@ Create `src/tools/write.ts`:
 - ✅ Validate content ≤ 1MB
 - ✅ Return `{ bytes_written, lines_written }`
 
-### T-07: Implement Edit tool
+### T-07: Implement Edit tool ✅
 | | |
 |---|---|
 | **Dependencies** | T-01 |
-| **Verification** | Tests pass: exact match, no match, multi-match, replace_all |
+| **Verification** | ✅ Tests pass: exact match, no match, multi-match, replace_all |
 
 Create `src/tools/edit.ts`:
-- Read current file content
-- Search for old_string exact match
-- 0 matches → error "No match found"
-- > 1 match + !replace_all → error with line numbers
-- = 1 or replace_all → replace and write
-- Return `{ replacements: [{ line_start, line_end }] }`
+- ✅ Read current file content
+- ✅ Search for old_string exact match
+- ✅ 0 matches → error "No match found"
+- ✅ > 1 match + !replace_all → error with line numbers
+- ✅ = 1 or replace_all → replace and write
+- ✅ Return `{ replacements: [{ line_start, line_end }] }`
 
 ### T-08: Implement Bash tool
 | | |
