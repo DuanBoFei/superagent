@@ -48,17 +48,17 @@ Create `src/models/retry.ts`:
 - ✅ Timeout: AbortController with configurable timeout, max 1 retry
 - ✅ Non-retryable errors: 401, 403, 400 — throw immediately
 
-### T-04: Implement fallback orchestrator
+### T-04: Implement fallback orchestrator ✅
 | | |
 |---|---|
 | **Dependencies** | T-02, T-03 |
-| **Verification** | Unit test passes |
+| **Verification** | ✅ `tests/models/fallback.test.ts` passes |
 
 Create `src/models/fallback.ts`:
-- `fallbackRequest(prompt, primaryCfg, secondaryCfg): AsyncGenerator<TokenChunk>`
-- Try primary with retry → exhaust → try secondary with retry → exhaust → throw
-- Emit model:fallback event when switching
-- Track: if primary times out 3 consecutive times in one session, skip primary for rest of session
+- ✅ `fallbackRequest(prompt, primaryCfg, secondaryCfg): AsyncGenerator<TokenChunk>`
+- ✅ Try primary with retry → exhaust → try secondary with retry → exhaust → throw
+- ✅ Emit model:fallback event when switching
+- ✅ Track: if primary times out 3 consecutive times in one session, skip primary for rest of session
 
 ---
 
