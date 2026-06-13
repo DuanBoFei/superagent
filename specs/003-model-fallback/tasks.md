@@ -142,11 +142,11 @@ Create `tests/models/smoke.test.ts` (`.skip` by default — requires real API ke
 - ✅ Verify `usage.input_tokens > 0` in final chunk
 - ✅ Verify response content is non-empty string
 
-### T-11: Update 002 stub
+### T-11: Update 002 stub ✅
 | | |
 |---|---|
 | **Dependencies** | T-05 |
-| **Verification** | 002 runtime smoke test still passes with real provider |
+| **Verification** | ✅ `tests/runtime/` passes with provider-backed runtime stub |
 
 Replace `src/runtime/stubs/model.ts` to re-export from `src/models/provider.ts`.
 

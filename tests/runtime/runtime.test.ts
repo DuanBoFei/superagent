@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { createRuntime } from "../../src/runtime/runtime";
-import { TurnEvent } from "../../src/runtime/types";
+import { TurnEvent, Token } from "../../src/runtime/types";
 
 async function collect(
   stream: AsyncGenerator<TurnEvent>,
@@ -12,9 +12,13 @@ async function collect(
   return events;
 }
 
+async function* textModel(): AsyncGenerator<Token> {
+  yield { type: "text", content: "provider response" };
+}
+
 describe("Runtime public API", () => {
-  it("startTurn yields text from stub model and completes", async () => {
-    const runtime = createRuntime();
+  it("startTurn yields text from model and completes", async () => {
+    const runtime = createRuntime({ sendMessage: textModel });
     const stream = runtime.startTurn("hello");
 
     const events = await collect(stream);
@@ -50,7 +54,7 @@ describe("Runtime public API", () => {
   });
 
   it("resumeSession loads with given sessionId and yields text", async () => {
-    const runtime = createRuntime();
+    const runtime = createRuntime({ sendMessage: textModel });
     const stream = runtime.resumeSession("test-session-id");
 
     const events = await collect(stream);
