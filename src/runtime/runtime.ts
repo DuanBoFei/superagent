@@ -4,10 +4,12 @@ import { composePrompt } from "./stubs/context";
 import { sendMessage } from "./stubs/model";
 import { checkPermission } from "./stubs/permission";
 import { saveSession, loadSession } from "./stubs/session";
+import type { LogEvent } from "../observability/types";
 
 function defaultDeps(): QueryLoopDeps {
   return {
     maxTurns: 50,
+    model: "deepseek-v4-pro",
     composePrompt,
     sendMessage,
     checkPermission,

@@ -4,6 +4,7 @@ import { ConfigError } from "./config/types";
 import { createRuntime } from "./runtime/runtime";
 import { listSessions } from "./runtime/stubs/session";
 import { startRepl } from "./cli/repl";
+import { createObservability } from "./observability/index";
 
 async function main(): Promise<void> {
   try {
@@ -25,15 +26,31 @@ async function main(): Promise<void> {
       process.exit(0);
     }
 
-    const runtime = createRuntime({ maxTurns: config.maxTurns });
+    const sessionId = process.argv.includes("--resume")
+      ? process.argv[process.argv.indexOf("--resume") + 1] ?? crypto.randomUUID()
+      : crypto.randomUUID();
 
-    const resumeSessionId = process.argv.includes("--resume")
-      ? process.argv[process.argv.indexOf("--resume") + 1] ?? null
-      : null;
+    const obs = createObservability(config, sessionId, {
+      verbose: process.argv.includes("--verbose"),
+    });
 
-    if (resumeSessionId) {
-      process.stdout.write(`SuperAgent · ${config.model} (resumed: ${resumeSessionId})\n`);
-      for await (const event of runtime.resumeSession(resumeSessionId)) {
+    obs.emit({
+      type: "session:start",
+      sessionId,
+      config: { model: config.model, maxTurns: config.maxTurns },
+    });
+
+    const runtime = createRuntime({
+      maxTurns: config.maxTurns,
+      model: config.model,
+      emit: (event) => obs.emit(event),
+    });
+
+    const isResume = process.argv.includes("--resume");
+
+    if (isResume) {
+      process.stdout.write(`SuperAgent · ${config.model} (resumed: ${sessionId})\n`);
+      for await (const event of runtime.resumeSession(sessionId)) {
         if (event.type === "text") {
           process.stdout.write(event.content);
         }
@@ -42,10 +59,14 @@ async function main(): Promise<void> {
         }
       }
       process.stdout.write("\n");
+      obs.emit({ type: "session:end", exitCode: 0 });
+      obs.close();
       process.exit(0);
     }
 
     await startRepl(runtime, config);
+    obs.emit({ type: "session:end", exitCode: 0 });
+    obs.close();
     process.exit(0);
   } catch (e) {
     if (e instanceof ConfigError) {
