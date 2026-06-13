@@ -6,6 +6,7 @@ import { LogEvent } from "./types";
 export interface Logger {
   log(event: LogEvent): void;
   close(): void;
+  getPath(): string;
 }
 
 let _warnedWriteFailure = false;
@@ -123,5 +124,9 @@ export function createLogger(
     }
   }
 
-  return { log, close };
+  function getPath(): string {
+    return currentPath;
+  }
+
+  return { log, close, getPath };
 }

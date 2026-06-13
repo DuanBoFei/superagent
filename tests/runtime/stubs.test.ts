@@ -78,6 +78,6 @@ describe("Stub modules", () => {
   });
 
   it("emit does not throw", () => {
-    expect(() => emit({ type: "text", content: "hello" })).not.toThrow();
+    expect(() => emit({ type: "turn:start", turnNumber: 1 })).not.toThrow();
   });
 });
