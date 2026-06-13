@@ -52,18 +52,18 @@ Create `src/tools/grep.ts`:
 - ✅ Truncate at 250 matches
 - ✅ Return matches with file, line_number, line_content
 
-### T-04: Implement Glob tool
+### T-04: Implement Glob tool ✅
 | | |
 |---|---|
 | **Dependencies** | T-01 |
-| **Verification** | Tests pass: matched files, empty pattern, escape attempt |
+| **Verification** | ✅ Tests pass: matched files, empty pattern, escape attempt |
 
 Create `src/tools/glob.ts`:
-- Use minimatch or fast-glob
-- Default ignore: node_modules, .git, dist, .next, build
-- Sort by mtime descending
-- Return file list (≤ 1000)
-- Block patterns that escape project root
+- ✅ Use minimatch or fast-glob
+- ✅ Default ignore: node_modules, .git, dist, .next, build
+- ✅ Sort by mtime descending
+- ✅ Return file list (≤ 1000)
+- ✅ Block patterns that escape project root
 
 ### T-05: Implement Task tool
 | | |
