@@ -1,7 +1,7 @@
 # 实施进度 · Model Fallback
 
 ## 当前任务
-[>] T12 · Re-run 002 integration tests
+（无，全部完成）
 
 ## 已完成
 - [x] T01 · Define model types + provider interface
@@ -15,6 +15,7 @@
 - [x] T09 · Integration test — provider with mock HTTP
 - [x] T10 · Smoke test — real API call (manual, skipped by default)
 - [x] T11 · Update 002 stub
+- [x] T12 · Re-run 002 integration tests
 
 ## 阻塞项
 （无）

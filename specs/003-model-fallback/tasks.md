@@ -150,11 +150,11 @@ Create `tests/models/smoke.test.ts` (`.skip` by default — requires real API ke
 
 Replace `src/runtime/stubs/model.ts` to re-export from `src/models/provider.ts`.
 
-### T-12: Re-run 002 integration tests
+### T-12: Re-run 002 integration tests ✅
 | | |
 |---|---|
 | **Dependencies** | T-11 |
-| **Verification** | `pnpm vitest run tests/runtime/` — all pass |
+| **Verification** | ✅ `tests/runtime/` and `tests/models tests/runtime` pass |
 
 Verify that the real model provider doesn't break the Core Runtime integration tests.
 
