@@ -1,7 +1,7 @@
 # 实施进度 · Built-in Tools
 
 ## 当前任务
-[>] T09 · Implement WebSearch tool
+[>] T10-T15 · Unit tests coverage reconciliation
 
 ## 已完成
 - [x] T01 · Define tool interface + types
@@ -12,6 +12,7 @@
 - [x] T06 · Implement Write tool
 - [x] T07 · Implement Edit tool
 - [x] T08 · Implement Bash tool
+- [x] T09 · Implement WebSearch tool
 
 ## 阻塞项
 （无）

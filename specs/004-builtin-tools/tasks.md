@@ -124,18 +124,18 @@ Create `src/tools/bash.ts`:
 - ✅ Return `{ stdout, stderr, exit_code, killed_by_timeout }`
 - ✅ Empty command → error
 
-### T-09: Implement WebSearch tool
+### T-09: Implement WebSearch tool ✅
 | | |
 |---|---|
 | **Dependencies** | T-01 |
-| **Verification** | Tests pass: results returned, timeout handled, no API key → empty |
+| **Verification** | ✅ Tests pass: results returned, timeout handled, no API key → empty |
 
 Create `src/tools/web-search.ts`:
-- POST to search API (configurable endpoint)
-- 30s timeout
-- Parse results → `[{ title, url, snippet }]`
-- On any error (timeout, no key, server error) → return empty with note
-- Never block or throw
+- ✅ POST to search API (configurable endpoint)
+- ✅ 30s timeout
+- ✅ Parse results → `[{ title, url, snippet }]`
+- ✅ On any error (timeout, no key, server error) → return empty with note
+- ✅ Never block or throw
 
 ---
 
