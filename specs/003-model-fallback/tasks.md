@@ -8,16 +8,16 @@
 
 ## Group 1: Foundation (serial)
 
-### T-01: Define model types
+### T-01: Define model types ✅
 | | |
 |---|---|
 | **Source** | spec §Integration Contract |
 | **Dependencies** | 001-config (types) |
-| **Verification** | `tsc --noEmit` passes |
+| **Verification** | ✅ `tsc --noEmit` passes; `tests/models/types.test.ts` passes |
 
 **What to do:**
-- Create `src/models/types.ts`
-- Define `Prompt` (system + messages), `TokenChunk` discriminated union, `ModelConfig` (apiKey, baseUrl, model, timeout), `ModelError` class with `code` field
+- ✅ Create `src/models/types.ts`
+- ✅ Define `Prompt` (system + messages), `TokenChunk` discriminated union, `ModelConfig` (apiKey, baseUrl, model, timeout), `ModelError` class with `code` field
 
 ---
 
