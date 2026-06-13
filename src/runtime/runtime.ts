@@ -3,7 +3,7 @@ import { SessionState, State, TurnEvent } from "./types";
 import { composePrompt } from "./stubs/context";
 import { sendMessage } from "./stubs/model";
 import { checkPermission } from "./stubs/permission";
-import { saveSession } from "./stubs/session";
+import { saveSession, loadSession } from "./stubs/session";
 
 function defaultDeps(): QueryLoopDeps {
   return {
@@ -12,6 +12,7 @@ function defaultDeps(): QueryLoopDeps {
     sendMessage,
     checkPermission,
     saveSession,
+    loadSession,
   };
 }
 
@@ -59,12 +60,21 @@ export function createRuntime(deps?: Partial<QueryLoopDeps>): RuntimeHandle {
     },
 
     async *resumeSession(sessionId: string) {
-      session = createFreshSession({
-        sessionId,
-        messages: [
-          { role: "system", content: "Continue where you left off." },
-        ],
-      });
+      const loaded = resolvedDeps.loadSession?.(sessionId);
+      if (loaded) {
+        session = loaded;
+        session.messages.push({
+          role: "system",
+          content: "Continue where you left off.",
+        });
+      } else {
+        session = createFreshSession({
+          sessionId,
+          messages: [
+            { role: "system", content: "Continue where you left off." },
+          ],
+        });
+      }
 
       yield* createQueryLoop(session, resolvedDeps);
     },

@@ -2,6 +2,7 @@
 import { getConfig } from "./config/config";
 import { ConfigError } from "./config/types";
 import { createRuntime } from "./runtime/runtime";
+import { listSessions } from "./runtime/stubs/session";
 import { startRepl } from "./cli/repl";
 
 async function main(): Promise<void> {
@@ -12,10 +13,22 @@ async function main(): Promise<void> {
       process.stderr.write(`[WARN] ${w}\n`);
     }
 
+    if (process.argv.includes("--list")) {
+      const sessions = listSessions();
+      if (sessions.length === 0) {
+        process.stdout.write("No saved sessions.\n");
+      } else {
+        for (const s of sessions) {
+          process.stdout.write(`${s.id}\t${s.date}\t${s.turns} turns\t${s.firstMessage}\n`);
+        }
+      }
+      process.exit(0);
+    }
+
     const runtime = createRuntime({ maxTurns: config.maxTurns });
 
     const resumeSessionId = process.argv.includes("--resume")
-      ? process.argv[process.argv.indexOf("--resume") + 1] ?? "default-session"
+      ? process.argv[process.argv.indexOf("--resume") + 1] ?? null
       : null;
 
     if (resumeSessionId) {

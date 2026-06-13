@@ -20,6 +20,7 @@ export interface QueryLoopDeps {
     args: Record<string, unknown>,
   ) => PermissionResult;
   saveSession: (state: SessionState) => void;
+  loadSession?: (id: string) => SessionState | null;
 }
 
 export async function* createQueryLoop(
