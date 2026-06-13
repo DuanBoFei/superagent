@@ -24,19 +24,19 @@
 
 ## Group 2: Read-only tools (parallel — depend on T-01)
 
-### T-02: Implement Read tool
+### T-02: Implement Read tool ✅
 | | |
 |---|---|
 | **Dependencies** | T-01 |
-| **Verification** | Tests pass: normal, offset/limit, missing file, binary, large file |
+| **Verification** | ✅ Tests pass: normal, offset/limit, missing file, binary, large file |
 
 Create `src/tools/read.ts`:
-- Resolve path relative to workingDirectory
-- Validate path is within project (no `../` escape)
-- Detect binary (null bytes in first 1KB)
-- Apply offset/limit
-- Format output: line-numbered text
-- > 1MB → first 2000 lines + size warning
+- ✅ Resolve path relative to workingDirectory
+- ✅ Validate path is within project (no `../` escape)
+- ✅ Detect binary (null bytes in first 1KB)
+- ✅ Apply offset/limit
+- ✅ Format output: line-numbered text
+- ✅ > 1MB → first 2000 lines + size warning
 
 ### T-03: Implement Grep tool
 | | |
