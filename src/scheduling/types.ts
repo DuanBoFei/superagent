@@ -16,3 +16,10 @@ export interface BatchPlan {
   concurrent: ToolCall[];
   serial: ToolCall[];
 }
+
+export interface PermissionSystem {
+  checkPermission(
+    toolName: string,
+    args: Record<string, unknown>,
+  ): { allowed: boolean; reason?: string };
+}

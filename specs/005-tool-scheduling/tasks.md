@@ -37,7 +37,7 @@
 - false → serial group (preserve declaration order within group)
 - Unknown tool → serial group (safer default)
 
-### T-03: Implement executor
+### T-03: Implement executor ✅
 | | |
 |---|---|
 | **Dependencies** | T-02, 006-permission-system (stub) |
@@ -77,7 +77,7 @@ Create `src/scheduling/scheduler.ts`:
 - Empty → empty both groups
 - Unknown tool → serial group
 
-### T-06: Unit tests — executor
+### T-06: Unit tests — executor ✅
 | | |
 |---|---|
 | **Dependencies** | T-03 |
