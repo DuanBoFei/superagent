@@ -1,7 +1,7 @@
 # 实施进度 · CLI REPL
 
 ## 当前任务
-[>] T08 · Implement input handler
+[>] T10 · Unit tests — text renderer
 
 ## 已完成
 - [x] T01 · Define CLI types + renderer dispatch
@@ -11,6 +11,8 @@
 - [x] T05 · Implement permission prompt
 - [x] T06 · Implement todo panel
 - [x] T07 · Implement summary line
+- [x] T08 · Implement input handler
+- [x] T09 · Implement REPL main loop
 
 ## 阻塞项
 （无）
