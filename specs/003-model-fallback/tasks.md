@@ -76,55 +76,55 @@ Create `src/models/provider.ts`:
 - ✅ Delegates to fallback orchestrator
 - Replaces stub at `src/runtime/stubs/model.ts`
 
-### T-06: Unit tests — SSE parser
+### T-06: Unit tests — SSE parser ✅
 | | |
 |---|---|
 | **Dependencies** | T-02 |
-| **Verification** | All assertions pass |
+| **Verification** | ✅ All assertions pass |
 
 Create `tests/models/client.test.ts`:
-- Normal text delta → yields text chunks
-- Tool call delta → yields tool_use chunk
-- Final chunk with `[DONE]` → yields end chunk with usage
-- Partial chunk (split across reads) → correctly reassembles
-- Malformed JSON line → skips line, continues
+- ✅ Normal text delta → yields text chunks
+- ✅ Tool call delta → yields tool_use chunk
+- ✅ Final chunk with `[DONE]` → yields end chunk with usage
+- ✅ Partial chunk (split across reads) → correctly reassembles
+- ✅ Malformed JSON line → skips line, continues
 
-### T-07: Unit tests — retry logic
+### T-07: Unit tests — retry logic ✅
 | | |
 |---|---|
 | **Dependencies** | T-03 |
-| **Verification** | All assertions pass |
+| **Verification** | ✅ All assertions pass |
 
 Create `tests/models/retry.test.ts`:
-- Function succeeds first try → no retry, result returned
-- Fails with 503 → waits 2s, retries once, succeeds
-- Fails with 429 → reads Retry-After, waits, retries
-- Exhausts retries → throws with all errors collected
-- 401 → throws immediately (no retry)
+- ✅ Function succeeds first try → no retry, result returned
+- ✅ Fails with 503 → waits 2s, retries once, succeeds
+- ✅ Fails with 429 → reads Retry-After, waits, retries
+- ✅ Exhausts retries → throws with all errors collected
+- ✅ 401 → throws immediately (no retry)
 
-### T-08: Unit tests — fallback
+### T-08: Unit tests — fallback ✅
 | | |
 |---|---|
 | **Dependencies** | T-04 |
-| **Verification** | All assertions pass |
+| **Verification** | ✅ All assertions pass |
 
 Create `tests/models/fallback.test.ts`:
-- Primary succeeds → uses primary only
-- Primary 503 → retry → still 503 → fallback to secondary → success
-- Both fail → throws ModelError with both errors
-- Primary timeout 3 consecutive → skips primary for session
-- model:fallback event emitted on switch
+- ✅ Primary succeeds → uses primary only
+- ✅ Primary 503 → retry → still 503 → fallback to secondary → success
+- ✅ Both fail → throws ModelError with both errors
+- ✅ Primary timeout 3 consecutive → skips primary for session
+- ✅ model:fallback event emitted on switch
 
-### T-09: Integration test — provider with mock HTTP
+### T-09: Integration test — provider with mock HTTP ✅
 | | |
 |---|---|
 | **Dependencies** | T-05 |
-| **Verification** | All assertions pass |
+| **Verification** | ✅ All assertions pass |
 
 Create `tests/models/provider.test.ts`:
-- Mock fetch to return valid SSE stream
-- `sendMessage({...})` yields expected TokenChunks
-- Real end-to-end: sendMessage → tokens → text content extracted
+- ✅ Mock fetch to return valid SSE stream
+- ✅ `sendMessage({...})` yields expected TokenChunks
+- ✅ Real end-to-end: sendMessage → tokens → text content extracted
 
 ---
 
