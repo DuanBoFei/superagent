@@ -1,7 +1,7 @@
 # 实施进度 · Observability
 
 ## 当前任务
-[>] T10 · Integration test — full pipeline
+✅ All tasks complete
 
 ## 已完成
 
@@ -16,6 +16,9 @@
 | T-07 | Unit tests — logger | ✅ (TDD in T02) |
 | T-08 | Unit tests — cost tracker | ✅ (TDD in T03) |
 | T-09 | Unit tests — stats collector | ✅ (TDD in T04) |
+| T-10 | Integration test — full pipeline | ✅ |
+| T-11 | Wire to 002 runtime | ✅ |
+| T-12 | Add --verbose flag to CLI | ✅ |
 
 ## 阻塞项
 （无）
