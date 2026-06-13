@@ -23,17 +23,17 @@
 
 ## Group 2: Core modules (parallel — depend on T-01)
 
-### T-02: Implement SSE stream parser
+### T-02: Implement SSE stream parser ✅
 | | |
 |---|---|
 | **Dependencies** | T-01 |
-| **Verification** | Unit test passes |
+| **Verification** | ✅ `tests/models/client.test.ts` passes |
 
 Create `src/models/client.ts` with:
-- `parseSSEStream(response: Response): AsyncGenerator<TokenChunk>`
-- Handles: `data: {...}`, `data: [DONE]`, empty lines, chunked reads
-- Extracts `delta.content`, `delta.tool_calls`, `usage` from OpenAI-compatible format
-- Yields TokenChunk for text, tool_use, and end (with usage)
+- ✅ `parseSSEStream(response: Response): AsyncGenerator<TokenChunk>`
+- ✅ Handles: `data: {...}`, `data: [DONE]`, empty lines, chunked reads
+- ✅ Extracts `delta.content`, `delta.tool_calls`, `usage` from OpenAI-compatible format
+- ✅ Yields TokenChunk for text, tool_use, and end (with usage)
 
 ### T-03: Implement retry logic
 | | |
