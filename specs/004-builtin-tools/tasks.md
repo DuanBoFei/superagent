@@ -38,19 +38,19 @@ Create `src/tools/read.ts`:
 - ✅ Format output: line-numbered text
 - ✅ > 1MB → first 2000 lines + size warning
 
-### T-03: Implement Grep tool
+### T-03: Implement Grep tool ✅
 | | |
 |---|---|
 | **Dependencies** | T-01 |
-| **Verification** | Tests pass: found, not found, invalid regex, > 250 matches truncated |
+| **Verification** | ✅ Tests pass: found, not found, invalid regex, > 250 matches truncated |
 
 Create `src/tools/grep.ts`:
-- Validate regex (try new RegExp)
-- Walk directory recursively (skip node_modules, .git, dist)
-- Filter by glob pattern if provided
-- Read each file line-by-line
-- Truncate at 250 matches
-- Return matches with file, line_number, line_content
+- ✅ Validate regex (try new RegExp)
+- ✅ Walk directory recursively (skip node_modules, .git, dist)
+- ✅ Filter by glob pattern if provided
+- ✅ Read each file line-by-line
+- ✅ Truncate at 250 matches
+- ✅ Return matches with file, line_number, line_content
 
 ### T-04: Implement Glob tool
 | | |
