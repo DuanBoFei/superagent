@@ -3,7 +3,7 @@ import { createSessionManager, SessionCorruptedError } from "../../src/persisten
 import type { SessionManager } from "../../src/persistence/session-manager";
 import type { SessionState } from "../../src/runtime/types";
 import { State } from "../../src/runtime/types";
-import { unlinkSync } from "fs";
+import { unlinkSync, writeFileSync } from "fs";
 import { tmpdir } from "os";
 import { join } from "path";
 
@@ -110,5 +110,16 @@ describe("session-manager", () => {
     const list = mgr.list();
     const entry = list.find((s) => s.id === "msg-test");
     expect(entry!.firstMessage).toBe("help me refactor");
+  });
+
+  it("returns error result for invalid DB path", () => {
+    const path = join(tmpdir(), `existing-file-${Date.now()}-${Math.random().toString(36).slice(2)}.tmp`);
+    writeFileSync(path, "block");
+    try {
+      const invalidPath = join(path, "sub", "sessions.db");
+      expect(() => createSessionManager(invalidPath)).toThrow();
+    } finally {
+      try { unlinkSync(path); } catch { /* ok */ }
+    }
   });
 });

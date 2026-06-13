@@ -63,6 +63,7 @@ export function createRuntime(deps?: Partial<QueryLoopDeps>): RuntimeHandle {
       const loaded = resolvedDeps.loadSession?.(sessionId);
       if (loaded) {
         session = loaded;
+        session.interruptFlag = false;
         session.messages.push({
           role: "system",
           content: "Continue where you left off.",
