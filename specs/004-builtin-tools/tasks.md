@@ -182,17 +182,17 @@ Create `src/tools/web-search.ts`:
 
 ## Group 5: Integration
 
-### T-16: Register all tools + registry integration test
+### T-16: Register all tools + registry integration test ✅
 | | |
 |---|---|
 | **Dependencies** | T-02 through T-09 |
-| **Verification** | All 8 tools pass integration test: register → get → execute → result |
+| **Verification** | ✅ All 8 tools pass integration test: register → get → execute → result |
 
-Create `src/tools/index.ts`:
-- `registerAllTools()` — calls `registerTool()` for all 8
-- Update 002 stub: `src/runtime/stubs/tools.ts` now imports from `src/tools/index.ts`
+✅ `src/tools/index.ts`:
+- ✅ `registerAllTools()` — calls `registerTool()` for all 8
+- ✅ Updated `src/runtime/stubs/tools.ts` now imports from `src/tools/index.ts`
 
-Create `tests/tools/registry.test.ts`:
-- Register all tools → count = 8
-- Each tool returns valid ToolResult (no throws)
-- Concurrency flags correct: Read/Grep/Glob/Task/WebSearch = safe; Write/Edit/Bash = unsafe
+✅ `tests/tools/registry.test.ts`:
+- ✅ Register all tools → count = 8
+- ✅ Each tool returns valid ToolResult (no throws)
+- ✅ Concurrency flags correct: Read/Grep/Glob/Task/WebSearch = safe; Write/Edit/Bash = unsafe

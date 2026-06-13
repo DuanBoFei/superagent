@@ -49,13 +49,14 @@ describe("Stub modules", () => {
     expect(value).toEqual({ type: "text", content: "provider response" });
   });
 
-  it("dispatchTools returns stub results for each call", async () => {
+  it("dispatchTools returns real tool results for each call", async () => {
     const results = await dispatchTools([
       { name: "Read", args: { file_path: "/f.ts" } },
     ]);
     expect(results).toHaveLength(1);
-    expect(results[0]!.success).toBe(true);
-    expect(results[0]!.output).toContain("[STUB]");
+    expect(results[0]!.success).toBe(false);
+    expect(results[0]!.output).toBe("");
+    expect(results[0]!.error).toBeDefined();
   });
 
   it("checkPermission returns allowed by default", () => {

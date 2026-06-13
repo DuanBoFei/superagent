@@ -1,7 +1,10 @@
 # 实施进度 · Built-in Tools
 
+## 状态
+✅ 已完成
+
 ## 当前任务
-[>] T16 · Register all tools + registry integration test
+（无，全部完成）
 
 ## 已完成
 - [x] T01 · Define tool interface + types
@@ -14,9 +17,9 @@
 - [x] T08 · Implement Bash tool
 - [x] T09 · Implement WebSearch tool
 - [x] T10-T15 · Unit tests coverage reconciliation
+- [x] T16 · Register all tools + registry integration test
 
-## 阻塞项
-（无）
-
-## 最后更新
-2026-06-12
+## 验证
+- [x] `tests/tools/` · 47 passed (9 files)
+- [x] `tests/` · 177 passed, 1 skipped (33 files)
+- [x] `tsc --noEmit` · passed
