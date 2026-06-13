@@ -1,5 +1,8 @@
 # 实施进度 · Model Fallback
 
+## 状态
+✅ 已完成
+
 ## 当前任务
 （无，全部完成）
 
@@ -16,6 +19,11 @@
 - [x] T10 · Smoke test — real API call (manual, skipped by default)
 - [x] T11 · Update 002 stub
 - [x] T12 · Re-run 002 integration tests
+
+## 验证
+- [x] `tests/runtime/` · 51 passed
+- [x] `tests/models tests/runtime` · 69 passed, 1 skipped
+- [x] `tsc --noEmit` · passed
 
 ## 阻塞项
 （无）
