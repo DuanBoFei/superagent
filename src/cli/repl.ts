@@ -17,6 +17,11 @@ export async function startRepl(
 
   // Startup header
   process.stdout.write(`\nSuperAgent · ${config.model} · ${process.cwd()}\n`);
+
+  if (!process.stdin.isTTY) {
+    return;
+  }
+
   process.stdout.write('Type a message or /help\n\n');
 
   const prompt = createPrompt();

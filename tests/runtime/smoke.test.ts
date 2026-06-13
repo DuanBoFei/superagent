@@ -29,18 +29,18 @@ function run(args: string[] = []): { stdout: string; exitCode: number } {
 }
 
 describe("End-to-end smoke test", () => {
-  it("default run prints SuperAgent ready and exits 0", () => {
+  it("default run prints SuperAgent and exits 0", () => {
     const { stdout, exitCode } = run();
 
     expect(exitCode).toBe(0);
-    expect(stdout).toContain("SuperAgent ready");
+    expect(stdout).toContain("SuperAgent");
   });
 
   it("--resume flag loads stub session without crash", () => {
     const { stdout, exitCode } = run(["--resume", "test-id"]);
 
     expect(exitCode).toBe(0);
-    expect(stdout).toContain("SuperAgent ready");
+    expect(stdout).toContain("SuperAgent");
     expect(stdout).toContain("resumed: test-id");
   });
 });

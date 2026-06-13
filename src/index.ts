@@ -2,6 +2,7 @@
 import { getConfig } from "./config/config";
 import { ConfigError } from "./config/types";
 import { createRuntime } from "./runtime/runtime";
+import { startRepl } from "./cli/repl";
 
 async function main(): Promise<void> {
   try {
@@ -18,25 +19,20 @@ async function main(): Promise<void> {
       : null;
 
     if (resumeSessionId) {
-      process.stdout.write(`SuperAgent ready (resumed: ${resumeSessionId})\n`);
-      const stream = runtime.resumeSession(resumeSessionId);
-      for await (const event of stream) {
+      process.stdout.write(`SuperAgent · ${config.model} (resumed: ${resumeSessionId})\n`);
+      for await (const event of runtime.resumeSession(resumeSessionId)) {
         if (event.type === "text") {
           process.stdout.write(event.content);
         }
-      }
-    } else {
-      process.stdout.write("SuperAgent ready\n");
-      // Hardcoded message for MVP wiring — replaced by REPL in 008-cli-repl
-      const stream = runtime.startTurn("Hello");
-      for await (const event of stream) {
-        if (event.type === "text") {
-          process.stdout.write(event.content);
+        if (event.type === "error") {
+          process.stderr.write(`✗ ${event.message}\n`);
         }
       }
+      process.stdout.write("\n");
+      process.exit(0);
     }
 
-    process.stdout.write("\n");
+    await startRepl(runtime, config);
     process.exit(0);
   } catch (e) {
     if (e instanceof ConfigError) {

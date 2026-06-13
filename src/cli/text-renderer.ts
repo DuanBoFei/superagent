@@ -45,5 +45,18 @@ function flushWord(
     col = 2;
   }
 
-  process.stdout.write(word);
+  // Split long words that exceed terminal width
+  let remaining = word;
+  while (remaining.length > 0) {
+    const available = width - col;
+    if (available <= 0) {
+      process.stdout.write("\n  ");
+      col = 2;
+    }
+    const chunkLen = Math.min(remaining.length, col === 2 ? width - 2 : width - col);
+    const chunk = remaining.slice(0, chunkLen);
+    process.stdout.write(chunk);
+    remaining = remaining.slice(chunkLen);
+    col += chunk.length;
+  }
 }
