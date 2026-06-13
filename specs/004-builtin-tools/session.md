@@ -1,13 +1,24 @@
-# 会话交接 · Built-in Tools
+# Session · 004 Built-in Tools
 
-## 上次做到哪
-新建 state.md，尚未开始实施。
+## 状态
+✅ 已完成
 
-## 下次会话要做的事
-1. 先读宪法（constitution.md）
-2. 读 state.md → 当前任务是 T01
-3. 从 T01 继续，禁止重新规划
+## 范围
+- T01: 定义 tool 接口 + 注册表类型
+- T02-T09: 实现 8 个内置工具（Read/Write/Edit/Bash/Grep/Glob/Task/WebSearch）
+- T10-T15: 单元测试覆盖对接
+- T16: 全工具注册 + runtime stub 集成
 
-## 禁止重新规划
-plan.md 已经定稿，tasks.md 已经锁定。
-直接执行，不要再 re-plan。
+## 验证
+- `tests/tools/` · 47 passed (9 files)
+- `tests/` · 177 passed, 1 skipped (33 files)
+- `tsc --noEmit` · passed
+
+## 提交
+共 9 个 commit（1ff714d → 61ebb69），无未提交变更。
+
+## 部署
+本地 merge。Tag: `v0.1.0-004-builtin-tools`。
+
+## Spec 冻结
+本 spec 目录冻结，需求变更开新编号。
