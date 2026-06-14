@@ -32,6 +32,14 @@ export function listTools(registry: ToolRegistry): RegisteredTool[] {
   return Array.from(registry.values());
 }
 
+export function clearMcpTools(registry: ToolRegistry): void {
+  for (const name of registry.keys()) {
+    if (name.startsWith("mcp__")) {
+      registry.delete(name);
+    }
+  }
+}
+
 export function registerMcpTools(registry: ToolRegistry, manager: McpManager): void {
   const tools = manager
     .listTools()

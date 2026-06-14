@@ -3,7 +3,7 @@ import { createChecker } from "../permissions/checker";
 import type { PromptFn } from "../permissions/types";
 import { permissionSystem } from "./stubs/permission";
 import { createToolDispatcher } from "./tool-dispatcher";
-import { createToolRegistry, registerMcpTools } from "../tools/registry";
+import { createToolRegistry, clearMcpTools, registerMcpTools } from "../tools/registry";
 import { registerAllTools } from "../tools/index";
 import { defaults } from "../config/defaults";
 import type { Config } from "../config/types";
@@ -81,6 +81,21 @@ export function createRuntime(options: RuntimeOptions = {}): RuntimeHandle {
     mcpConnected = true;
   }
 
+  async function refreshMcpTools(): Promise<void> {
+    for (const mcpSession of mcpManager.getSessions()) {
+      if (mcpSession.state !== "disabled") {
+        try {
+          await mcpManager.refreshTools(mcpSession.serverName);
+        } catch {
+          // Keep built-in tools available when one MCP server refresh fails.
+        }
+      }
+    }
+
+    clearMcpTools(registry);
+    registerMcpTools(registry, mcpManager);
+  }
+
   return {
     getSession() {
       return session;
@@ -88,6 +103,7 @@ export function createRuntime(options: RuntimeOptions = {}): RuntimeHandle {
 
     async *startTurn(userMessage: string) {
       await ensureMcpConnected();
+      await refreshMcpTools();
       session.messages.push({ role: "user", content: userMessage });
 
       const sigintHandler = () => {
@@ -104,6 +120,7 @@ export function createRuntime(options: RuntimeOptions = {}): RuntimeHandle {
 
     async *resumeSession(sessionId: string) {
       await ensureMcpConnected();
+      await refreshMcpTools();
       const loaded = resolvedDeps.loadSession?.(sessionId);
       if (loaded) {
         session = loaded;

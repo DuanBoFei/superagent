@@ -254,7 +254,7 @@ Tool availability changes between turns and MCP lifecycle/tool events are visibl
 
 A fake server changing its tool list between turns is reflected on the next turn, and connection/tool-call events appear in structured logs with redacted details.
 
-- [ ] T013 [INT] [US4] Add between-turn MCP tool refresh in src/runtime/query-loop.ts
+- [x] T013 [INT] [US4] Add between-turn MCP tool refresh in src/runtime/query-loop.ts
 
 | | |
 |---|---|
