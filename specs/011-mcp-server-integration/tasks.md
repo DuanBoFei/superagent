@@ -117,7 +117,7 @@ A developer can configure local and remote MCP servers and have SuperAgent conne
 
 A fake stdio server and a fake HTTP transport can be configured; enabled servers connect, disabled servers remain disabled, and broken servers are marked failed without crashing startup.
 
-- [ ] T006 [BE] [US1] Implement mcpServers config schema and defaults in src/config/types.ts, src/config/defaults.ts, and src/config/validator.ts
+- [x] T006 [BE] [US1] Implement mcpServers config schema and defaults in src/config/types.ts, src/config/defaults.ts, and src/config/validator.ts
 
 | | |
 |---|---|
