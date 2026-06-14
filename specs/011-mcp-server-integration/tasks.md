@@ -90,7 +90,7 @@ Cover:
 - explicit ask returns ask
 - no matching MCP rule defaults to ask
 
-- [ ] T005 [P] [BE] Add MCP safe error and redaction tests in tests/mcp/errors.test.ts and src/mcp/errors.ts
+- [x] T005 [P] [BE] Add MCP safe error and redaction tests in tests/mcp/errors.test.ts and src/mcp/errors.ts
 
 | | |
 |---|---|
