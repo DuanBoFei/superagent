@@ -142,7 +142,7 @@ Add `mcpServers` to layered config with default `{}` and validation for:
 
 Integrate MCP permission keys into the existing permission pipeline without changing built-in tool behavior.
 
-- [ ] T008 [BE] [US1] Implement MCP transport builders in src/mcp/transports.ts
+- [x] T008 [BE] [US1] Implement MCP transport builders in src/mcp/transports.ts
 
 | | |
 |---|---|
