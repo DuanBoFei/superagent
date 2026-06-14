@@ -58,7 +58,7 @@ Define typed shapes for:
 - `McpToolCall`
 - normalized safe error/result shapes
 
-- [ ] T003 [P] [BE] Add MCP tool identity tests and helpers in tests/mcp/tool-names.test.ts and src/mcp/tool-names.ts
+- [x] T003 [P] [BE] Add MCP tool identity tests and helpers in tests/mcp/tool-names.test.ts and src/mcp/tool-names.ts
 
 | | |
 |---|---|
