@@ -43,7 +43,7 @@ Create failing tests for:
 
 Define typed MCP domain boundaries and red tests for identity, permission, and safe errors before runtime implementation.
 
-- [ ] T002 [P] [BE] Define MCP domain types in src/mcp/types.ts and tests/mcp/types.test.ts
+- [x] T002 [P] [BE] Define MCP domain types in src/mcp/types.ts and tests/mcp/types.test.ts
 
 | | |
 |---|---|

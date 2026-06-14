@@ -64,7 +64,7 @@ async function executeOne(
   }
 
   const perm = await permission.checkPermission(call.name, call.args);
-  if (perm !== "approved") {
+  if (perm !== "approved" && perm !== "always") {
     return {
       id: call.id,
       name: call.name,

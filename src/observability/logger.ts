@@ -117,7 +117,9 @@ export function createLogger(
   function close(): void {
     if (destination) {
       try {
-        destination.end();
+        if ("end" in destination && typeof destination.end === "function") {
+          destination.end();
+        }
       } catch {
         // ignore close errors
       }
