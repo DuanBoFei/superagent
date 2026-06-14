@@ -156,7 +156,7 @@ Build transport construction for:
 - safe validation errors from malformed configs
 - redacted diagnostic summaries
 
-- [ ] T009 [BE] [US1] Implement MCP manager connection lifecycle in src/mcp/manager.ts and src/mcp/index.ts
+- [x] T009 [BE] [US1] Implement MCP manager connection lifecycle in src/mcp/manager.ts and src/mcp/index.ts
 
 | | |
 |---|---|
