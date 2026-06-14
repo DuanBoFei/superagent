@@ -18,6 +18,7 @@ export type ToolFunction = (
 
 export interface RegisteredTool {
   name: string;
+  description?: string;
   fn: ToolFunction;
   schema: z.ZodSchema;
   concurrencySafe: boolean;

@@ -185,7 +185,7 @@ Connected server tools become SuperAgent-callable tools with stable, server-qual
 
 A fake connected server exposing two tools produces deterministic SuperAgent tool definitions named `mcp__server__tool`, with description and input schema preserved.
 
-- [ ] T010 [BE] [US2] Implement MCP tool adapter in src/mcp/tool-adapter.ts
+- [x] T010 [BE] [US2] Implement MCP tool adapter in src/mcp/tool-adapter.ts
 
 | | |
 |---|---|
