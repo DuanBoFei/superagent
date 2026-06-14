@@ -8,7 +8,7 @@ import {
   TurnEvent,
 } from "./types";
 import { parseStream } from "./stream-handler";
-import { dispatchTools } from "./tool-dispatcher";
+import { dispatchTools as defaultDispatchTools } from "./tool-dispatcher";
 import { transition } from "./state-machine";
 import type { LogEvent } from "../observability/types";
 
@@ -23,6 +23,7 @@ export interface QueryLoopDeps {
   ) => PermissionResult;
   saveSession: (state: SessionState) => void;
   loadSession?: (id: string) => SessionState | null;
+  dispatchTools?: (calls: Array<{ name: string; args: Record<string, unknown> }>) => Promise<Array<{ name: string; success: boolean; output: string; error?: string }>>;
   emit?: (event: LogEvent) => void;
 }
 
@@ -105,7 +106,7 @@ export async function* createQueryLoop(
           });
 
           const toolStart = Date.now();
-          const results = await dispatchTools([
+          const results = await (deps.dispatchTools ?? defaultDispatchTools)([
             { name: event.name, args: event.args },
           ]);
           for (const result of results) {

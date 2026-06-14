@@ -226,7 +226,7 @@ Agent-requested MCP tool calls execute through the same permission and dispatch 
 
 An available fake MCP tool defaults to ask, can be explicitly allowed, and is denied when a deny rule also matches.
 
-- [ ] T012 [INT] [US3] Wire MCP manager into runtime startup and tool dispatch in src/runtime/runtime.ts and src/runtime/tool-dispatcher.ts
+- [x] T012 [INT] [US3] Wire MCP manager into runtime startup and tool dispatch in src/runtime/runtime.ts and src/runtime/tool-dispatcher.ts
 
 | | |
 |---|---|
