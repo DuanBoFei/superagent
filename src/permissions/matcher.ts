@@ -3,6 +3,12 @@ export function matchPattern(
   args: Record<string, unknown>,
   pattern: string,
 ): boolean {
+  if (!pattern) return false;
+
+  if (pattern.startsWith("mcp__")) {
+    return wildcardMatch(toolName, pattern);
+  }
+
   if (!pattern.includes(":")) return false;
 
   const colonIdx = pattern.indexOf(":");
@@ -12,11 +18,12 @@ export function matchPattern(
   if (patternTool !== toolName && patternTool !== "*") return false;
 
   const argsStr = Object.values(args).join(" ");
-
-  // Escape regex special chars, then replace * with .*
-  const escaped = patternArgs.replace(/[.+^${}()|[\]\\]/g, "\\$&");
-  const regexStr = escaped.replace(/\*/g, ".*");
-  const regex = new RegExp(`^${regexStr}$`);
-
-  return regex.test(argsStr);
+  return wildcardMatch(argsStr, patternArgs);
 }
+
+function wildcardMatch(value: string, pattern: string): boolean {
+  const escaped = pattern.replace(/[.+^${}()|[\]\\]/g, "\\$&");
+  const regexStr = escaped.replace(/\*/g, ".*");
+  return new RegExp(`^${regexStr}$`).test(value);
+}
+

@@ -73,7 +73,7 @@ Test and implement:
 - parsing generated keys back to server/tool parts
 - no collision with built-in tool names because of `mcp__` prefix
 
-- [ ] T004 [P] [BE] Add MCP permission matching tests in tests/mcp/permissions.test.ts
+- [x] T004 [P] [BE] Add MCP permission matching tests in tests/mcp/permissions.test.ts
 
 | | |
 |---|---|
@@ -132,7 +132,7 @@ Add `mcpServers` to layered config with default `{}` and validation for:
 - http requiring `url`
 - unknown transport rejected
 
-- [ ] T007 [BE] [US1] Implement MCP permission matcher integration in src/permissions/matcher.ts and src/permissions/checker.ts
+- [x] T007 [BE] [US1] Implement MCP permission matcher integration in src/permissions/matcher.ts and src/permissions/checker.ts
 
 | | |
 |---|---|
