@@ -1,4 +1,6 @@
 import type { z } from "zod";
+import type { McpManager } from "../mcp/manager";
+import { adaptMcpTool } from "../mcp/tool-adapter";
 import type {
   RegisteredTool,
   ToolFunction,
@@ -28,6 +30,18 @@ export function getTool(
 
 export function listTools(registry: ToolRegistry): RegisteredTool[] {
   return Array.from(registry.values());
+}
+
+export function registerMcpTools(registry: ToolRegistry, manager: McpManager): void {
+  const tools = manager
+    .listTools()
+    .filter((tool) => tool.isAvailable)
+    .sort((left, right) => left.permissionKey.localeCompare(right.permissionKey));
+
+  for (const tool of tools) {
+    const registered = adaptMcpTool(tool, manager);
+    registry.set(registered.name, registered);
+  }
 }
 
 export function isConcurrencySafe(

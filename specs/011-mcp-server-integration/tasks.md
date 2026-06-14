@@ -200,7 +200,7 @@ Convert MCP tool definitions into existing SuperAgent tool shape:
 - execution delegates to `McpManager.callTool`
 - malformed/failed results normalize to safe tool results
 
-- [ ] T011 [INT] [US2] Extend tool registry for deterministic built-in plus MCP tools in src/tools/registry.ts
+- [x] T011 [INT] [US2] Extend tool registry for deterministic built-in plus MCP tools in src/tools/registry.ts
 
 | | |
 |---|---|
