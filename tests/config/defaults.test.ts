@@ -56,6 +56,7 @@ describe("defaults", () => {
       "fallbackBaseUrl",
       "permissions",
       "rulesFile",
+      "mcpServers",
     ];
     const actualKeys = Object.keys(defaults) as (keyof Config)[];
     for (const key of actualKeys) {

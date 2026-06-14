@@ -7,6 +7,7 @@ exports[`Config schema contract > field type map matches snapshot 1`] = `
   "fallbackBaseUrl": "string",
   "fallbackModel": "string",
   "maxTurns": "number",
+  "mcpServers": "default",
   "model": "string",
   "permissions": "object",
   "permissions.askTimeout": "number",

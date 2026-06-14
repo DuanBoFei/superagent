@@ -18,4 +18,5 @@ export const defaults: Config = {
     askTimeout: 30,
   },
   rulesFile: "CLAUDE.md",
+  mcpServers: {},
 };

@@ -20,7 +20,7 @@ function schemaShape(): Record<string, string> {
 }
 
 describe("Config schema contract", () => {
-  it("has all 8 required top-level fields", () => {
+  it("has all 9 required top-level fields", () => {
     const shape = schemaShape();
     expect(Object.keys(shape).sort()).toEqual([
       "apiKey",
@@ -28,6 +28,7 @@ describe("Config schema contract", () => {
       "fallbackBaseUrl",
       "fallbackModel",
       "maxTurns",
+      "mcpServers",
       "model",
       "permissions",
       "permissions.askTimeout",

@@ -1,3 +1,20 @@
+export type McpServerConfig = McpStdioServerConfig | McpHttpServerConfig;
+
+export interface McpStdioServerConfig {
+  enabled: boolean;
+  transport: "stdio";
+  command: string;
+  args: string[];
+  env: Record<string, string>;
+}
+
+export interface McpHttpServerConfig {
+  enabled: boolean;
+  transport: "http";
+  url: string;
+  headers: Record<string, string>;
+}
+
 export interface Config {
   apiKey: string;
   model: string;
@@ -11,6 +28,7 @@ export interface Config {
     askTimeout: number;
   };
   rulesFile: string;
+  mcpServers: Record<string, McpServerConfig>;
 }
 
 export interface ConfigLoadResult {

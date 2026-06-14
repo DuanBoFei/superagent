@@ -9,6 +9,30 @@ export const permissionsSchema = z.object({
   askTimeout: z.number().int().min(5).max(300),
 });
 
+const safeRecordSchema = z.record(z.string(), z.string()).default({});
+
+const mcpStdioServerSchema = z.object({
+  enabled: z.boolean().default(true),
+  transport: z.literal("stdio"),
+  command: z.string().min(1),
+  args: z.array(z.string()).default([]),
+  env: safeRecordSchema,
+});
+
+const mcpHttpServerSchema = z.object({
+  enabled: z.boolean().default(true),
+  transport: z.literal("http"),
+  url: z.string().url(),
+  headers: safeRecordSchema,
+});
+
+export const mcpServerSchema = z.discriminatedUnion("transport", [
+  mcpStdioServerSchema,
+  mcpHttpServerSchema,
+]);
+
+export const mcpServersSchema = z.record(z.string().min(1), mcpServerSchema).default({});
+
 export const configSchema = z.object({
   apiKey: z.string().min(1),
   model: z.string(),
@@ -18,10 +42,11 @@ export const configSchema = z.object({
   fallbackBaseUrl: z.string().url(),
   permissions: permissionsSchema,
   rulesFile: z.string(),
+  mcpServers: mcpServersSchema,
 });
 
 const KNOWN_KEYS = new Set(Object.keys(configSchema.shape));
-const NESTED_KEYS = new Set(["permissions"]);
+const NESTED_KEYS = new Set(["permissions", "mcpServers"]);
 const PERMISSION_KEYS = new Set(Object.keys(permissionsSchema.shape));
 
 export function validateConfig(raw: Record<string, unknown>): {
@@ -76,6 +101,24 @@ export function validateConfig(raw: Record<string, unknown>): {
         }
       }
     }
+  }
+
+  const mcpServersRaw = raw.mcpServers as Record<string, unknown> | undefined;
+  if (mcpServersRaw && typeof mcpServersRaw === "object" && !Array.isArray(mcpServersRaw)) {
+    const parsedServers: Record<string, unknown> = {};
+    for (const [serverName, serverConfig] of Object.entries(mcpServersRaw)) {
+      const parsed = mcpServerSchema.safeParse(serverConfig);
+      if (parsed.success) {
+        parsedServers[serverName] = parsed.data;
+        continue;
+      }
+
+      for (const issue of parsed.error.issues) {
+        const path = ["mcpServers", serverName, ...issue.path].join(".");
+        warnings.push(`Warning: invalid value for '${path}', using default (undefined)`);
+      }
+    }
+    merged.mcpServers = parsedServers as Config["mcpServers"];
   }
 
   if (!merged.apiKey || merged.apiKey.trim() === "") {

@@ -15,6 +15,8 @@ export function mergeConfigs(
 
     if (overrideVal === null) {
       result[key] = null;
+    } else if (key === "mcpServers" && isPlainObject(overrideVal) && isPlainObject(baseVal)) {
+      result[key] = { ...baseVal, ...overrideVal };
     } else if (Array.isArray(overrideVal)) {
       const baseArr = Array.isArray(baseVal) ? baseVal : [];
       const merged = [...baseArr];
