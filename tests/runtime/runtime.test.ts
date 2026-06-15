@@ -1,6 +1,19 @@
-import { describe, expect, it } from "vitest";
-import { createRuntime } from "../../src/runtime/runtime";
+import { describe, expect, it, vi } from "vitest";
 import { TurnEvent, Token } from "../../src/runtime/types";
+import type { HookManager } from "../../src/hooks";
+import type { HookEvent, HookEventName } from "../../src/hooks/types";
+
+vi.mock("../../src/mcp/manager", () => ({
+  createMcpManager: () => ({
+    getSessions: () => [],
+    listTools: () => [],
+    connectAll: async () => {},
+    refreshTools: async () => {},
+    getSession: () => undefined,
+  }),
+}));
+
+const { createRuntime } = await import("../../src/runtime/runtime");
 
 async function collect(
   stream: AsyncGenerator<TurnEvent>,
@@ -83,5 +96,58 @@ describe("Runtime public API", () => {
     const stream2 = runtime.startTurn("second message");
     await collect(stream2);
     expect(runtime.getSession().turnNumber).toBe(2);
+  });
+
+  it("fires SessionStart before a new turn and Stop after shutdown", async () => {
+    const seen: Array<{ eventName: HookEventName; event: HookEvent }> = [];
+    const hookManager: HookManager = {
+      async dispatch(eventName, event) {
+        seen.push({ eventName, event });
+        return { decision: "continue", results: [] };
+      },
+    };
+    const runtime = createRuntime({ sendMessage: textModel, hookManager });
+
+    await collect(runtime.startTurn("hello"));
+
+    expect(seen.map((entry) => entry.eventName)).toEqual(["SessionStart", "UserPromptSubmit", "Stop"]);
+    expect(seen[0]!.event.payload).toEqual({ resumed: false });
+    expect(seen[2]!.event.payload.reason).toBe("completed");
+  });
+
+  it("fires SessionStart as resumed before resuming a session", async () => {
+    const seen: Array<{ eventName: HookEventName; event: HookEvent }> = [];
+    const hookManager: HookManager = {
+      async dispatch(eventName, event) {
+        seen.push({ eventName, event });
+        return { decision: "continue", results: [] };
+      },
+    };
+    const runtime = createRuntime({ sendMessage: textModel, hookManager });
+
+    await collect(runtime.resumeSession("test-session-id"));
+
+    expect(seen[0]!.eventName).toBe("SessionStart");
+    expect(seen[0]!.event.sessionId).toBe("test-session-id");
+    expect(seen[0]!.event.payload).toEqual({ resumed: true });
+  });
+
+  it("observe-only lifecycle hook blocks do not prevent turn completion", async () => {
+    const hookManager: HookManager = {
+      async dispatch(eventName) {
+        return eventName === "SessionStart" || eventName === "Stop"
+          ? { decision: "block", message: "observe-only block", results: [] }
+          : { decision: "continue", results: [] };
+      },
+    };
+    const runtime = createRuntime({ sendMessage: textModel, hookManager });
+
+    const events = await collect(runtime.startTurn("hello"));
+
+    const turnEnd = events.find((event) => event.type === "turn_end");
+    expect(turnEnd).toBeDefined();
+    if (turnEnd!.type === "turn_end") {
+      expect(turnEnd.summary.reason).toBe("completed");
+    }
   });
 });

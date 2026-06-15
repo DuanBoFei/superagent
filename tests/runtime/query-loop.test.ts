@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { createQueryLoop } from "../../src/runtime/query-loop";
+import type { HookManager } from "../../src/hooks";
+import type { HookEvent, HookEventName } from "../../src/hooks/types";
 import {
   Message,
   State,
@@ -153,5 +155,36 @@ describe("Query loop", () => {
     const toolResults = events.filter((e) => e.type === "tool_result");
     expect(toolResults.length).toBeGreaterThanOrEqual(1);
     expect(toolResults[0]!.type).toBe("tool_result");
+  });
+
+  it("fires PreCompact when prompt composition compacts context", async () => {
+    const session = makeSession();
+    const seen: Array<{ eventName: HookEventName; event: HookEvent }> = [];
+    const hookManager: HookManager = {
+      async dispatch(eventName, event) {
+        seen.push({ eventName, event });
+        return { decision: "continue", results: [] };
+      },
+    };
+    const loop = createQueryLoop(session, {
+      maxTurns: 50,
+      composePrompt: (messages: Message[]): Prompt & { compacted: boolean } => ({
+        system: "test",
+        messages,
+        compacted: true,
+      }),
+      sendMessage: async function* () {
+        yield { type: "text", content: "Hello from stub!" } satisfies Token;
+      },
+      checkPermission: () => ({ allowed: true }),
+      saveSession: () => {},
+      hookManager,
+    });
+
+    await collect(loop);
+
+    const preCompact = seen.find((entry) => entry.eventName === "PreCompact");
+    expect(preCompact).toBeDefined();
+    expect(preCompact!.event.payload.reason).toBe("context_compaction");
   });
 });

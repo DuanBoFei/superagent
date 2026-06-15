@@ -10,7 +10,7 @@ import {
 import { parseStream } from "./stream-handler";
 import { dispatchTools as defaultDispatchTools } from "./tool-dispatcher";
 import { transition } from "./state-machine";
-import { createUserPromptSubmitEvent } from "../hooks/events";
+import { createPreCompactEvent, createUserPromptSubmitEvent } from "../hooks/events";
 import type { HookManager } from "../hooks";
 import type { LogEvent } from "../observability/types";
 
@@ -67,6 +67,19 @@ export async function* createQueryLoop(
     }
 
     const prompt = deps.composePrompt(session.messages);
+    if (prompt.compacted) {
+      await deps.hookManager?.dispatch(
+        "PreCompact",
+        createPreCompactEvent({
+          sessionId: session.sessionId,
+          turnId: String(turnNumber),
+          timestamp: new Date().toISOString(),
+          cwd: process.cwd(),
+          reason: "context_compaction",
+        }),
+      );
+    }
+
     const estimatedTokens = Math.ceil(
       (JSON.stringify(prompt).length + JSON.stringify(session.messages).length) / 4,
     );

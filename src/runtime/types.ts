@@ -69,6 +69,8 @@ export interface TurnContext {
 export interface Prompt {
   system: string;
   messages: Message[];
+  estimatedTokens?: number;
+  compacted?: boolean;
 }
 
 export interface PermissionResult {

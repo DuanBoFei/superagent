@@ -8,13 +8,15 @@ import { registerAllTools } from "../tools/index";
 import { defaults } from "../config/defaults";
 import type { Config } from "../config/types";
 import { createQueryLoop, QueryLoopDeps } from "./query-loop";
-import { SessionState, State, TurnEvent } from "./types";
+import { SessionState, State, TurnEvent, TurnSummary } from "./types";
 import { composePrompt } from "./stubs/context";
 import { sendMessage } from "./stubs/model";
 import { checkPermission } from "./stubs/permission";
 import { saveSession, loadSession } from "./stubs/session";
 import type { LogEvent } from "../observability/types";
 import { redactMcpSecrets } from "../mcp/errors";
+import { createHookManager } from "../hooks";
+import { createSessionStartEvent, createStopEvent } from "../hooks/events";
 
 function defaultDeps(): QueryLoopDeps {
   return {
@@ -62,7 +64,8 @@ export function createRuntime(options: RuntimeOptions = {}): RuntimeHandle {
 
   const promptPermission: PromptFn = options.promptPermission ?? (async () => "denied");
   const permission = options.config ? createChecker(config.permissions, promptPermission) : permissionSystem;
-  const dispatcher = createToolDispatcher({ registry, permission });
+  const hookManager = options.hookManager ?? createHookManager(config);
+  const dispatcher = createToolDispatcher({ registry, permission, hookManager });
 
   const { config: _config, mcpManager: _mcpManager, promptPermission: _promptPermission, ...queryDeps } = options;
   const resolvedDeps = {
@@ -71,6 +74,7 @@ export function createRuntime(options: RuntimeOptions = {}): RuntimeHandle {
     maxTurns: queryDeps.maxTurns ?? config.maxTurns,
     model: queryDeps.model ?? config.model,
     dispatchTools: dispatcher.dispatchTools,
+    hookManager,
   };
   let session: SessionState = createFreshSession();
   let mcpConnected = false;
@@ -104,6 +108,30 @@ export function createRuntime(options: RuntimeOptions = {}): RuntimeHandle {
 
     registerMcpTools(registry, mcpManager, { emit: options.emit });
     mcpConnected = true;
+  }
+
+  async function dispatchSessionStart(resumed: boolean): Promise<void> {
+    await hookManager.dispatch(
+      "SessionStart",
+      createSessionStartEvent({
+        sessionId: session.sessionId,
+        timestamp: new Date().toISOString(),
+        cwd: process.cwd(),
+        resumed,
+      }),
+    );
+  }
+
+  async function dispatchStop(reason?: TurnSummary["reason"]): Promise<void> {
+    await hookManager.dispatch(
+      "Stop",
+      createStopEvent({
+        sessionId: session.sessionId,
+        timestamp: new Date().toISOString(),
+        cwd: process.cwd(),
+        reason,
+      }),
+    );
   }
 
   async function refreshMcpTools(): Promise<void> {
@@ -151,10 +179,18 @@ export function createRuntime(options: RuntimeOptions = {}): RuntimeHandle {
       };
       process.once("SIGINT", sigintHandler);
 
+      let stopReason: TurnSummary["reason"] | undefined;
       try {
-        yield* createQueryLoop(session, resolvedDeps);
+        await dispatchSessionStart(false);
+        for await (const event of createQueryLoop(session, resolvedDeps)) {
+          if (event.type === "turn_end") {
+            stopReason = event.summary.reason;
+          }
+          yield event;
+        }
       } finally {
         process.off("SIGINT", sigintHandler);
+        await dispatchStop(stopReason);
       }
     },
 
@@ -178,7 +214,18 @@ export function createRuntime(options: RuntimeOptions = {}): RuntimeHandle {
         });
       }
 
-      yield* createQueryLoop(session, resolvedDeps);
+      let stopReason: TurnSummary["reason"] | undefined;
+      try {
+        await dispatchSessionStart(true);
+        for await (const event of createQueryLoop(session, resolvedDeps)) {
+          if (event.type === "turn_end") {
+            stopReason = event.summary.reason;
+          }
+          yield event;
+        }
+      } finally {
+        await dispatchStop(stopReason);
+      }
     },
   };
 }

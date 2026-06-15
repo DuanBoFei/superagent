@@ -246,7 +246,7 @@ Hooks run at remaining lifecycle points and emit redacted observability events.
 
 SessionStart, PreCompact, and Stop hooks emit hook lifecycle events, and failures/timeouts are logged safely without preventing shutdown or compaction.
 
-- [ ] T012 [INT] [US4] Wire SessionStart, PreCompact, and Stop hooks into src/runtime/runtime.ts and src/runtime/query-loop.ts
+- [x] T012 [INT] [US4] Wire SessionStart, PreCompact, and Stop hooks into src/runtime/runtime.ts and src/runtime/query-loop.ts
 
 | | |
 |---|---|
