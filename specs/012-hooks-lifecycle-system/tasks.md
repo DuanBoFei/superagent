@@ -205,7 +205,7 @@ PreToolUse can block matching tool calls, while PostToolUse observes completed r
 
 A fake Bash policy hook blocks `git push`; a PostToolUse hook runs after a safe tool and cannot alter its result.
 
-- [ ] T010 [INT] [US3] Wire PreToolUse blocking hooks into src/runtime/tool-dispatcher.ts
+- [x] T010 [INT] [US3] Wire PreToolUse blocking hooks into src/runtime/tool-dispatcher.ts
 
 | | |
 |---|---|
