@@ -276,7 +276,7 @@ Add and verify events:
 
 Fields must include hook name, hook event, duration, exit status when available, decision, and redacted diagnostics.
 
-- [ ] T014 [INT] [US4] Add end-to-end hook lifecycle coverage in tests/hooks/integration.test.ts
+- [x] T014 [INT] [US4] Add end-to-end hook lifecycle coverage in tests/hooks/integration.test.ts
 
 | | |
 |---|---|

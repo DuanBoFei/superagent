@@ -11,6 +11,7 @@ import { parseStream } from "./stream-handler";
 import { dispatchTools as defaultDispatchTools } from "./tool-dispatcher";
 import { transition } from "./state-machine";
 import { createPreCompactEvent, createUserPromptSubmitEvent } from "../hooks/events";
+import { redactHookSecrets } from "../hooks/errors";
 import type { HookManager } from "../hooks";
 import type { LogEvent } from "../observability/types";
 
@@ -60,7 +61,7 @@ export async function* createQueryLoop(
     );
 
     if (promptHookResult?.decision === "block") {
-      const message = promptHookResult.message ?? "Prompt blocked by hook";
+      const message = redactHookSecrets(promptHookResult.message ?? "Prompt blocked by hook");
       deps.emit?.({ type: "error", message });
       yield { type: "error", message };
       break;
