@@ -90,7 +90,7 @@ Cover:
 - `promptPattern` matching submitted prompt text
 - no matcher means hook applies to its event
 
-- [ ] T005 [P] [BE] Add hook error redaction tests in tests/hooks/errors.test.ts and src/hooks/errors.ts
+- [x] T005 [P] [BE] Add hook error redaction tests in tests/hooks/errors.test.ts and src/hooks/errors.ts
 
 | | |
 |---|---|
