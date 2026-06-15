@@ -19,7 +19,7 @@ All tasks include:
 
 Write config and lifecycle contract tests before implementation.
 
-- [ ] T001 [BE] Add hooks config contract tests in tests/config/hooks-config.test.ts
+- [x] T001 [BE] Add hooks config contract tests in tests/config/hooks-config.test.ts
 
 | | |
 |---|---|
