@@ -15,6 +15,7 @@ function tempConfig(): Config {
     fallbackBaseUrl: "https://api.deepseek.com",
     permissions: { autoApprove: [], deny: [], askTimeout: 30 },
     rulesFile: "CLAUDE.md",
+    mcpServers: {},
   };
 }
 
@@ -193,6 +194,30 @@ describe("integration", () => {
       const stats = obs.getSessionStats();
       expect(stats.totalInputTokens).toBe(0); // Only turn:end updates token counts
       expect(stats.totalCost).toBeGreaterThan(0); // model:response updates cost
+
+      obs.close();
+    } finally {
+      rmSync(logDir, { recursive: true, force: true });
+    }
+  });
+
+  it("redacts secrets from MCP event logs", () => {
+    const logDir = mkdtempSync(join(tmpdir(), "obs-integration-XXXXXX"));
+
+    try {
+      const obs = createObservability(tempConfig(), "sess-005", { logDir });
+
+      obs.emit({
+        type: "mcp:server_connect_end",
+        serverName: "filesystem",
+        success: false,
+        durationMs: 1,
+        error: "authorization: Bearer sk-secret-value",
+      });
+
+      const logContent = readFileSync(obs.getSessionLogPath(), "utf-8");
+      expect(logContent).not.toContain("sk-secret-value");
+      expect(logContent).toContain("[REDACTED]");
 
       obs.close();
     } finally {

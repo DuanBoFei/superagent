@@ -269,7 +269,7 @@ Implement refresh lifecycle:
 - mark server failed on refresh failure without crashing turn loop
 - removed tools are not offered in later turns
 
-- [ ] T014 [INT] [US4] Add MCP observability events and end-to-end fake server coverage in src/observability/types.ts and tests/mcp/integration.test.ts
+- [x] T014 [INT] [US4] Add MCP observability events and end-to-end fake server coverage in src/observability/types.ts and tests/mcp/integration.test.ts
 
 | | |
 |---|---|

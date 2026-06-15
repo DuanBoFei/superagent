@@ -14,6 +14,7 @@ import { sendMessage } from "./stubs/model";
 import { checkPermission } from "./stubs/permission";
 import { saveSession, loadSession } from "./stubs/session";
 import type { LogEvent } from "../observability/types";
+import { redactMcpSecrets } from "../mcp/errors";
 
 function defaultDeps(): QueryLoopDeps {
   return {
@@ -57,7 +58,7 @@ export function createRuntime(options: RuntimeOptions = {}): RuntimeHandle {
   const mcpManager = options.mcpManager ?? createMcpManager(config.mcpServers);
   const registry = createToolRegistry();
   registerAllTools(registry);
-  registerMcpTools(registry, mcpManager);
+  registerMcpTools(registry, mcpManager, { emit: options.emit });
 
   const promptPermission: PromptFn = options.promptPermission ?? (async () => "denied");
   const permission = options.config ? createChecker(config.permissions, promptPermission) : permissionSystem;
@@ -76,24 +77,63 @@ export function createRuntime(options: RuntimeOptions = {}): RuntimeHandle {
 
   async function ensureMcpConnected(): Promise<void> {
     if (mcpConnected) return;
+    const connectStarts = new Map<string, number>();
+    for (const mcpSession of mcpManager.getSessions()) {
+      if (mcpSession.state !== "disabled") {
+        connectStarts.set(mcpSession.serverName, Date.now());
+        options.emit?.({ type: "mcp:server_connect_start", serverName: mcpSession.serverName });
+      }
+    }
+
     await mcpManager.connectAll();
-    registerMcpTools(registry, mcpManager);
+
+    for (const mcpSession of mcpManager.getSessions()) {
+      const startedAt = connectStarts.get(mcpSession.serverName);
+      if (startedAt !== undefined) {
+        options.emit?.({
+          type: "mcp:server_connect_end",
+          serverName: mcpSession.serverName,
+          success: mcpSession.state === "connected",
+          durationMs: Date.now() - startedAt,
+          ...(mcpSession.lastError?.detail || mcpSession.lastError?.message
+            ? { error: redactMcpSecrets(mcpSession.lastError.detail ?? mcpSession.lastError.message) }
+            : {}),
+        });
+      }
+    }
+
+    registerMcpTools(registry, mcpManager, { emit: options.emit });
     mcpConnected = true;
   }
 
   async function refreshMcpTools(): Promise<void> {
     for (const mcpSession of mcpManager.getSessions()) {
       if (mcpSession.state !== "disabled") {
+        const startedAt = Date.now();
+        let thrownError: unknown;
         try {
           await mcpManager.refreshTools(mcpSession.serverName);
-        } catch {
-          // Keep built-in tools available when one MCP server refresh fails.
+        } catch (error) {
+          thrownError = error;
         }
+
+        const refreshed = mcpManager.getSession(mcpSession.serverName);
+        const error = thrownError instanceof Error
+          ? thrownError.message
+          : refreshed?.lastError?.detail ?? refreshed?.lastError?.message;
+        options.emit?.({
+          type: "mcp:tools_refresh",
+          serverName: mcpSession.serverName,
+          success: refreshed?.state === "connected" && thrownError === undefined,
+          durationMs: Date.now() - startedAt,
+          toolCount: refreshed?.tools.length ?? 0,
+          ...(error ? { error: redactMcpSecrets(error) } : {}),
+        });
       }
     }
 
     clearMcpTools(registry);
-    registerMcpTools(registry, mcpManager);
+    registerMcpTools(registry, mcpManager, { emit: options.emit });
   }
 
   return {

@@ -1,4 +1,5 @@
 import { Config } from "../config/types";
+import { redactMcpSecrets } from "../mcp/errors";
 import { LogEvent, SessionStats, DEFAULT_COST_MODEL } from "./types";
 import { createLogger } from "./logger";
 import { createCostTracker } from "./cost-tracker";
@@ -37,16 +38,16 @@ export function createObservability(
   });
 
   function emit(event: LogEvent): void {
-    let enriched = event;
+    let enriched = redactMcpEvent(event);
 
-    if (event.type === "model:response") {
+    if (enriched.type === "model:response") {
       const result = costTracker.trackUsage(
-        event.model,
-        event.inputTokens,
-        event.outputTokens,
+        enriched.model,
+        enriched.inputTokens,
+        enriched.outputTokens,
       );
       if (!result.unknownModel) {
-        enriched = { ...event, cost: result.totalCost };
+        enriched = { ...enriched, cost: result.totalCost };
       }
     }
 
@@ -69,4 +70,16 @@ export function createObservability(
   }
 
   return { emit, getSessionStats, getSessionLogPath, close };
+}
+
+function redactMcpEvent(event: LogEvent): LogEvent {
+  if (
+    (event.type === "mcp:server_connect_end" ||
+      event.type === "mcp:tools_refresh" ||
+      event.type === "mcp:tool_end") &&
+    event.error
+  ) {
+    return { ...event, error: redactMcpSecrets(event.error) };
+  }
+  return event;
 }

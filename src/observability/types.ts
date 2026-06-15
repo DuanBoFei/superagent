@@ -48,6 +48,40 @@ export type LogEvent =
       success: boolean;
     }
   | {
+      type: "mcp:server_connect_start";
+      serverName: string;
+    }
+  | {
+      type: "mcp:server_connect_end";
+      serverName: string;
+      success: boolean;
+      durationMs: number;
+      error?: string;
+    }
+  | {
+      type: "mcp:tools_refresh";
+      serverName: string;
+      success: boolean;
+      durationMs: number;
+      toolCount: number;
+      error?: string;
+    }
+  | {
+      type: "mcp:tool_start";
+      serverName: string;
+      toolName: string;
+      permissionKey: string;
+    }
+  | {
+      type: "mcp:tool_end";
+      serverName: string;
+      toolName: string;
+      permissionKey: string;
+      durationMs: number;
+      success: boolean;
+      error?: string;
+    }
+  | {
       type: "error";
       message: string;
       stack?: string;
