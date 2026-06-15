@@ -5,7 +5,8 @@ type HookErrorCode =
   | "NON_ZERO_EXIT"
   | "TIMEOUT"
   | "INVALID_JSON"
-  | "OVERSIZED_OUTPUT";
+  | "OVERSIZED_OUTPUT"
+  | "OBSERVE_ONLY_BLOCK";
 
 const ERROR_MESSAGES: Record<HookErrorCode, string> = {
   COMMAND_NOT_FOUND: "Hook command not found",
@@ -13,6 +14,7 @@ const ERROR_MESSAGES: Record<HookErrorCode, string> = {
   TIMEOUT: "Hook command timed out",
   INVALID_JSON: "Hook returned invalid JSON",
   OVERSIZED_OUTPUT: "Hook output was too large",
+  OBSERVE_ONLY_BLOCK: "Observe-only hook cannot block runtime flow",
 };
 
 const SECRET_PATTERNS = [

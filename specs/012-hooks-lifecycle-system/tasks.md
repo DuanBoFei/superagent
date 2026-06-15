@@ -150,7 +150,7 @@ Implement:
 - enforce timeout and terminate process
 - normalize execution result without throwing on command failure
 
-- [ ] T008 [BE] [US1] Implement hook manager ordered dispatch in src/hooks/manager.ts and src/hooks/index.ts
+- [x] T008 [BE] [US1] Implement hook manager ordered dispatch in src/hooks/manager.ts and src/hooks/index.ts
 
 | | |
 |---|---|
