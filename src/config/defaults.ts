@@ -19,4 +19,5 @@ export const defaults: Config = {
   },
   rulesFile: "CLAUDE.md",
   mcpServers: {},
+  hooks: {},
 };

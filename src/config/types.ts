@@ -1,3 +1,5 @@
+import type { HookConfig, HookEventName } from "../hooks/types";
+
 export type McpServerConfig = McpStdioServerConfig | McpHttpServerConfig;
 
 export interface McpStdioServerConfig {
@@ -29,6 +31,7 @@ export interface Config {
   };
   rulesFile: string;
   mcpServers: Record<string, McpServerConfig>;
+  hooks: Partial<Record<HookEventName, HookConfig[]>>;
 }
 
 export interface ConfigLoadResult {

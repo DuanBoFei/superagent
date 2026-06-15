@@ -118,7 +118,7 @@ A maintainer can configure local command hooks and run a SessionStart hook safel
 
 A local fake SessionStart command receives JSON stdin, returns continue, and emits hook observability without blocking startup.
 
-- [ ] T006 [BE] [US1] Implement hooks config schema and defaults in src/config/types.ts, src/config/defaults.ts, and src/config/validator.ts
+- [x] T006 [BE] [US1] Implement hooks config schema and defaults in src/config/types.ts, src/config/defaults.ts, and src/config/validator.ts
 
 | | |
 |---|---|

@@ -1,7 +1,9 @@
 import { z } from "zod/v4";
 import { ConfigError } from "./types";
 import { defaults } from "./defaults";
+import { HOOK_EVENTS, isObserveOnlyHookEvent } from "../hooks/types";
 import type { Config } from "./types";
+import type { HookConfig, HookEventName } from "../hooks/types";
 
 export const permissionsSchema = z.object({
   autoApprove: z.array(z.string()),
@@ -33,6 +35,37 @@ export const mcpServerSchema = z.discriminatedUnion("transport", [
 
 export const mcpServersSchema = z.record(z.string().min(1), mcpServerSchema).default({});
 
+const hookMatcherSchema = z.object({
+  tool: z.string().optional(),
+  inputPattern: z.string().optional(),
+  promptPattern: z.string().optional(),
+});
+
+const enabledHookSchema = z.object({
+  name: z.string().min(1),
+  enabled: z.literal(true),
+  command: z.string().min(1),
+  args: z.array(z.string()).default([]),
+  env: safeRecordSchema,
+  timeoutMs: z.number().int().positive().default(3000),
+  blocking: z.boolean().optional(),
+  matcher: hookMatcherSchema.optional(),
+});
+
+const disabledHookSchema = z.object({
+  name: z.string().min(1),
+  enabled: z.literal(false),
+  command: z.string().min(1).optional(),
+  args: z.array(z.string()).default([]),
+  env: safeRecordSchema,
+  timeoutMs: z.number().int().positive().default(3000),
+  blocking: z.boolean().optional(),
+  matcher: hookMatcherSchema.optional(),
+});
+
+const hookConfigSchema = z.discriminatedUnion("enabled", [enabledHookSchema, disabledHookSchema]);
+const hooksSchema = z.partialRecord(z.enum(HOOK_EVENTS), z.array(hookConfigSchema)).default({});
+
 export const configSchema = z.object({
   apiKey: z.string().min(1),
   model: z.string(),
@@ -43,11 +76,13 @@ export const configSchema = z.object({
   permissions: permissionsSchema,
   rulesFile: z.string(),
   mcpServers: mcpServersSchema,
+  hooks: hooksSchema,
 });
 
 const KNOWN_KEYS = new Set(Object.keys(configSchema.shape));
-const NESTED_KEYS = new Set(["permissions", "mcpServers"]);
+const NESTED_KEYS = new Set(["permissions", "mcpServers", "hooks"]);
 const PERMISSION_KEYS = new Set(Object.keys(permissionsSchema.shape));
+const HOOK_EVENT_NAMES = new Set<HookEventName>(HOOK_EVENTS);
 
 export function validateConfig(raw: Record<string, unknown>): {
   config: Config;
@@ -121,6 +156,11 @@ export function validateConfig(raw: Record<string, unknown>): {
     merged.mcpServers = parsedServers as Config["mcpServers"];
   }
 
+  const hooksRaw = raw.hooks as Record<string, unknown> | undefined;
+  if (hooksRaw && typeof hooksRaw === "object" && !Array.isArray(hooksRaw)) {
+    merged.hooks = parseHooksConfig(hooksRaw, warnings);
+  }
+
   if (!merged.apiKey || merged.apiKey.trim() === "") {
     throw new ConfigError(
       "MISSING_REQUIRED_KEY",
@@ -129,6 +169,49 @@ export function validateConfig(raw: Record<string, unknown>): {
   }
 
   return { config: merged, warnings };
+}
+
+function parseHooksConfig(
+  hooksRaw: Record<string, unknown>,
+  warnings: string[],
+): Config["hooks"] {
+  const parsedHooks: Config["hooks"] = {};
+
+  for (const [eventName, hookEntries] of Object.entries(hooksRaw)) {
+    if (!HOOK_EVENT_NAMES.has(eventName as HookEventName)) {
+      warnings.push(`Warning: invalid value for 'hooks.${eventName}', using default (undefined)`);
+      continue;
+    }
+
+    if (!Array.isArray(hookEntries)) {
+      warnings.push(`Warning: invalid value for 'hooks.${eventName}', using default (undefined)`);
+      continue;
+    }
+
+    const parsedEventHooks: HookConfig[] = [];
+    for (const [index, hookEntry] of hookEntries.entries()) {
+      const parsed = hookConfigSchema.safeParse(hookEntry);
+      if (!parsed.success) {
+        for (const issue of parsed.error.issues) {
+          const issuePath = issue.path.length > 0 ? issue.path : ["command"];
+          const path = ["hooks", eventName, index, ...issuePath].join(".");
+          warnings.push(`Warning: invalid value for '${path}', using default (undefined)`);
+        }
+        continue;
+      }
+
+      if (parsed.data.blocking === true && isObserveOnlyHookEvent(eventName as HookEventName)) {
+        warnings.push(`Warning: invalid value for 'hooks.${eventName}.${index}.blocking', using default (undefined)`);
+        continue;
+      }
+
+      parsedEventHooks.push(parsed.data as HookConfig);
+    }
+
+    parsedHooks[eventName as HookEventName] = parsedEventHooks;
+  }
+
+  return parsedHooks;
 }
 
 function getDefaultForPath(path: (string | number)[]): string {
