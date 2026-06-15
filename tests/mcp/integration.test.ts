@@ -1,4 +1,10 @@
+import { createServer, type Server } from "node:http";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { pathToFileURL } from "node:url";
 import { describe, expect, it, vi } from "vitest";
+import { getConfig } from "../../src/config/config";
 import { defaults } from "../../src/config/defaults";
 import { createMcpManager, type McpClientLike, type McpManager } from "../../src/mcp/manager";
 import type { McpServerConfig } from "../../src/mcp/types";
@@ -69,6 +75,65 @@ function stdioServer(command: string, env: Record<string, string> = {}): McpServ
     args: [],
     env,
   };
+}
+
+function httpServer(url: string, headers: Record<string, string> = {}): McpServerConfig {
+  return {
+    enabled: true,
+    transport: "http",
+    url,
+    headers,
+  };
+}
+
+function startHttpMcpServer(): Promise<{ url: string; close: () => Promise<void>; seenAuthorization: () => string | undefined }> {
+  let authorization: string | undefined;
+  const server = createServer((request, response) => {
+    authorization = request.headers.authorization;
+    let body = "";
+    request.setEncoding("utf8");
+    request.on("data", (chunk) => {
+      body += chunk;
+    });
+    request.on("end", () => {
+      const message = JSON.parse(body) as { id: number; method: string };
+      response.setHeader("content-type", "application/json");
+      if (message.method === "initialize") {
+        response.end(JSON.stringify({ jsonrpc: "2.0", id: message.id, result: { protocolVersion: "2024-11-05", capabilities: { tools: {} }, serverInfo: { name: "http-smoke", version: "1.0.0" } } }));
+        return;
+      }
+      if (message.method === "tools/list") {
+        response.end(JSON.stringify({ jsonrpc: "2.0", id: message.id, result: { tools: [{ name: "ping", description: "Ping", inputSchema: { type: "object" } }] } }));
+        return;
+      }
+      if (message.method === "tools/call") {
+        response.end(JSON.stringify({ jsonrpc: "2.0", id: message.id, result: { content: [{ type: "text", text: "pong" }] } }));
+        return;
+      }
+      response.end(JSON.stringify({ jsonrpc: "2.0", id: message.id, result: {} }));
+    });
+  });
+
+  return new Promise((resolve) => {
+    server.listen(0, "127.0.0.1", () => {
+      const address = server.address();
+      if (typeof address !== "object" || address === null) throw new Error("expected TCP address");
+      resolve({
+        url: `http://127.0.0.1:${address.port}/mcp`,
+        close: () => closeServer(server),
+        seenAuthorization: () => authorization,
+      });
+    });
+  });
+}
+
+function closeServer(server: Server): Promise<void> {
+  return new Promise((resolve, reject) => {
+    server.close((error) => {
+      if (error) reject(error);
+      else resolve();
+    });
+  });
 }
 
 describe("MCP runtime integration", () => {
@@ -252,5 +317,126 @@ describe("MCP runtime integration", () => {
         durationMs: expect.any(Number),
       }),
     );
+  });
+
+  it("connects to a real Streamable HTTP MCP endpoint and preserves configured headers", async () => {
+    const server = await startHttpMcpServer();
+    try {
+      const mcp = createMcpManager({ remote: httpServer(server.url, { Authorization: "Bearer test-token" }) });
+
+      await mcp.connectAll();
+      const tools = mcp.listTools();
+      const result = await mcp.callTool("remote", "ping", {});
+
+      expect(tools).toContainEqual(
+        expect.objectContaining({
+          serverName: "remote",
+          toolName: "ping",
+          permissionKey: "mcp__remote__ping",
+          isAvailable: true,
+        }),
+      );
+      expect(result).toEqual({ ok: true, content: [{ type: "text", text: "pong" }], metadata: undefined });
+      expect(server.seenAuthorization()).toBe("Bearer test-token");
+      await mcp.close();
+    } finally {
+      await server.close();
+    }
+  });
+
+  it("connects to a real stdio MCP subprocess and calls its discovered tool", async () => {
+    const root = mkdtempSync(join(tmpdir(), "mcp-stdio-"));
+    const serverPath = join(root, "server.mjs");
+
+    try {
+      const sdkRoot = join(process.cwd(), "node_modules", "@modelcontextprotocol", "sdk", "dist", "esm");
+      const mcpServerUrl = pathToFileURL(join(sdkRoot, "server", "mcp.js")).href;
+      const stdioTransportUrl = pathToFileURL(join(sdkRoot, "server", "stdio.js")).href;
+      writeFileSync(
+        serverPath,
+        `import { McpServer } from "${mcpServerUrl}";\nimport { StdioServerTransport } from "${stdioTransportUrl}";\nconst server = new McpServer({ name: "stdio-smoke", version: "1.0.0" });\nserver.registerTool("echo", { description: "Echo" }, async () => ({ content: [{ type: "text", text: "hello stdio" }] }));\nawait server.connect(new StdioServerTransport());\n`,
+      );
+      const mcp = createMcpManager({ local: { enabled: true, transport: "stdio", command: process.execPath, args: [serverPath], env: {} } });
+
+      await mcp.connectAll();
+      const session = mcp.getSession("local");
+      const tools = mcp.listTools();
+      const result = await mcp.callTool("local", "echo", { text: "hello stdio" });
+
+      expect(session).toEqual(expect.objectContaining({ state: "connected" }));
+      expect(tools).toContainEqual(
+        expect.objectContaining({
+          serverName: "local",
+          toolName: "echo",
+          permissionKey: "mcp__local__echo",
+          isAvailable: true,
+        }),
+      );
+      expect(result).toEqual({ ok: true, content: [{ type: "text", text: "hello stdio" }], metadata: undefined });
+      await mcp.close();
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  it("loads layered config into runtime and dispatches a configured MCP tool with observability", async () => {
+    const root = mkdtempSync(join(tmpdir(), "mcp-full-chain-"));
+    const globalDir = join(root, "global");
+    const projectDir = join(root, "project");
+    const observed: LogEvent[] = [];
+
+    try {
+      mkdirSync(globalDir);
+      mkdirSync(projectDir);
+      writeFileSync(join(globalDir, "settings.json"), JSON.stringify({ mcpServers: { tools: stdioServer("global-tools") } }));
+      writeFileSync(
+        join(projectDir, "settings.json"),
+        JSON.stringify({
+          apiKey: "sk-test",
+          permissions: { autoApprove: ["mcp__tools__read_file"], deny: [], askTimeout: 30 },
+          mcpServers: { tools: stdioServer("project-tools") },
+        }),
+      );
+
+      const { config } = getConfig({ globalConfigDir: globalDir, projectConfigDir: projectDir, env: {} });
+      const mcp = createMcpManager(config.mcpServers, {
+        createClient: () => new FakeMcpClient("read-file", "configured content"),
+        createTransport: (_serverName, mcpConfig) => ({
+          ok: true,
+          transport: { start: async () => undefined, close: async () => undefined } as never,
+          diagnostic: JSON.stringify(mcpConfig),
+        }),
+      });
+      let calls = 0;
+      async function* model(): AsyncGenerator<Token> {
+        calls++;
+        if (calls === 1) {
+          yield { type: "tool_use", name: "mcp__tools__read_file", arguments: JSON.stringify({ path: "README.md" }) };
+        } else {
+          yield { type: "text", content: "done" };
+        }
+      }
+
+      const runtime = createRuntime({
+        config,
+        mcpManager: mcp,
+        sendMessage: model,
+        emit: (event) => observed.push(event),
+      });
+
+      const events = await collect(runtime.startTurn("use configured mcp"));
+
+      expect(config.mcpServers.tools).toEqual(stdioServer("project-tools"));
+      expect(events).toContainEqual({
+        type: "tool_result",
+        name: "mcp__tools__read_file",
+        success: true,
+        summary: "configured content",
+      });
+      expect(observed).toContainEqual(expect.objectContaining({ type: "mcp:server_connect_end", serverName: "tools", success: true }));
+      expect(observed).toContainEqual(expect.objectContaining({ type: "mcp:tool_end", serverName: "tools", toolName: "read-file", permissionKey: "mcp__tools__read_file", success: true }));
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
   });
 });
