@@ -44,7 +44,7 @@ Create failing tests for:
 
 Define typed hook contracts and red tests for matching, execution, and safe errors before runtime wiring.
 
-- [ ] T002 [P] [BE] Define hook domain types in src/hooks/types.ts and tests/hooks/types.test.ts
+- [x] T002 [P] [BE] Define hook domain types in src/hooks/types.ts and tests/hooks/types.test.ts
 
 | | |
 |---|---|
