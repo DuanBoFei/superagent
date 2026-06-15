@@ -58,7 +58,7 @@ Define typed shapes for:
 - result decisions `continue` and `block`
 - observe-only vs blocking event classification
 
-- [ ] T003 [P] [BE] Add hook lifecycle event builders in src/hooks/events.ts and tests/hooks/events.test.ts
+- [x] T003 [P] [BE] Add hook lifecycle event builders in src/hooks/events.ts and tests/hooks/events.test.ts
 
 | | |
 |---|---|
