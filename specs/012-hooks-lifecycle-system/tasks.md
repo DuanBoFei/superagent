@@ -75,7 +75,7 @@ Test and implement builders for:
 - `PreCompact`
 - `Stop`
 
-- [ ] T004 [P] [BE] Add hook matcher tests in tests/hooks/matcher.test.ts and src/hooks/matcher.ts
+- [x] T004 [P] [BE] Add hook matcher tests in tests/hooks/matcher.test.ts and src/hooks/matcher.ts
 
 | | |
 |---|---|
