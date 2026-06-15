@@ -10,6 +10,8 @@ import {
 import { parseStream } from "./stream-handler";
 import { dispatchTools as defaultDispatchTools } from "./tool-dispatcher";
 import { transition } from "./state-machine";
+import { createUserPromptSubmitEvent } from "../hooks/events";
+import type { HookManager } from "../hooks";
 import type { LogEvent } from "../observability/types";
 
 export interface QueryLoopDeps {
@@ -24,6 +26,7 @@ export interface QueryLoopDeps {
   saveSession: (state: SessionState) => void;
   loadSession?: (id: string) => SessionState | null;
   dispatchTools?: (calls: Array<{ name: string; args: Record<string, unknown> }>) => Promise<Array<{ name: string; success: boolean; output: string; error?: string }>>;
+  hookManager?: HookManager;
   emit?: (event: LogEvent) => void;
 }
 
@@ -43,6 +46,25 @@ export async function* createQueryLoop(
 
     const turnNumber = session.turnNumber + 1;
     deps.emit?.({ type: "turn:start", turnNumber });
+
+    const userPrompt = [...session.messages].reverse().find((message) => message.role === "user")?.content ?? "";
+    const promptHookResult = await deps.hookManager?.dispatch(
+      "UserPromptSubmit",
+      createUserPromptSubmitEvent({
+        sessionId: session.sessionId,
+        turnId: String(turnNumber),
+        timestamp: new Date().toISOString(),
+        cwd: process.cwd(),
+        prompt: userPrompt,
+      }),
+    );
+
+    if (promptHookResult?.decision === "block") {
+      const message = promptHookResult.message ?? "Prompt blocked by hook";
+      deps.emit?.({ type: "error", message });
+      yield { type: "error", message };
+      break;
+    }
 
     const prompt = deps.composePrompt(session.messages);
     const estimatedTokens = Math.ceil(

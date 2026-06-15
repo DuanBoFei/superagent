@@ -178,7 +178,7 @@ A UserPromptSubmit hook can block a prompt before a model request is made.
 
 A fake policy hook blocks a prompt containing a forbidden pattern, and the runtime emits no model request for that prompt.
 
-- [ ] T009 [INT] [US2] Wire UserPromptSubmit hooks into src/runtime/query-loop.ts
+- [x] T009 [INT] [US2] Wire UserPromptSubmit hooks into src/runtime/query-loop.ts
 
 | | |
 |---|---|
