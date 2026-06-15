@@ -151,4 +151,47 @@ describe("hook manager", () => {
       detail: "cannot block startup",
     });
   });
+
+  it("emits redacted hook observability lifecycle events", async () => {
+    const events: Array<{ type: string; [key: string]: unknown }> = [];
+    const manager = createHookManager(config({
+      PreToolUse: [enabledHook("allow"), enabledHook("blocker"), enabledHook("after")],
+    }), {
+      emit: (event) => events.push(event),
+      execute: async (hook) => hook.name === "blocker"
+        ? {
+            ok: false,
+            decision: "block",
+            message: "blocked api_key=SECRET123",
+            durationMs: 7,
+            stdout: "stdout sk-secret-token",
+            stderr: "stderr api_key=SECRET123",
+            exitCode: 2,
+            error: { code: "NON_ZERO_EXIT", message: "failed", detail: "api_key=SECRET123" },
+          }
+        : { ok: true, decision: "continue", durationMs: 3, stdout: "ok", stderr: "", exitCode: 0 },
+    });
+
+    await manager.dispatch("PreToolUse", createPreToolUseEvent({
+      ...base,
+      toolName: "Bash",
+      input: { command: "git push" },
+      permissionKey: "Bash",
+    }));
+
+    expect(events.map((event) => event.type)).toEqual([
+      "hook:start",
+      "hook:end",
+      "hook:start",
+      "hook:failure",
+      "hook:block",
+    ]);
+    expect(events[0]).toMatchObject({ type: "hook:start", hookName: "allow", hookEvent: "PreToolUse" });
+    expect(events[1]).toMatchObject({ type: "hook:end", hookName: "allow", hookEvent: "PreToolUse", durationMs: 3, exitCode: 0, decision: "continue" });
+    expect(events[3]).toMatchObject({ type: "hook:failure", hookName: "blocker", hookEvent: "PreToolUse", durationMs: 7, exitCode: 2, decision: "block" });
+    expect(events[3].stdout).toBe("stdout [REDACTED]");
+    expect(events[3].stderr).toBe("stderr api_key=[REDACTED]");
+    expect(events[3].error).toEqual({ code: "NON_ZERO_EXIT", message: "failed", detail: "api_key=[REDACTED]" });
+    expect(events[4]).toMatchObject({ type: "hook:block", hookName: "blocker", hookEvent: "PreToolUse", message: "blocked api_key=[REDACTED]" });
+  });
 });

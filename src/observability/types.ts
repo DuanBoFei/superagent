@@ -82,6 +82,41 @@ export type LogEvent =
       error?: string;
     }
   | {
+      type: "hook:start";
+      hookName: string;
+      hookEvent: string;
+    }
+  | {
+      type: "hook:end";
+      hookName: string;
+      hookEvent: string;
+      durationMs: number;
+      exitCode?: number;
+      decision: "continue" | "block";
+      stdout?: string;
+      stderr?: string;
+    }
+  | {
+      type: "hook:failure";
+      hookName: string;
+      hookEvent: string;
+      durationMs: number;
+      exitCode?: number;
+      decision: "continue" | "block";
+      stdout?: string;
+      stderr?: string;
+      error?: { code: string; message: string; detail?: string };
+    }
+  | {
+      type: "hook:block";
+      hookName: string;
+      hookEvent: string;
+      durationMs: number;
+      exitCode?: number;
+      decision: "block";
+      message?: string;
+    }
+  | {
       type: "error";
       message: string;
       stack?: string;

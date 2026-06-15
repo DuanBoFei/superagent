@@ -64,7 +64,7 @@ export function createRuntime(options: RuntimeOptions = {}): RuntimeHandle {
 
   const promptPermission: PromptFn = options.promptPermission ?? (async () => "denied");
   const permission = options.config ? createChecker(config.permissions, promptPermission) : permissionSystem;
-  const hookManager = options.hookManager ?? createHookManager(config);
+  const hookManager = options.hookManager ?? createHookManager(config, { emit: options.emit });
   const dispatcher = createToolDispatcher({ registry, permission, hookManager });
 
   const { config: _config, mcpManager: _mcpManager, promptPermission: _promptPermission, ...queryDeps } = options;

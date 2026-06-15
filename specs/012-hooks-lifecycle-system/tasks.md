@@ -260,7 +260,7 @@ Wire:
 - Stop during session shutdown
 - observe-only failures never block startup, compaction, or shutdown
 
-- [ ] T013 [INT] [US4] Add hook observability event types and emission in src/observability/types.ts
+- [x] T013 [INT] [US4] Add hook observability event types and emission in src/observability/types.ts
 
 | | |
 |---|---|
