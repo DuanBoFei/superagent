@@ -220,7 +220,7 @@ Implement:
 - return safe blocked tool result to Agent
 - preserve existing dangerous command deny behavior
 
-- [ ] T011 [INT] [US3] Wire PostToolUse and PostToolUseFailure observe-only hooks in src/runtime/tool-dispatcher.ts
+- [x] T011 [INT] [US3] Wire PostToolUse and PostToolUseFailure observe-only hooks in src/runtime/tool-dispatcher.ts
 
 | | |
 |---|---|

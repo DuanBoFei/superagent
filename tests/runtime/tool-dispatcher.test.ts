@@ -102,7 +102,7 @@ describe("Tool dispatcher", () => {
 
   it("PreToolUse preserves result order when mixing continued and blocked calls", async () => {
     const registry = createToolRegistry();
-    registerTool(registry, "Allowed", async () => ({ output: "allowed" }), {} as never, false);
+    registerTool(registry, "Allowed", async () => ({ output: "allowed" }), schema, false);
     const hookManager: HookManager = {
       async dispatch(_eventName, event) {
         return event.payload.toolName === "Blocked"
@@ -129,6 +129,91 @@ describe("Tool dispatcher", () => {
 
     expect(results.map((result) => result.name)).toEqual(["Allowed", "Blocked"]);
     expect(results.map((result) => result.output)).toEqual(["allowed", "blocked"]);
+  });
+
+  it("PostToolUse observes successful tool result without mutation", async () => {
+    const hookEvents: Array<{ eventName: HookEventName; event: HookEvent }> = [];
+    const registry = createToolRegistry();
+    registerTool(registry, "ObservedTool", async () => ({ output: "original" }), schema, false);
+    const hookManager: HookManager = {
+      async dispatch(eventName, event) {
+        hookEvents.push({ eventName, event });
+        return eventName === "PostToolUse"
+          ? { decision: "block", message: "mutated", results: [] }
+          : { decision: "continue", results: [] };
+      },
+    };
+
+    const results = await dispatchTools(
+      [{ name: "ObservedTool", args: { value: 1 } }],
+      {
+        registry,
+        hookManager,
+        permission: {
+          async checkPermission() {
+            return "approved";
+          },
+        },
+      },
+    );
+
+    expect(results).toEqual([
+      {
+        name: "ObservedTool",
+        success: true,
+        output: "original",
+        error: undefined,
+      },
+    ]);
+    expect(hookEvents.map((entry) => entry.eventName)).toEqual(["PreToolUse", "PostToolUse"]);
+    expect(hookEvents[1]!.event.payload.toolName).toBe("ObservedTool");
+    expect(hookEvents[1]!.event.payload.input).toEqual({ value: 1 });
+    expect(hookEvents[1]!.event.payload.result).toEqual({
+      name: "ObservedTool",
+      success: true,
+      output: "original",
+      error: undefined,
+    });
+  });
+
+  it("PostToolUseFailure observes failed tool result without mutation", async () => {
+    const hookEvents: Array<{ eventName: HookEventName; event: HookEvent }> = [];
+    const registry = createToolRegistry();
+    registerTool(registry, "FailingTool", async () => ({ output: "", error: "original failure" }), schema, false);
+    const hookManager: HookManager = {
+      async dispatch(eventName, event) {
+        hookEvents.push({ eventName, event });
+        return eventName === "PostToolUseFailure"
+          ? { decision: "block", message: "mutated", results: [] }
+          : { decision: "continue", results: [] };
+      },
+    };
+
+    const results = await dispatchTools(
+      [{ name: "FailingTool", args: { value: 2 } }],
+      {
+        registry,
+        hookManager,
+        permission: {
+          async checkPermission() {
+            return "approved";
+          },
+        },
+      },
+    );
+
+    expect(results).toEqual([
+      {
+        name: "FailingTool",
+        success: false,
+        output: "",
+        error: "original failure",
+      },
+    ]);
+    expect(hookEvents.map((entry) => entry.eventName)).toEqual(["PreToolUse", "PostToolUseFailure"]);
+    expect(hookEvents[1]!.event.payload.toolName).toBe("FailingTool");
+    expect(hookEvents[1]!.event.payload.input).toEqual({ value: 2 });
+    expect(hookEvents[1]!.event.payload.error).toBe("original failure");
   });
 
   it("PreToolUse continue preserves scheduler permission denial", async () => {

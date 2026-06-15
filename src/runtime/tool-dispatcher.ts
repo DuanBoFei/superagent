@@ -3,7 +3,7 @@ import { createScheduler } from "../scheduling/scheduler";
 import { createToolRegistry, registerTool } from "../tools/registry";
 import { registerAllTools } from "../tools/index";
 import type { ToolRegistry } from "../tools/types";
-import { createPreToolUseEvent } from "../hooks/events";
+import { createPostToolUseEvent, createPostToolUseFailureEvent, createPreToolUseEvent } from "../hooks/events";
 import type { HookManager } from "../hooks";
 import type { ToolCall, ToolResult } from "./types";
 import { permissionSystem } from "./stubs/permission";
@@ -42,7 +42,7 @@ export async function dispatchTools(calls: ToolCall[], options: ToolDispatcherOp
     id: nextId++,
   }));
   const preHookResults = new Map<number, ToolResult>();
-  const allowedCalls: SchedulingToolCall[] = [];
+  const allowedCalls = new Map<number, SchedulingToolCall>();
 
   for (const call of schedulingCalls) {
     const hookResult = await options.hookManager?.dispatch(
@@ -68,18 +68,48 @@ export async function dispatchTools(calls: ToolCall[], options: ToolDispatcherOp
       continue;
     }
 
-    allowedCalls.push(call);
+    allowedCalls.set(call.id, call);
   }
 
   const scheduler = createScheduler(options.registry ?? registry, options.permission ?? permissionSystem);
-  const results = allowedCalls.length > 0 ? await scheduler.dispatchTools(allowedCalls) : [];
+  const results = allowedCalls.size > 0 ? await scheduler.dispatchTools([...allowedCalls.values()]) : [];
   for (const result of results) {
-    preHookResults.set(result.id, {
+    const toolResult = {
       name: result.name,
       success: result.success,
       output: result.output,
       error: result.error,
-    });
+    };
+    preHookResults.set(result.id, toolResult);
+
+    const call = allowedCalls.get(result.id)!;
+    if (result.success) {
+      await options.hookManager?.dispatch(
+        "PostToolUse",
+        createPostToolUseEvent({
+          sessionId: "dispatcher",
+          timestamp: new Date().toISOString(),
+          cwd: process.cwd(),
+          toolName: result.name,
+          input: call.args,
+          permissionKey: result.name,
+          result: toolResult,
+        }),
+      );
+    } else {
+      await options.hookManager?.dispatch(
+        "PostToolUseFailure",
+        createPostToolUseFailureEvent({
+          sessionId: "dispatcher",
+          timestamp: new Date().toISOString(),
+          cwd: process.cwd(),
+          toolName: result.name,
+          input: call.args,
+          permissionKey: result.name,
+          error: result.error ?? "Tool failed",
+        }),
+      );
+    }
   }
 
   return schedulingCalls.map((call) => preHookResults.get(call.id)!);
