@@ -134,7 +134,7 @@ Add `hooks` config with:
 - disabled hook preservation
 - blocking-event validation
 
-- [ ] T007 [BE] [US1] Implement local command hook executor in src/hooks/executor.ts
+- [x] T007 [BE] [US1] Implement local command hook executor in src/hooks/executor.ts
 
 | | |
 |---|---|
