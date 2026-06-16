@@ -151,7 +151,7 @@ Add `browser` config with:
 - artifact path validation
 - redacted diagnostics
 
-- [ ] T008 [BE] [US1] Implement Playwright adapter boundary in src/browser/playwright-adapter.ts
+- [x] T008 [BE] [US1] Implement Playwright adapter boundary in src/browser/playwright-adapter.ts
 
 | | |
 |---|---|
