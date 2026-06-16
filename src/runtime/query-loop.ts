@@ -16,7 +16,7 @@ export interface QueryLoopDeps {
   maxTurns: number;
   model: string;
   composePrompt: (messages: Message[]) => Prompt;
-  sendMessage: (prompt: Prompt) => AsyncGenerator<Token>;
+  sendMessage: (prompt: Prompt, emit?: (event: LogEvent) => void) => AsyncGenerator<Token>;
   checkPermission: (
     toolName: string,
     args: Record<string, unknown>,
@@ -61,7 +61,7 @@ export async function* createQueryLoop(
     const turnStart = Date.now();
 
     try {
-      const tokenStream = deps.sendMessage(prompt);
+      const tokenStream = deps.sendMessage(prompt, deps.emit);
       const events = parseStream(tokenStream);
 
       for await (const event of events) {

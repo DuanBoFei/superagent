@@ -1,4 +1,4 @@
-import { classifyError } from "./fallback-policy";
+import { classifyError, evaluatePolicy } from "./fallback-policy";
 import { withRetry } from "./retry";
 import { ModelError, type ModelConfig, type Prompt, type TokenChunk } from "./types";
 
@@ -66,7 +66,13 @@ export async function* fallbackRequest(
         success: false,
         errorCategory: category,
       });
-      if (category === "client_error" || category === "auth_error") {
+      const action = evaluatePolicy({
+        category,
+        primaryAttempts: Number.MAX_SAFE_INTEGER,
+        maxPrimaryRetries: 0,
+        fallbackAvailable: true,
+      });
+      if (action.type === "fail") {
         throw primaryError;
       }
       if (isTimeoutError(primaryError)) {
@@ -90,6 +96,8 @@ export async function* fallbackRequest(
   options.onAttemptStart?.({ model: secondaryCfg.model, attempt: 1, category: "fallback" });
   try {
     yield* yieldChunks(requestWithRetry(prompt, secondaryCfg, options.requester));
+    primaryTimeouts = 0;
+    skipPrimary = false;
     options.onAttemptEnd?.({
       model: secondaryCfg.model,
       attempt: 1,
@@ -157,6 +165,10 @@ function isTimeoutError(error: ModelError): boolean {
 function toModelError(err: unknown): ModelError {
   if (err instanceof ModelError) {
     return err;
+  }
+
+  if (err instanceof DOMException && err.name === "AbortError") {
+    return new ModelError("TIMEOUT", "Model request timed out");
   }
 
   if (err instanceof Error) {

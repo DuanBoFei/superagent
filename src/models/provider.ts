@@ -2,8 +2,12 @@ import { getConfig } from "../config/config";
 import { parseSSEStream } from "./client";
 import { fallbackRequest, type ModelRequester } from "./fallback";
 import { ModelError, type ModelConfig, type Prompt, type TokenChunk } from "./types";
+import type { LogEvent } from "../observability/types";
 
-export async function* sendMessage(prompt: Prompt): AsyncGenerator<TokenChunk> {
+export async function* sendMessage(
+  prompt: Prompt,
+  emit?: (event: LogEvent) => void,
+): AsyncGenerator<TokenChunk> {
   const { config } = getConfig();
   const primary: ModelConfig = {
     apiKey: config.apiKey,
@@ -18,7 +22,22 @@ export async function* sendMessage(prompt: Prompt): AsyncGenerator<TokenChunk> {
     timeout: 120000,
   };
 
-  yield* fallbackRequest(prompt, primary, secondary, { requester: requestModel });
+  yield* fallbackRequest(prompt, primary, secondary, {
+    requester: requestModel,
+    onAttemptStart: (e) =>
+      emit?.({ type: "model:attempt_start", model: e.model, attempt: e.attempt, category: e.category }),
+    onAttemptEnd: (e) =>
+      emit?.({
+        type: "model:attempt_end",
+        model: e.model,
+        attempt: e.attempt,
+        durationMs: e.durationMs,
+        success: e.success,
+        errorCategory: e.errorCategory,
+      }),
+    onFallback: (e) =>
+      emit?.({ type: "model:fallback", from: e.from, to: e.to, reason: e.reason }),
+  });
 }
 
 const requestModel: ModelRequester = async function* (

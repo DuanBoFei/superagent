@@ -1,9 +1,13 @@
 import { sendMessage as sendProviderMessage } from "../../models/provider";
 import type { TokenChunk } from "../../models/types";
 import type { Prompt, Token } from "../types";
+import type { LogEvent } from "../../observability/types";
 
-export async function* sendMessage(prompt: Prompt): AsyncGenerator<Token> {
-  for await (const chunk of sendProviderMessage(prompt)) {
+export async function* sendMessage(
+  prompt: Prompt,
+  emit?: (event: LogEvent) => void,
+): AsyncGenerator<Token> {
+  for await (const chunk of sendProviderMessage(prompt, emit)) {
     const token = toRuntimeToken(chunk);
     if (token) {
       yield token;
