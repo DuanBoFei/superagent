@@ -61,7 +61,7 @@ Define typed shapes for:
 - `BrowserResult`
 - browser lifecycle status values
 
-- [ ] T003 [P] [BE] Add browser config resolution tests in tests/browser/config.test.ts and src/browser/config.ts
+- [x] T003 [P] [BE] Add browser config resolution tests in tests/browser/config.test.ts and src/browser/config.ts
 
 | | |
 |---|---|

@@ -24,6 +24,11 @@ export interface BrowserConfig {
   captureScreenshots: boolean;
 }
 
+export interface BrowserProfile extends BrowserConfig {
+  enabled: true;
+  artifactDir: string;
+}
+
 export type BrowserAvailability =
   | {
       available: true;
