@@ -211,7 +211,7 @@ Browser interactions are useful but remain permission-gated.
 
 Denied browser actions do not reach the fake Playwright adapter; approved actions do and return normalized results.
 
-- [ ] T011 [INT] [US2] Add browser permission-order tests in tests/runtime/browser-permissions.test.ts
+- [x] T011 [INT] [US2] Add browser permission-order tests in tests/runtime/browser-permissions.test.ts
 
 | | |
 |---|---|
