@@ -1,6 +1,7 @@
 import { z } from "zod/v4";
 import { ConfigError } from "./types";
 import { defaults } from "./defaults";
+import { browserConfigSchema } from "../browser/schema";
 import { sandboxConfigSchema } from "../sandbox/schema";
 import { HOOK_EVENTS, isObserveOnlyHookEvent } from "../hooks/types";
 import type { Config } from "./types";
@@ -79,10 +80,11 @@ export const configSchema = z.object({
   mcpServers: mcpServersSchema,
   hooks: hooksSchema,
   sandbox: sandboxConfigSchema.default(defaults.sandbox),
+  browser: browserConfigSchema.default(defaults.browser),
 });
 
 const KNOWN_KEYS = new Set(Object.keys(configSchema.shape));
-const NESTED_KEYS = new Set(["permissions", "mcpServers", "hooks", "sandbox"]);
+const NESTED_KEYS = new Set(["permissions", "mcpServers", "hooks", "sandbox", "browser"]);
 const PERMISSION_KEYS = new Set(Object.keys(permissionsSchema.shape));
 const HOOK_EVENT_NAMES = new Set<HookEventName>(HOOK_EVENTS);
 

@@ -19,7 +19,7 @@ All tasks include:
 
 Write browser configuration and permission-order contract tests before implementation.
 
-- [ ] T001 [BE] Add browser config contract tests in tests/config/browser-config.test.ts
+- [x] T001 [BE] Add browser config contract tests in tests/config/browser-config.test.ts
 
 | | |
 |---|---|
@@ -44,7 +44,7 @@ Create failing tests for:
 
 Define typed browser contracts and red tests for availability, safe results, artifacts, and lifecycle state.
 
-- [ ] T002 [P] [BE] Define browser domain types in src/browser/types.ts and tests/browser/types.test.ts
+- [x] T002 [P] [BE] Define browser domain types in src/browser/types.ts and tests/browser/types.test.ts
 
 | | |
 |---|---|
@@ -61,7 +61,7 @@ Define typed shapes for:
 - `BrowserResult`
 - browser lifecycle status values
 
-- [ ] T003 [P] [BE] Add browser config resolution tests in tests/browser/config.test.ts and src/browser/config.ts
+- [x] T003 [P] [BE] Add browser config resolution tests in tests/browser/config.test.ts and src/browser/config.ts
 
 | | |
 |---|---|
@@ -77,7 +77,7 @@ Test and implement runtime profile resolution for:
 - screenshot capture default
 - network policy default
 
-- [ ] T004 [P] [BE] Add browser availability tests in tests/browser/availability.test.ts and src/browser/availability.ts
+- [x] T004 [P] [BE] Add browser availability tests in tests/browser/availability.test.ts and src/browser/availability.ts
 
 | | |
 |---|---|
@@ -92,7 +92,7 @@ Cover:
 - setup failure returns safe availability result
 - diagnostics do not expose local secrets
 
-- [ ] T005 [P] [BE] Add browser results/redaction tests in tests/browser/results.test.ts and src/browser/results.ts
+- [x] T005 [P] [BE] Add browser results/redaction tests in tests/browser/results.test.ts and src/browser/results.ts
 
 | | |
 |---|---|
@@ -109,7 +109,7 @@ Normalize:
 - oversized visible text/action trace truncation
 - secret-like value redaction
 
-- [ ] T006 [P] [BE] Add browser artifact tests in tests/browser/artifacts.test.ts and src/browser/artifacts.ts
+- [x] T006 [P] [BE] Add browser artifact tests in tests/browser/artifacts.test.ts and src/browser/artifacts.ts
 
 | | |
 |---|---|
@@ -136,7 +136,7 @@ A developer can enable browser support and inspect a page from the CLI.
 
 A fake Playwright adapter receives an open request and returns normalized final URL, title, visible text summary, and screenshot artifact metadata.
 
-- [ ] T007 [BE] [US1] Implement browser config schema and defaults in src/config/types.ts, src/config/defaults.ts, and src/config/validator.ts
+- [x] T007 [BE] [US1] Implement browser config schema and defaults in src/config/types.ts, src/config/defaults.ts, and src/config/validator.ts
 
 | | |
 |---|---|
@@ -151,7 +151,7 @@ Add `browser` config with:
 - artifact path validation
 - redacted diagnostics
 
-- [ ] T008 [BE] [US1] Implement Playwright adapter boundary in src/browser/playwright-adapter.ts
+- [x] T008 [BE] [US1] Implement Playwright adapter boundary in src/browser/playwright-adapter.ts
 
 | | |
 |---|---|
@@ -167,7 +167,7 @@ Create an adapter boundary for:
 - taking screenshots
 - allowing fake adapter injection without browser dependency
 
-- [ ] T009 [BE] [US1] Implement browser session lifecycle in src/browser/session.ts
+- [x] T009 [BE] [US1] Implement browser session lifecycle in src/browser/session.ts
 
 | | |
 |---|---|
@@ -183,7 +183,7 @@ Implement:
 - setup failure isolation
 - lifecycle status transitions
 
-- [ ] T010 [BE] [US1] Implement open/screenshot action normalization in src/browser/actions.ts and src/browser/index.ts
+- [x] T010 [BE] [US1] Implement open/screenshot action normalization in src/browser/actions.ts and src/browser/index.ts
 
 | | |
 |---|---|
@@ -211,7 +211,7 @@ Browser interactions are useful but remain permission-gated.
 
 Denied browser actions do not reach the fake Playwright adapter; approved actions do and return normalized results.
 
-- [ ] T011 [INT] [US2] Add browser permission-order tests in tests/runtime/browser-permissions.test.ts
+- [x] T011 [INT] [US2] Add browser permission-order tests in tests/runtime/browser-permissions.test.ts
 
 | | |
 |---|---|
@@ -225,7 +225,7 @@ Test:
 - allow routes to browser manager when enabled
 - browser disabled does not bypass permission semantics
 
-- [ ] T012 [BE] [US2] Implement click/type/select/wait/close actions in src/browser/actions.ts
+- [x] T012 [BE] [US2] Implement click/type/select/wait/close actions in src/browser/actions.ts
 
 | | |
 |---|---|
@@ -241,7 +241,7 @@ Implement:
 - close browser context
 - normalized action trace
 
-- [ ] T013 [INT] [US2] Register browser tool and route through runtime after permission approval in src/tools/browser.ts and src/runtime/tool-dispatcher.ts
+- [x] T013 [INT] [US2] Register browser tool and route through runtime after permission approval in src/tools/browser.ts and src/runtime/tool-dispatcher.ts
 
 | | |
 |---|---|
@@ -267,7 +267,7 @@ Browser failures are diagnosable and do not crash the Agent session.
 
 Browser setup failure, timeout, action failure, and secret-like page content produce safe results and redacted browser events.
 
-- [ ] T014 [INT] [US3] Add browser observability and integration coverage in src/observability/types.ts and tests/browser/integration.test.ts
+- [x] T014 [INT] [US3] Add browser observability and integration coverage in src/observability/types.ts and tests/browser/integration.test.ts
 
 | | |
 |---|---|

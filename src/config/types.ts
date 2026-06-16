@@ -1,3 +1,4 @@
+import type { BrowserConfig } from "../browser/types";
 import type { HookConfig, HookEventName } from "../hooks/types";
 import type { SandboxConfig } from "../sandbox/types";
 
@@ -34,6 +35,7 @@ export interface Config {
   mcpServers: Record<string, McpServerConfig>;
   hooks: Partial<Record<HookEventName, HookConfig[]>>;
   sandbox: SandboxConfig;
+  browser: BrowserConfig;
 }
 
 export interface ConfigLoadResult {

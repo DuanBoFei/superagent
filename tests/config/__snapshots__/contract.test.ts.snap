@@ -4,6 +4,7 @@ exports[`Config schema contract > field type map matches snapshot 1`] = `
 {
   "apiKey": "string",
   "baseUrl": "string",
+  "browser": "default",
   "fallbackBaseUrl": "string",
   "fallbackModel": "string",
   "hooks": "default",

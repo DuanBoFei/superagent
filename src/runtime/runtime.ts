@@ -1,9 +1,13 @@
+import { resolveBrowserProfile } from "../browser/config";
+import { PlaywrightBrowserAdapter } from "../browser/playwright-adapter";
+import { BrowserSessionManager } from "../browser/session";
 import { createMcpManager, type McpManager } from "../mcp/manager";
 import { createChecker } from "../permissions/checker";
 import type { PromptFn } from "../permissions/types";
 import { permissionSystem } from "./stubs/permission";
 import { createToolDispatcher } from "./tool-dispatcher";
-import { createToolRegistry, clearMcpTools, registerMcpTools } from "../tools/registry";
+import { browserToolSchema, createBrowserTool } from "../tools/browser";
+import { createToolRegistry, clearMcpTools, registerMcpTools, registerTool } from "../tools/registry";
 import { registerAllTools } from "../tools/index";
 import { defaults } from "../config/defaults";
 import type { Config } from "../config/types";
@@ -60,6 +64,16 @@ export function createRuntime(options: RuntimeOptions = {}): RuntimeHandle {
   const mcpManager = options.mcpManager ?? createMcpManager(config.mcpServers);
   const registry = createToolRegistry();
   registerAllTools(registry);
+  const browserProfile = resolveBrowserProfile({ config: config.browser ?? defaults.browser, workspace: process.cwd() });
+  if (browserProfile !== undefined) {
+    registerTool(
+      registry,
+      "Browser",
+      createBrowserTool({ profile: browserProfile, sessions: new BrowserSessionManager(new PlaywrightBrowserAdapter()), emit: options.emit }),
+      browserToolSchema,
+      false,
+    );
+  }
   registerMcpTools(registry, mcpManager, { emit: options.emit });
 
   const promptPermission: PromptFn = options.promptPermission ?? (async () => "denied");
