@@ -73,6 +73,7 @@ export interface BrowserResult {
   finalUrl?: string;
   title?: string;
   textSummary?: string;
+  actionTrace?: string;
   artifacts: BrowserArtifact[];
   timedOut: boolean;
   durationMs: number;

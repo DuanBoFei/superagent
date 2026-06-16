@@ -84,6 +84,7 @@ describe("browser domain types", () => {
       finalUrl?: string;
       title?: string;
       textSummary?: string;
+      actionTrace?: string;
       artifacts: BrowserArtifact[];
       timedOut: boolean;
       durationMs: number;

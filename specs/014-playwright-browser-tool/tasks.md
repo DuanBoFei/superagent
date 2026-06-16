@@ -92,7 +92,7 @@ Cover:
 - setup failure returns safe availability result
 - diagnostics do not expose local secrets
 
-- [ ] T005 [P] [BE] Add browser results/redaction tests in tests/browser/results.test.ts and src/browser/results.ts
+- [x] T005 [P] [BE] Add browser results/redaction tests in tests/browser/results.test.ts and src/browser/results.ts
 
 | | |
 |---|---|
