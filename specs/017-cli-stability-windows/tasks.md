@@ -68,8 +68,8 @@
 - [x] T018 [INT] Run `pnpm start -- --prompt "hello"` smoke  
   Source: FR-CW-03 · Input: one-shot prompt · Output: response then exit · Verify: manual command output (PASSED)
 
-- [ ] T019 [INT] Run interactive Windows VS Code terminal smoke  
-  Source: FR-CW-01, FR-CW-06 · Input: type `hello` · Output: accepted input, no flicker · Verify: manual result recorded
+- [x] T019 [INT] Run interactive Windows VS Code terminal smoke  
+  Source: FR-CW-01, FR-CW-06 · Input: type `hello` · Output: accepted input, no flicker · Verify: PASSED
 
-- [ ] T020 [INT] Run interactive PowerShell smoke  
-  Source: FR-CW-02, FR-CW-06 · Input: type `hello` · Output: accepted input, no flicker · Verify: manual result recorded
+- [x] T020 [INT] Run interactive PowerShell smoke  
+  Source: FR-CW-02, FR-CW-06 · Input: type `hello` · Output: accepted input, no flicker · Verify: PASSED

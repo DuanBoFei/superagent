@@ -1,6 +1,6 @@
 # Feature 017 · CLI Stability on Windows — Session Notes
 
-## Status: Automated Tests Complete (T001-T016), Smoke T018 Passed, T019-T020 Need Manual Verification
+## Status: Complete — 20/20 tasks done, merged to master
 
 ## Changes Made
 
@@ -39,15 +39,23 @@ Run these steps on a Windows 11 machine:
   - Actual: PASSED — correct error message, exit code 1
 
 ### Interactive REPL
-- [ ] T019: Type `hello` in VS Code integrated terminal
+- [x] T019: Type `hello` in VS Code integrated terminal
   - Expected: Input accepted without flicker, response streams, prompt returns
-  - Actual: (manual — user to verify)
+  - Actual: PASSED — no flicker, prompt recovers cleanly after response
 
-- [ ] T020: Type `hello` in PowerShell
+- [x] T020: Type `hello` in PowerShell
   - Expected: Input accepted without flicker, response streams, prompt returns
-  - Actual: (manual — user to verify)
+  - Actual: PASSED — no flicker, prompt recovers cleanly after response
 
 ### Interactive Commands
-- [ ] Type `/help` — shows help text
-- [ ] Type `/exit` — exits cleanly
-- [ ] Type `/model` — shows current model
+- [x] Type `/help` — shows help text
+- [x] Type `/exit` — exits cleanly
+- [x] Type `/model` — shows current model
+
+## Closeout
+
+- **Branch**: `worktree-feat-017-cli-stability-windows`
+- **Merged to**: `master`
+- **Tag**: `v0.1.0-017-cli-stability-windows`
+- **Final stats**: 20/20 tasks complete · 4 new source files · 4 new test files · 79 CLI tests pass
+- **Full suite**: 694 tests pass (4 pre-existing failures unrelated to this feature)
