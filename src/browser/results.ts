@@ -20,6 +20,7 @@ export interface NormalizeBrowserResultInput {
   };
   timedOut?: boolean;
   durationMs: number;
+  status?: BrowserResult["status"];
 }
 
 export function safeBrowserText(value: string, maxChars = MAX_TEXT_CHARS): string {
@@ -36,7 +37,7 @@ export function normalizeBrowserResult(input: NormalizeBrowserResultInput): Brow
 
   return {
     action: input.action,
-    status: timedOut ? "timed_out" : failed ? "failed" : "running",
+    status: input.status ?? (timedOut ? "timed_out" : failed ? "failed" : "running"),
     ...(input.pageState?.finalUrl !== undefined ? { finalUrl: safeBrowserText(input.pageState.finalUrl) } : {}),
     ...(input.pageState?.title !== undefined ? { title: safeBrowserText(input.pageState.title) } : {}),
     ...(input.pageState?.visibleText !== undefined ? { textSummary: safeBrowserText(input.pageState.visibleText) } : {}),

@@ -56,6 +56,22 @@ class FakeBrowserAdapter implements BrowserAdapter {
     this.calls.push(`screenshot:${session.id}:${options?.fullPage === true}`);
     return new Uint8Array([1, 2, 3]);
   }
+
+  async click(session: BrowserAdapterSession, selector: string, timeoutMs: number) {
+    this.calls.push(`click:${session.id}:${selector}:${timeoutMs}`);
+  }
+
+  async typeText(session: BrowserAdapterSession, selector: string, text: string, timeoutMs: number) {
+    this.calls.push(`typeText:${session.id}:${selector}:${text}:${timeoutMs}`);
+  }
+
+  async select(session: BrowserAdapterSession, selector: string, value: string, timeoutMs: number) {
+    this.calls.push(`select:${session.id}:${selector}:${value}:${timeoutMs}`);
+  }
+
+  async wait(session: BrowserAdapterSession, target: { selector?: string; text?: string; loadState?: "load" | "domcontentloaded" | "networkidle" }, timeoutMs: number) {
+    this.calls.push(`wait:${session.id}:${target.selector ?? ""}:${target.text ?? ""}:${target.loadState ?? ""}:${timeoutMs}`);
+  }
 }
 
 describe("browser adapter boundary", () => {
@@ -104,6 +120,21 @@ describe("browser adapter boundary", () => {
 
     await expect(adapter.screenshot(session, { fullPage: true })).resolves.toEqual(new Uint8Array([1, 2, 3]));
     expect(adapter.calls).toContain("screenshot:session-1:true");
+  });
+
+  it("performs safe UI interactions", async () => {
+    const adapter = new FakeBrowserAdapter();
+    const session = await adapter.launch(profile());
+
+    await adapter.click(session, "button.save", 10000);
+    await adapter.typeText(session, "input[name=email]", "user@example.test", 10000);
+    await adapter.select(session, "select[name=role]", "admin", 10000);
+    await adapter.wait(session, { selector: "main", loadState: "domcontentloaded" }, 10000);
+
+    expect(adapter.calls).toContain("click:session-1:button.save:10000");
+    expect(adapter.calls).toContain("typeText:session-1:input[name=email]:user@example.test:10000");
+    expect(adapter.calls).toContain("select:session-1:select[name=role]:admin:10000");
+    expect(adapter.calls).toContain("wait:session-1:main::domcontentloaded:10000");
   });
 });
 
@@ -169,5 +200,69 @@ describe("executeBrowserAction", () => {
       status: "timed_out",
       timedOut: true,
     });
+  });
+
+  it("clicks target and returns action trace", async () => {
+    const adapter = new FakeBrowserAdapter();
+    const result = await executeBrowserAction({
+      action: { type: "click", selector: "button.save", timeoutMs: 10000 },
+      profile: profile(),
+      sessions: new BrowserSessionManager(adapter),
+    });
+
+    expect(result).toMatchObject({ action: "click", status: "running", actionTrace: "clicked button.save" });
+    expect(adapter.calls).toContain("click:session-1:button.save:10000");
+  });
+
+  it("types text with redacted action trace", async () => {
+    const adapter = new FakeBrowserAdapter();
+    const result = await executeBrowserAction({
+      action: { type: "type", selector: "input[name=token]", text: "token=secret-value", timeoutMs: 10000 },
+      profile: profile(),
+      sessions: new BrowserSessionManager(adapter),
+    });
+
+    expect(result.actionTrace).toBe("typed into input[name=token]: token=[REDACTED]");
+    expect(adapter.calls).toContain("typeText:session-1:input[name=token]:token=secret-value:10000");
+  });
+
+  it("selects option and waits for target", async () => {
+    const adapter = new FakeBrowserAdapter();
+    const sessions = new BrowserSessionManager(adapter);
+
+    const selectResult = await executeBrowserAction({
+      action: { type: "select", selector: "select[name=role]", value: "admin", timeoutMs: 10000 },
+      profile: profile(),
+      sessions,
+    });
+    const waitResult = await executeBrowserAction({
+      action: { type: "wait", selector: "main", loadState: "domcontentloaded", timeoutMs: 10000 },
+      profile: profile(),
+      sessions,
+    });
+
+    expect(selectResult).toMatchObject({ action: "select", actionTrace: "selected select[name=role]: admin" });
+    expect(waitResult).toMatchObject({ action: "wait", actionTrace: "waited for selector main and load state domcontentloaded" });
+    expect(adapter.calls).toContain("select:session-1:select[name=role]:admin:10000");
+    expect(adapter.calls).toContain("wait:session-1:main::domcontentloaded:10000");
+  });
+
+  it("closes browser context", async () => {
+    const adapter = new FakeBrowserAdapter();
+    const sessions = new BrowserSessionManager(adapter);
+    await executeBrowserAction({
+      action: { type: "open", url: "https://example.test" },
+      profile: profile(),
+      sessions,
+    });
+
+    const result = await executeBrowserAction({
+      action: { type: "close" },
+      profile: profile(),
+      sessions,
+    });
+
+    expect(result).toMatchObject({ action: "close", status: "closed", actionTrace: "closed browser context" });
+    expect(adapter.calls).toContain("close:session-1");
   });
 });

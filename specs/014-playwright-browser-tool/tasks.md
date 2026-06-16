@@ -225,7 +225,7 @@ Test:
 - allow routes to browser manager when enabled
 - browser disabled does not bypass permission semantics
 
-- [ ] T012 [BE] [US2] Implement click/type/select/wait/close actions in src/browser/actions.ts
+- [x] T012 [BE] [US2] Implement click/type/select/wait/close actions in src/browser/actions.ts
 
 | | |
 |---|---|

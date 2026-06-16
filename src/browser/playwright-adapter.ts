@@ -17,6 +17,14 @@ export interface BrowserAdapter {
   navigate(session: BrowserAdapterSession, url: string, timeoutMs: number): Promise<void>;
   getPageState(session: BrowserAdapterSession, maxTextChars: number): Promise<BrowserPageStateSnapshot>;
   screenshot(session: BrowserAdapterSession, options?: { fullPage?: boolean }): Promise<Uint8Array>;
+  click(session: BrowserAdapterSession, selector: string, timeoutMs: number): Promise<void>;
+  typeText(session: BrowserAdapterSession, selector: string, text: string, timeoutMs: number): Promise<void>;
+  select(session: BrowserAdapterSession, selector: string, value: string, timeoutMs: number): Promise<void>;
+  wait(
+    session: BrowserAdapterSession,
+    target: { selector?: string; text?: string; loadState?: "load" | "domcontentloaded" | "networkidle" },
+    timeoutMs: number,
+  ): Promise<void>;
 }
 
 export type PlaywrightLoader = () => Promise<{
@@ -46,6 +54,12 @@ interface PlaywrightPage {
   title(): Promise<string>;
   locator(selector: string): { innerText(options: { timeout: number }): Promise<string> };
   screenshot(options: { fullPage?: boolean; type: "png" }): Promise<Buffer>;
+  click(selector: string, options: { timeout: number }): Promise<void>;
+  fill(selector: string, text: string, options: { timeout: number }): Promise<void>;
+  selectOption(selector: string, value: string, options: { timeout: number }): Promise<unknown>;
+  waitForSelector(selector: string, options: { timeout: number }): Promise<unknown>;
+  waitForLoadState(loadState: "load" | "domcontentloaded" | "networkidle", options: { timeout: number }): Promise<void>;
+  getByText(text: string): { waitFor(options: { timeout: number }): Promise<void> };
 }
 
 interface PlaywrightSession extends BrowserAdapterSession {
@@ -116,5 +130,34 @@ export class PlaywrightBrowserAdapter implements BrowserAdapter {
       fullPage: options.fullPage,
       type: "png",
     }));
+  }
+
+  async click(session: BrowserAdapterSession, selector: string, timeoutMs: number): Promise<void> {
+    await (session as PlaywrightSession).page.click(selector, { timeout: timeoutMs });
+  }
+
+  async typeText(session: BrowserAdapterSession, selector: string, text: string, timeoutMs: number): Promise<void> {
+    await (session as PlaywrightSession).page.fill(selector, text, { timeout: timeoutMs });
+  }
+
+  async select(session: BrowserAdapterSession, selector: string, value: string, timeoutMs: number): Promise<void> {
+    await (session as PlaywrightSession).page.selectOption(selector, value, { timeout: timeoutMs });
+  }
+
+  async wait(
+    session: BrowserAdapterSession,
+    target: { selector?: string; text?: string; loadState?: "load" | "domcontentloaded" | "networkidle" },
+    timeoutMs: number,
+  ): Promise<void> {
+    const page = (session as PlaywrightSession).page;
+    if (target.selector !== undefined) {
+      await page.waitForSelector(target.selector, { timeout: timeoutMs });
+    }
+    if (target.text !== undefined) {
+      await page.getByText(target.text).waitFor({ timeout: timeoutMs });
+    }
+    if (target.loadState !== undefined) {
+      await page.waitForLoadState(target.loadState, { timeout: timeoutMs });
+    }
   }
 }
