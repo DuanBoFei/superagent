@@ -2,6 +2,7 @@ import { resolveBrowserProfile } from "../browser/config";
 import { PlaywrightBrowserAdapter } from "../browser/playwright-adapter";
 import { BrowserSessionManager } from "../browser/session";
 import { createMcpManager, type McpManager } from "../mcp/manager";
+import { buildModelToolDefinitions } from "../models/tool-schema";
 import { createChecker } from "../permissions/checker";
 import type { PromptFn } from "../permissions/types";
 import { permissionSystem } from "./stubs/permission";
@@ -196,7 +197,7 @@ export function createRuntime(options: RuntimeOptions = {}): RuntimeHandle {
       let stopReason: TurnSummary["reason"] | undefined;
       try {
         await dispatchSessionStart(false);
-        for await (const event of createQueryLoop(session, resolvedDeps)) {
+        for await (const event of createQueryLoop(session, withModelTools())) {
           if (event.type === "turn_end") {
             stopReason = event.summary.reason;
           }
@@ -231,7 +232,7 @@ export function createRuntime(options: RuntimeOptions = {}): RuntimeHandle {
       let stopReason: TurnSummary["reason"] | undefined;
       try {
         await dispatchSessionStart(true);
-        for await (const event of createQueryLoop(session, resolvedDeps)) {
+        for await (const event of createQueryLoop(session, withModelTools())) {
           if (event.type === "turn_end") {
             stopReason = event.summary.reason;
           }
@@ -242,4 +243,17 @@ export function createRuntime(options: RuntimeOptions = {}): RuntimeHandle {
       }
     },
   };
+
+  function withModelTools(): QueryLoopDeps {
+    return {
+      ...resolvedDeps,
+      composePrompt(messages) {
+        const prompt = resolvedDeps.composePrompt(messages);
+        return {
+          ...prompt,
+          tools: buildModelToolDefinitions(registry),
+        };
+      },
+    };
+  }
 }

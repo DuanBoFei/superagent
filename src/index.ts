@@ -46,6 +46,29 @@ async function main(): Promise<void> {
       emit: (event) => obs.emit(event),
     });
 
+    const promptIndex = process.argv.indexOf("--prompt");
+    if (promptIndex !== -1) {
+      const userMessage = process.argv.slice(promptIndex + 1).join(" ").trim();
+      if (userMessage === "") {
+        process.stderr.write("Fatal: --prompt requires a message\n");
+        process.exit(1);
+      }
+
+      process.stdout.write(`SuperAgent · ${config.model}\n`);
+      for await (const event of runtime.startTurn(userMessage)) {
+        if (event.type === "text") {
+          process.stdout.write(event.content);
+        }
+        if (event.type === "error") {
+          process.stderr.write(`✗ ${event.message}\n`);
+        }
+      }
+      process.stdout.write("\n");
+      obs.emit({ type: "session:end", exitCode: 0 });
+      obs.close();
+      process.exit(0);
+    }
+
     const isResume = process.argv.includes("--resume");
 
     if (isResume) {

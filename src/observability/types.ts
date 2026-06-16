@@ -180,6 +180,26 @@ export type LogEvent =
       inputSummary?: string;
     }
   | {
+      type: "model:attempt_start";
+      model: string;
+      attempt: number;
+      category?: string;
+    }
+  | {
+      type: "model:attempt_end";
+      model: string;
+      attempt: number;
+      durationMs: number;
+      success: boolean;
+      errorCategory?: string;
+    }
+  | {
+      type: "model:fallback";
+      from: string;
+      to: string;
+      reason: string;
+    }
+  | {
       type: "error";
       message: string;
       stack?: string;

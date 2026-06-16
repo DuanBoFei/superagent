@@ -1,3 +1,4 @@
+import { classifyError, evaluatePolicy } from "./fallback-policy";
 import { withRetry } from "./retry";
 import { ModelError, type ModelConfig, type Prompt, type TokenChunk } from "./types";
 
@@ -13,9 +14,17 @@ export interface FallbackEvent {
   reason: string;
 }
 
+export interface ModelAttemptEvent {
+  model: string;
+  attempt: number;
+  category?: string;
+}
+
 export interface FallbackOptions {
   requester: ModelRequester;
   onFallback?: (event: FallbackEvent) => void;
+  onAttemptStart?: (event: ModelAttemptEvent) => void;
+  onAttemptEnd?: (event: ModelAttemptEvent & { durationMs: number; success: boolean; errorCategory?: string }) => void;
 }
 
 let primaryTimeouts = 0;
@@ -35,12 +44,37 @@ export async function* fallbackRequest(
   let primaryError: ModelError | undefined;
 
   if (!skipPrimary) {
+    const primaryStart = Date.now();
+    options.onAttemptStart?.({ model: primaryCfg.model, attempt: primaryTimeouts + 1 });
     try {
       yield* yieldChunks(requestWithRetry(prompt, primaryCfg, options.requester));
       primaryTimeouts = 0;
+      options.onAttemptEnd?.({
+        model: primaryCfg.model,
+        attempt: 1,
+        durationMs: Date.now() - primaryStart,
+        success: true,
+      });
       return;
     } catch (err) {
       primaryError = primaryFailure(toModelError(err));
+      const category = classifyError(primaryError);
+      options.onAttemptEnd?.({
+        model: primaryCfg.model,
+        attempt: primaryTimeouts + 1,
+        durationMs: Date.now() - primaryStart,
+        success: false,
+        errorCategory: category,
+      });
+      const action = evaluatePolicy({
+        category,
+        primaryAttempts: Number.MAX_SAFE_INTEGER,
+        maxPrimaryRetries: 0,
+        fallbackAvailable: true,
+      });
+      if (action.type === "fail") {
+        throw primaryError;
+      }
       if (isTimeoutError(primaryError)) {
         primaryTimeouts++;
         if (primaryTimeouts >= 3) {
@@ -58,10 +92,29 @@ export async function* fallbackRequest(
     reason: primaryError?.message ?? "Primary skipped",
   });
 
+  const fallbackStart = Date.now();
+  options.onAttemptStart?.({ model: secondaryCfg.model, attempt: 1, category: "fallback" });
   try {
     yield* yieldChunks(requestWithRetry(prompt, secondaryCfg, options.requester));
+    primaryTimeouts = 0;
+    skipPrimary = false;
+    options.onAttemptEnd?.({
+      model: secondaryCfg.model,
+      attempt: 1,
+      durationMs: Date.now() - fallbackStart,
+      success: true,
+      errorCategory: "fallback",
+    });
   } catch (err) {
     const secondaryError = toModelError(err);
+    const category = classifyError(secondaryError);
+    options.onAttemptEnd?.({
+      model: secondaryCfg.model,
+      attempt: 1,
+      durationMs: Date.now() - fallbackStart,
+      success: false,
+      errorCategory: category,
+    });
     throw new ModelError(
       "ALL_MODELS_UNAVAILABLE",
       `All models unavailable: ${primaryCfg.model}: ${primaryError?.message ?? "skipped"}; ${secondaryCfg.model}: ${secondaryError.message}`,
@@ -112,6 +165,10 @@ function isTimeoutError(error: ModelError): boolean {
 function toModelError(err: unknown): ModelError {
   if (err instanceof ModelError) {
     return err;
+  }
+
+  if (err instanceof DOMException && err.name === "AbortError") {
+    return new ModelError("TIMEOUT", "Model request timed out");
   }
 
   if (err instanceof Error) {

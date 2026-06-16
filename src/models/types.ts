@@ -1,8 +1,18 @@
 import type { Message } from "../runtime/types";
 
+export interface ModelToolDefinition {
+  type: "function";
+  function: {
+    name: string;
+    description?: string;
+    parameters: Record<string, unknown>;
+  };
+}
+
 export interface Prompt {
   system: string;
   messages: Message[];
+  tools?: ModelToolDefinition[];
 }
 
 export type TokenUsage = {
@@ -15,6 +25,11 @@ export type ToolCall = {
   arguments: Record<string, unknown>;
 };
 
+export type ToolErrorCall = {
+  name: string;
+  arguments: string;
+};
+
 export type TokenChunk =
   | {
       type: "text";
@@ -24,6 +39,12 @@ export type TokenChunk =
   | {
       type: "tool_use";
       tool_call: ToolCall;
+      model?: string;
+    }
+  | {
+      type: "tool_error";
+      tool_call: ToolErrorCall;
+      error: string;
       model?: string;
     }
   | {

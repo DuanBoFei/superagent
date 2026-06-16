@@ -19,7 +19,7 @@ export interface QueryLoopDeps {
   maxTurns: number;
   model: string;
   composePrompt: (messages: Message[]) => Prompt;
-  sendMessage: (prompt: Prompt) => AsyncGenerator<Token>;
+  sendMessage: (prompt: Prompt, emit?: (event: LogEvent) => void) => AsyncGenerator<Token>;
   checkPermission: (
     toolName: string,
     args: Record<string, unknown>,
@@ -93,10 +93,11 @@ export async function* createQueryLoop(
 
     let hadToolCalls = false;
     let firstTokenEmitted = false;
+    let assistantContent = "";
     const turnStart = Date.now();
 
     try {
-      const tokenStream = deps.sendMessage(prompt);
+      const tokenStream = deps.sendMessage(prompt, deps.emit);
       const events = parseStream(tokenStream);
 
       for await (const event of events) {
@@ -115,10 +116,19 @@ export async function* createQueryLoop(
         if (event.type === "text") {
           state = transition(state, "text_complete");
           totalTokens += event.content.length;
+          assistantContent += event.content;
           yield event;
         } else if (event.type === "tool_call") {
           hadToolCalls = true;
           state = transition(state, "tool_calls");
+          if (assistantContent.length > 0) {
+            session.messages.push({ role: "assistant", content: assistantContent });
+            assistantContent = "";
+          }
+          session.messages.push({
+            role: "assistant",
+            content: `[Tool call: ${event.name}] ${JSON.stringify(event.args)}`,
+          });
           yield event;
 
           const permission = deps.checkPermission(event.name, event.args);
@@ -146,6 +156,11 @@ export async function* createQueryLoop(
             { name: event.name, args: event.args },
           ]);
           for (const result of results) {
+            session.toolResults.push(result);
+            session.messages.push({
+              role: "system",
+              content: `[Tool result: ${result.name}] ${result.success ? result.output : result.error ?? result.output}`,
+            });
             deps.emit?.({
               type: "tool:end",
               toolName: result.name,
