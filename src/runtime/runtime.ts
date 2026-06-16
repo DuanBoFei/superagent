@@ -1,4 +1,5 @@
 import { createMcpManager, type McpManager } from "../mcp/manager";
+import { buildModelToolDefinitions } from "../models/tool-schema";
 import { createChecker } from "../permissions/checker";
 import type { PromptFn } from "../permissions/types";
 import { permissionSystem } from "./stubs/permission";
@@ -152,7 +153,7 @@ export function createRuntime(options: RuntimeOptions = {}): RuntimeHandle {
       process.once("SIGINT", sigintHandler);
 
       try {
-        yield* createQueryLoop(session, resolvedDeps);
+        yield* createQueryLoop(session, withModelTools());
       } finally {
         process.off("SIGINT", sigintHandler);
       }
@@ -178,7 +179,20 @@ export function createRuntime(options: RuntimeOptions = {}): RuntimeHandle {
         });
       }
 
-      yield* createQueryLoop(session, resolvedDeps);
+      yield* createQueryLoop(session, withModelTools());
     },
   };
+
+  function withModelTools(): QueryLoopDeps {
+    return {
+      ...resolvedDeps,
+      composePrompt(messages) {
+        const prompt = resolvedDeps.composePrompt(messages);
+        return {
+          ...prompt,
+          tools: buildModelToolDefinitions(registry),
+        };
+      },
+    };
+  }
 }

@@ -24,5 +24,13 @@ function toRuntimeToken(chunk: TokenChunk): Token | null {
     };
   }
 
+  if (chunk.type === "tool_error") {
+    return {
+      type: "error",
+      name: chunk.tool_call.name,
+      error: chunk.error,
+    };
+  }
+
   return null;
 }

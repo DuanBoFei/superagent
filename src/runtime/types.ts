@@ -1,3 +1,5 @@
+import type { ModelToolDefinition } from "../models/types";
+
 export enum State {
   IDLE = "IDLE",
   THINKING = "THINKING",
@@ -69,6 +71,7 @@ export interface TurnContext {
 export interface Prompt {
   system: string;
   messages: Message[];
+  tools?: ModelToolDefinition[];
 }
 
 export interface PermissionResult {
@@ -76,9 +79,7 @@ export interface PermissionResult {
   reason?: string;
 }
 
-export interface Token {
-  type: "text" | "tool_use";
-  content?: string;
-  name?: string;
-  arguments?: string;
-}
+export type Token =
+  | { type: "text"; content?: string }
+  | { type: "tool_use"; name?: string; arguments?: string }
+  | { type: "error"; name?: string; error: string };

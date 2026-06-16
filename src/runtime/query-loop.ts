@@ -57,6 +57,7 @@ export async function* createQueryLoop(
 
     let hadToolCalls = false;
     let firstTokenEmitted = false;
+    let assistantContent = "";
     const turnStart = Date.now();
 
     try {
@@ -79,10 +80,19 @@ export async function* createQueryLoop(
         if (event.type === "text") {
           state = transition(state, "text_complete");
           totalTokens += event.content.length;
+          assistantContent += event.content;
           yield event;
         } else if (event.type === "tool_call") {
           hadToolCalls = true;
           state = transition(state, "tool_calls");
+          if (assistantContent.length > 0) {
+            session.messages.push({ role: "assistant", content: assistantContent });
+            assistantContent = "";
+          }
+          session.messages.push({
+            role: "assistant",
+            content: `[Tool call: ${event.name}] ${JSON.stringify(event.args)}`,
+          });
           yield event;
 
           const permission = deps.checkPermission(event.name, event.args);
@@ -110,6 +120,11 @@ export async function* createQueryLoop(
             { name: event.name, args: event.args },
           ]);
           for (const result of results) {
+            session.toolResults.push(result);
+            session.messages.push({
+              role: "system",
+              content: `[Tool result: ${result.name}] ${result.success ? result.output : result.error ?? result.output}`,
+            });
             deps.emit?.({
               type: "tool:end",
               toolName: result.name,

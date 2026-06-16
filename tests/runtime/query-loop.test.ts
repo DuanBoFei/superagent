@@ -154,4 +154,113 @@ describe("Query loop", () => {
     expect(toolResults.length).toBeGreaterThanOrEqual(1);
     expect(toolResults[0]!.type).toBe("tool_result");
   });
+
+  it("DSML text tool call is dispatched as a tool call", async () => {
+    const session = makeSession();
+    const dispatched: Array<{ name: string; args: Record<string, unknown> }> = [];
+    const loop = createQueryLoop(session, {
+      maxTurns: 1,
+      composePrompt: (messages: Message[]): Prompt => ({
+        system: "test",
+        messages,
+      }),
+      sendMessage: async function* () {
+        yield {
+          type: "text",
+          content: "Let me read the file.\n\n<｜｜DSML｜｜tool_calls>\n<｜｜DSML｜｜invoke name=\"Read\">\n<｜｜DSML｜｜parameter name=\"filePath\" string=\"true\">src/runtime/runtime.ts</｜｜DSML｜｜parameter>\n</｜｜DSML｜｜invoke>\n</｜｜DSML｜｜tool_calls>",
+        } satisfies Token;
+      },
+      checkPermission: (_tool, _args): PermissionResult => ({
+        allowed: true,
+      }),
+      dispatchTools: async (calls) => {
+        dispatched.push(...calls);
+        return calls.map((call) => ({ name: call.name, success: true, output: "read ok" }));
+      },
+      saveSession: () => {},
+    });
+
+    const events = await collect(loop);
+
+    expect(events).toContainEqual({ type: "text", content: "Let me read the file.\n\n" });
+    expect(events).toContainEqual({
+      type: "tool_call",
+      name: "Read",
+      args: { file_path: "src/runtime/runtime.ts" },
+    });
+    expect(dispatched).toEqual([{ name: "Read", args: { file_path: "src/runtime/runtime.ts" } }]);
+  });
+
+  it("dispatches structured tool calls from the model stream", async () => {
+    const session = makeSession();
+    const dispatched: Array<{ name: string; args: Record<string, unknown> }> = [];
+    const loop = createQueryLoop(session, {
+      maxTurns: 1,
+      composePrompt: (messages: Message[]): Prompt => ({
+        system: "test",
+        messages,
+      }),
+      sendMessage: async function* () {
+        yield {
+          type: "tool_use",
+          name: "Read",
+          arguments: '{"file_path":"src/runtime/runtime.ts"}',
+        } satisfies Token;
+      },
+      checkPermission: (_tool, _args): PermissionResult => ({ allowed: true }),
+      dispatchTools: async (calls) => {
+        dispatched.push(...calls);
+        return calls.map((call) => ({ name: call.name, success: true, output: "read ok" }));
+      },
+      saveSession: () => {},
+    });
+
+    const events = await collect(loop);
+
+    expect(events).toContainEqual({
+      type: "tool_call",
+      name: "Read",
+      args: { file_path: "src/runtime/runtime.ts" },
+    });
+    expect(dispatched).toEqual([{ name: "Read", args: { file_path: "src/runtime/runtime.ts" } }]);
+  });
+
+  it("feeds tool results into the next model request", async () => {
+    const session = makeSession({ messages: [{ role: "user", content: "analyze runtime" }] });
+    const promptMessages: Message[][] = [];
+    let requestCount = 0;
+    const loop = createQueryLoop(session, {
+      maxTurns: 3,
+      composePrompt: (messages: Message[]): Prompt => {
+        promptMessages.push([...messages]);
+        return { system: "test", messages };
+      },
+      sendMessage: async function* () {
+        requestCount++;
+        if (requestCount === 1) {
+          yield {
+            type: "text",
+            content: "Let me read the file.\n\n<tool>\n<name>Read</name>\n<parameter name=\"file_path\">src/runtime/runtime.ts</parameter>\n</tool>",
+          } satisfies Token;
+          return;
+        }
+
+        yield { type: "text", content: "createRuntime builds the runtime." } satisfies Token;
+      },
+      checkPermission: (_tool, _args): PermissionResult => ({ allowed: true }),
+      dispatchTools: async (calls) => calls.map((call) => ({
+        name: call.name,
+        success: true,
+        output: "FILE CONTENT: export function createRuntime() {}",
+      })),
+      saveSession: () => {},
+    });
+
+    const events = await collect(loop);
+
+    expect(requestCount).toBe(2);
+    expect(promptMessages.length).toBe(2);
+    expect(promptMessages[1]!.some((message) => message.content.includes("[Tool result: Read] FILE CONTENT"))).toBe(true);
+    expect(events).toContainEqual({ type: "text", content: "createRuntime builds the runtime." });
+  });
 });

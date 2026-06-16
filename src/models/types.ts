@@ -25,6 +25,11 @@ export type ToolCall = {
   arguments: Record<string, unknown>;
 };
 
+export type ToolErrorCall = {
+  name: string;
+  arguments: string;
+};
+
 export type TokenChunk =
   | {
       type: "text";
@@ -34,6 +39,12 @@ export type TokenChunk =
   | {
       type: "tool_use";
       tool_call: ToolCall;
+      model?: string;
+    }
+  | {
+      type: "tool_error";
+      tool_call: ToolErrorCall;
+      error: string;
       model?: string;
     }
   | {

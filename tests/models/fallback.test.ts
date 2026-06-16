@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { fallbackRequest, resetFallbackState, type ModelRequester } from "../../src/models/fallback";
-import { ModelError, type ModelConfig, type Prompt, type TokenChunk } from "../../src/models/types";
+import { ModelError, type ModelConfig, type ModelToolDefinition, type Prompt, type TokenChunk } from "../../src/models/types";
 
 const prompt: Prompt = {
   system: "You are SuperAgent.",
@@ -92,6 +92,42 @@ describe("fallbackRequest", () => {
       errors: [expect.any(ModelError), expect.any(ModelError)],
     });
     expect(requester).toHaveBeenCalledTimes(4);
+  });
+
+  it("preserves tools in fallback request when primary fails", async () => {
+    resetFallbackState();
+    const tools: ModelToolDefinition[] = [
+      {
+        type: "function",
+        function: {
+          name: "Read",
+          description: "Read a file",
+          parameters: { type: "object", properties: { file_path: { type: "string" } } },
+        },
+      },
+    ];
+    const promptWithTools: Prompt = {
+      system: "You are SuperAgent.",
+      messages: [{ role: "user", content: "Read the file" }],
+      tools,
+    };
+
+    let fallbackPromptTools: ModelToolDefinition[] | undefined;
+    const requester = vi.fn<ModelRequester>().mockImplementation((_prompt, cfg) => {
+      if (cfg.model === "deepseek-v4-pro") {
+        throw new ModelError("HTTP_ERROR", "Primary unavailable", { status: 503 });
+      }
+      fallbackPromptTools = _prompt.tools;
+      return stream([{ type: "text", content: "ok", model: cfg.model }]);
+    });
+
+    const chunks: TokenChunk[] = [];
+    for await (const chunk of fallbackRequest(promptWithTools, primary, secondary, { requester })) {
+      chunks.push(chunk);
+    }
+
+    expect(chunks).toEqual([{ type: "text", content: "ok", model: "deepseek-v4-flash" }]);
+    expect(fallbackPromptTools).toEqual(tools);
   });
 
   it("skips primary after three consecutive primary timeouts", async () => {
