@@ -4,6 +4,9 @@ import { ConfigError } from "./config/types";
 import { createRuntime } from "./runtime/runtime";
 import { listSessions } from "./runtime/stubs/session";
 import { startRepl } from "./cli/repl";
+import { parseCliMode } from "./cli/args";
+import { detectTerminalProfile } from "./cli/terminal-profile";
+import { runOneShot } from "./cli/one-shot";
 import { createObservability } from "./observability/index";
 
 async function main(): Promise<void> {
@@ -46,27 +49,16 @@ async function main(): Promise<void> {
       emit: (event) => obs.emit(event),
     });
 
-    const promptIndex = process.argv.indexOf("--prompt");
-    if (promptIndex !== -1) {
-      const userMessage = process.argv.slice(promptIndex + 1).join(" ").trim();
-      if (userMessage === "") {
-        process.stderr.write("Fatal: --prompt requires a message\n");
-        process.exit(1);
-      }
+    const cliMode = parseCliMode(process.argv);
 
-      process.stdout.write(`SuperAgent · ${config.model}\n`);
-      for await (const event of runtime.startTurn(userMessage)) {
-        if (event.type === "text") {
-          process.stdout.write(event.content);
-        }
-        if (event.type === "error") {
-          process.stderr.write(`✗ ${event.message}\n`);
-        }
-      }
-      process.stdout.write("\n");
-      obs.emit({ type: "session:end", exitCode: 0 });
-      obs.close();
-      process.exit(0);
+    if (cliMode.mode === "error") {
+      process.stderr.write(`${cliMode.message}\n`);
+      process.exit(1);
+    }
+
+    if (cliMode.mode === "one-shot") {
+      const exitCode = await runOneShot(runtime, cliMode.prompt, config.model, obs);
+      process.exit(exitCode);
     }
 
     const isResume = process.argv.includes("--resume");
@@ -87,7 +79,7 @@ async function main(): Promise<void> {
       process.exit(0);
     }
 
-    await startRepl(runtime, config);
+    await startRepl(runtime, config, detectTerminalProfile(process.platform, process.env));
     obs.emit({ type: "session:end", exitCode: 0 });
     obs.close();
     process.exit(0);

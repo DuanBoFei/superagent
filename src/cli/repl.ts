@@ -1,19 +1,24 @@
 import type { RuntimeHandle } from "../runtime/runtime";
 import type { Config } from "../config/types";
 import type { TerminalConfig } from "./types";
+import type { TerminalProfile } from "./terminal-profile";
 import { dispatchEvent } from "./renderer";
 import { renderSummary } from "./summary";
 import { createPrompt, isCommand, parseCommand, HELP_TEXT } from "./input";
+import { createSafeWriter } from "./safe-writer";
 
 export async function startRepl(
   runtime: RuntimeHandle,
   config: Config,
+  profile: TerminalProfile = "default",
 ): Promise<void> {
   const terminal: TerminalConfig = {
     width: process.stdout.columns ?? 80,
     supportsColor: process.stdout.isTTY ?? false,
     isTTY: process.stdout.isTTY ?? false,
   };
+
+  const safeWriter = createSafeWriter(profile, (s) => process.stdout.write(s));
 
   // Startup header
   process.stdout.write(`\nSuperAgent · ${config.model} · ${process.cwd()}\n`);
@@ -68,7 +73,7 @@ export async function startRepl(
         }
       }
 
-      process.stdout.write("\n");
+      safeWriter.write("\n");
     }
   } catch (err) {
     process.stderr.write(
