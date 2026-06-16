@@ -51,6 +51,7 @@ describe("browser domain types", () => {
       createdAt: Date;
       updatedAt: Date;
       currentUrl?: string;
+      adapterSessionId?: string;
     }>();
   });
 

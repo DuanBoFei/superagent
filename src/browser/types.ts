@@ -47,6 +47,7 @@ export interface BrowserSession {
   createdAt: Date;
   updatedAt: Date;
   currentUrl?: string;
+  adapterSessionId?: string;
 }
 
 export type BrowserAction =

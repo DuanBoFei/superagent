@@ -167,7 +167,7 @@ Create an adapter boundary for:
 - taking screenshots
 - allowing fake adapter injection without browser dependency
 
-- [ ] T009 [BE] [US1] Implement browser session lifecycle in src/browser/session.ts
+- [x] T009 [BE] [US1] Implement browser session lifecycle in src/browser/session.ts
 
 | | |
 |---|---|
