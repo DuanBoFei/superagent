@@ -35,10 +35,11 @@
 
 ```json
 {
-  "action": "open",
-  "url": "http://localhost:3000",
-  "timeoutMs": 30000,
-  "captureScreenshot": true
+  "action": {
+    "type": "open",
+    "url": "http://localhost:3000",
+    "timeoutMs": 30000
+  }
 }
 ```
 
@@ -46,13 +47,11 @@ Interaction request:
 
 ```json
 {
-  "action": "click",
-  "target": {
-    "kind": "role",
-    "value": "button",
-    "name": "Submit"
-  },
-  "timeoutMs": 10000
+  "action": {
+    "type": "click",
+    "selector": "button[type=submit]",
+    "timeoutMs": 10000
+  }
 }
 ```
 
@@ -60,49 +59,39 @@ Typing request:
 
 ```json
 {
-  "action": "type",
-  "target": {
-    "kind": "label",
-    "value": "Email"
-  },
-  "text": "user@example.invalid",
-  "timeoutMs": 10000
+  "action": {
+    "type": "type",
+    "selector": "input[name=email]",
+    "text": "user@example.invalid",
+    "timeoutMs": 10000
+  }
 }
 ```
+
+Other supported action types are `select`, `wait`, `screenshot`, and `close`.
 
 ## Normalized browser result
 
 ```json
 {
-  "success": true,
-  "pageState": {
-    "url": "http://localhost:3000/dashboard",
-    "title": "Dashboard",
-    "visibleText": "Dashboard Welcome Recent activity...",
-    "truncated": false
-  },
+  "action": "open",
+  "status": "running",
+  "finalUrl": "http://localhost:3000/dashboard",
+  "title": "Dashboard",
+  "textSummary": "Dashboard Welcome Recent activity...",
   "artifacts": [
     {
-      "artifactId": "artifact-123",
-      "type": "screenshot",
+      "id": "artifact-123",
+      "kind": "screenshot",
       "path": ".superagent/browser-artifacts/artifact-123.png",
       "mimeType": "image/png",
-      "sizeBytes": 12345,
-      "label": "dashboard screenshot"
+      "bytes": 12345,
+      "createdAt": "2026-06-16T12:00:00.000Z"
     }
   ],
-  "actionTrace": [
-    {
-      "actionId": "action-123",
-      "type": "open",
-      "target": "http://localhost:3000",
-      "durationMs": 842,
-      "success": true
-    }
-  ],
+  "actionTrace": "opened http://localhost:3000",
   "durationMs": 842,
-  "timedOut": false,
-  "safeError": null
+  "timedOut": false
 }
 ```
 
@@ -110,13 +99,12 @@ Typing request:
 
 ```json
 {
-  "success": false,
-  "pageState": null,
+  "action": "open",
+  "status": "failed",
   "artifacts": [],
-  "actionTrace": [],
   "durationMs": 12,
   "timedOut": false,
-  "safeError": "Playwright browser is not available. Install browser dependencies or disable browser tools."
+  "safeError": "Browser setup failed: Playwright browser is not available. Install browser dependencies or disable browser tools."
 }
 ```
 
@@ -140,18 +128,17 @@ browser:end
 browser:failure
 ```
 
-Required fields:
+Event fields:
 
 ```text
-browserSessionId
-actionId
-actionType
-url
-safeTarget
+action
+status
 durationMs
 success
 timedOut
-artifactCount
+urlSummary
+inputSummary
+textSummary
 safeError
 ```
 

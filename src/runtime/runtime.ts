@@ -64,7 +64,7 @@ export function createRuntime(options: RuntimeOptions = {}): RuntimeHandle {
   const mcpManager = options.mcpManager ?? createMcpManager(config.mcpServers);
   const registry = createToolRegistry();
   registerAllTools(registry);
-  const browserProfile = resolveBrowserProfile({ config: config.browser, workspace: process.cwd() });
+  const browserProfile = resolveBrowserProfile({ config: config.browser ?? defaults.browser, workspace: process.cwd() });
   if (browserProfile !== undefined) {
     registerTool(
       registry,
