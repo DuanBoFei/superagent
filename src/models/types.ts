@@ -1,8 +1,18 @@
 import type { Message } from "../runtime/types";
 
+export interface ModelToolDefinition {
+  type: "function";
+  function: {
+    name: string;
+    description?: string;
+    parameters: Record<string, unknown>;
+  };
+}
+
 export interface Prompt {
   system: string;
   messages: Message[];
+  tools?: ModelToolDefinition[];
 }
 
 export type TokenUsage = {

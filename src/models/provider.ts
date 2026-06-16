@@ -36,6 +36,9 @@ const requestModel: ModelRequester = async function* (
       model: config.model,
       stream: true,
       messages: [{ role: "system", content: prompt.system }, ...prompt.messages],
+      ...(prompt.tools && prompt.tools.length > 0
+        ? { tools: prompt.tools, tool_choice: "auto" }
+        : {}),
     }),
     signal,
   });
