@@ -1,5 +1,9 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { z } from "zod";
 import { sendMessage } from "../../src/models/provider";
+import { buildModelToolDefinitions } from "../../src/models/tool-schema";
+import { readToolSchema } from "../../src/tools/read";
+import type { RegisteredTool, ToolRegistry } from "../../src/tools/types";
 import type { ModelToolDefinition, Prompt, TokenChunk } from "../../src/models/types";
 
 const readTool: ModelToolDefinition = {
@@ -43,6 +47,55 @@ async function collect(): Promise<TokenChunk[]> {
   }
   return chunks;
 }
+
+function fakeTool(name: string, schema: z.ZodSchema): RegisteredTool {
+  return {
+    name,
+    description: `${name} description`,
+    fn: async () => ({ output: "" }),
+    schema,
+    concurrencySafe: true,
+  };
+}
+
+describe("buildModelToolDefinitions", () => {
+  it("generates model tool definitions in deterministic name order", () => {
+    const registry: ToolRegistry = new Map([
+      ["Write", fakeTool("Write", z.object({ content: z.string() }))],
+      ["Read", fakeTool("Read", z.object({ file_path: z.string() }))],
+    ]);
+
+    const definitions = buildModelToolDefinitions(registry);
+
+    expect(definitions.map((definition) => definition.function.name)).toEqual(["Read", "Write"]);
+  });
+
+  it("maps Read zod schema to JSON schema properties", () => {
+    const registry: ToolRegistry = new Map([
+      ["Read", fakeTool("Read", readToolSchema)],
+    ]);
+
+    expect(buildModelToolDefinitions(registry)).toEqual([
+      {
+        type: "function",
+        function: {
+          name: "Read",
+          description: "Read description",
+          parameters: {
+            type: "object",
+            properties: {
+              file_path: { type: "string" },
+              offset: { type: "number" },
+              limit: { type: "number" },
+            },
+            required: ["file_path"],
+            additionalProperties: false,
+          },
+        },
+      },
+    ]);
+  });
+});
 
 describe("provider tool request body", () => {
   afterEach(() => {

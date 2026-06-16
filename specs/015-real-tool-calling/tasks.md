@@ -9,16 +9,16 @@
 - [x] T001 [BE] Add `tests/models/provider-tools.test.ts` with a failing test for `tools` in request body  
   Source: FR-RTC-01, FR-RTC-03 · Input: fake prompt + one Read schema · Output: request JSON contains `tools` and `tool_choice` · Verify: `pnpm test -- tests/models/provider-tools.test.ts`
 
-- [ ] T002 [BE] Add stable tool-order test for generated model tool definitions  
+- [x] T002 [BE] Add stable tool-order test for generated model tool definitions  
   Source: NFR-RTC-01 · Input: two fake tools · Output: deterministic order · Verify: same test file
 
-- [ ] T003 [BE] Create `src/models/tool-schema.ts` export placeholder builder  
+- [x] T003 [BE] Create `src/models/tool-schema.ts` export placeholder builder  
   Source: FR-RTC-01 · Input: registered tool metadata · Output: `ModelToolDefinition[]` · Verify: typecheck
 
-- [ ] T004 [BE] Implement minimal zod-object to JSON schema mapping for string/number/boolean/optional  
+- [x] T004 [BE] Implement minimal zod-object to JSON schema mapping for string/number/boolean/optional  
   Source: FR-RTC-02 · Input: Read schema · Output: JSON schema properties · Verify: provider tool tests
 
-- [ ] T005 [BE] Wire schema builder into `src/models/provider.ts` request body  
+- [x] T005 [BE] Wire schema builder into `src/models/provider.ts` request body  
   Source: FR-RTC-01, FR-RTC-03 · Input: prompt + tools · Output: provider receives tools · Verify: provider tool tests
 
 ## Phase 2: Streaming Parser
