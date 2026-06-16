@@ -42,3 +42,12 @@ export function redactSecrets(text: string): string {
     .replace(/sk-[a-zA-Z0-9]+/g, "sk-****")
     .replace(/Authorization:\s*[^\n]*/gi, "Authorization: ****");
 }
+
+export function redactProviderError(message: string): string {
+  return message
+    .replace(/"(api[_-]?key|apikey|secret|token|password)"\s*:\s*"[^"]+"/gi, '"$1":"****"')
+    .replace(/(api[_-]?key|apikey|secret|token|password)=["']?[^\s"',}&]+/gi, "$1=****")
+    .replace(/sk-(?:or-)?[a-zA-Z0-9_-]+/g, "sk-****")
+    .replace(/Bearer\s+[a-zA-Z0-9._-]+/gi, "Bearer ****")
+    .replace(/(?:Authorization|X-API-Key):\s*[^\n]*/gi, "$1: ****");
+}
