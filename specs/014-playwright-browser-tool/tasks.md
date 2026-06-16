@@ -77,7 +77,7 @@ Test and implement runtime profile resolution for:
 - screenshot capture default
 - network policy default
 
-- [ ] T004 [P] [BE] Add browser availability tests in tests/browser/availability.test.ts and src/browser/availability.ts
+- [x] T004 [P] [BE] Add browser availability tests in tests/browser/availability.test.ts and src/browser/availability.ts
 
 | | |
 |---|---|
