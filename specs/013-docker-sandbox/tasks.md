@@ -43,7 +43,7 @@ Create failing tests for:
 
 Define typed sandbox contracts and red tests for profile resolution, safe errors, and Docker availability.
 
-- [ ] T002 [P] [BE] Define sandbox domain types in src/sandbox/types.ts and tests/sandbox/types.test.ts
+- [x] T002 [P] [BE] Define sandbox domain types in src/sandbox/types.ts and tests/sandbox/types.test.ts
 
 | | |
 |---|---|
