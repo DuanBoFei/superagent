@@ -183,7 +183,7 @@ Implement:
 - setup failure isolation
 - lifecycle status transitions
 
-- [ ] T010 [BE] [US1] Implement open/screenshot action normalization in src/browser/actions.ts and src/browser/index.ts
+- [x] T010 [BE] [US1] Implement open/screenshot action normalization in src/browser/actions.ts and src/browser/index.ts
 
 | | |
 |---|---|

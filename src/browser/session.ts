@@ -12,7 +12,7 @@ export class BrowserSessionManager {
   private adapterSession: BrowserAdapterSession | undefined;
 
   constructor(
-    private readonly adapter: BrowserAdapter,
+    readonly adapter: BrowserAdapter,
     private readonly now: () => Date = () => new Date(),
     private readonly createId: () => string = () => randomUUID(),
   ) {}
