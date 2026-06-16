@@ -19,7 +19,7 @@ All tasks include:
 
 Write sandbox configuration and permission-order contract tests before implementation.
 
-- [ ] T001 [BE] Add sandbox config contract tests in tests/config/sandbox-config.test.ts
+- [x] T001 [BE] Add sandbox config contract tests in tests/config/sandbox-config.test.ts
 
 | | |
 |---|---|
