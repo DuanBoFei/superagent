@@ -136,7 +136,7 @@ A developer can enable browser support and inspect a page from the CLI.
 
 A fake Playwright adapter receives an open request and returns normalized final URL, title, visible text summary, and screenshot artifact metadata.
 
-- [ ] T007 [BE] [US1] Implement browser config schema and defaults in src/config/types.ts, src/config/defaults.ts, and src/config/validator.ts
+- [x] T007 [BE] [US1] Implement browser config schema and defaults in src/config/types.ts, src/config/defaults.ts, and src/config/validator.ts
 
 | | |
 |---|---|

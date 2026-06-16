@@ -33,4 +33,13 @@ export const defaults: Config = {
     memoryMb: undefined,
     cpus: undefined,
   },
+  browser: {
+    enabled: false,
+    headless: true,
+    defaultTimeoutMs: 30000,
+    artifactDir: ".superagent/browser-artifacts",
+    viewport: { width: 1280, height: 720 },
+    network: "enabled",
+    captureScreenshots: true,
+  },
 };

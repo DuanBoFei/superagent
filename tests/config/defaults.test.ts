@@ -59,6 +59,7 @@ describe("defaults", () => {
       "mcpServers",
       "hooks",
       "sandbox",
+      "browser",
     ];
     const actualKeys = Object.keys(defaults) as (keyof Config)[];
     for (const key of actualKeys) {
