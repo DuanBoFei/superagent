@@ -44,7 +44,7 @@ Create failing tests for:
 
 Define typed browser contracts and red tests for availability, safe results, artifacts, and lifecycle state.
 
-- [ ] T002 [P] [BE] Define browser domain types in src/browser/types.ts and tests/browser/types.test.ts
+- [x] T002 [P] [BE] Define browser domain types in src/browser/types.ts and tests/browser/types.test.ts
 
 | | |
 |---|---|
