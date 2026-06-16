@@ -148,6 +148,38 @@ export type LogEvent =
       safeError: string;
     }
   | {
+      type: "browser:start";
+      action: string;
+      urlSummary?: string;
+      inputSummary?: string;
+    }
+  | {
+      type: "browser:action";
+      action: string;
+      status: string;
+      durationMs: number;
+      urlSummary?: string;
+      textSummary?: string;
+      inputSummary?: string;
+    }
+  | {
+      type: "browser:end";
+      action: string;
+      status: string;
+      durationMs: number;
+      success: boolean;
+      timedOut: boolean;
+    }
+  | {
+      type: "browser:failure";
+      action: string;
+      durationMs: number;
+      timedOut: boolean;
+      safeError: string;
+      urlSummary?: string;
+      inputSummary?: string;
+    }
+  | {
       type: "error";
       message: string;
       stack?: string;

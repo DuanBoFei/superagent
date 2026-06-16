@@ -69,7 +69,7 @@ export function createRuntime(options: RuntimeOptions = {}): RuntimeHandle {
     registerTool(
       registry,
       "Browser",
-      createBrowserTool({ profile: browserProfile, sessions: new BrowserSessionManager(new PlaywrightBrowserAdapter()) }),
+      createBrowserTool({ profile: browserProfile, sessions: new BrowserSessionManager(new PlaywrightBrowserAdapter()), emit: options.emit }),
       browserToolSchema,
       false,
     );

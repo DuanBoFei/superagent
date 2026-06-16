@@ -267,7 +267,7 @@ Browser failures are diagnosable and do not crash the Agent session.
 
 Browser setup failure, timeout, action failure, and secret-like page content produce safe results and redacted browser events.
 
-- [ ] T014 [INT] [US3] Add browser observability and integration coverage in src/observability/types.ts and tests/browser/integration.test.ts
+- [x] T014 [INT] [US3] Add browser observability and integration coverage in src/observability/types.ts and tests/browser/integration.test.ts
 
 | | |
 |---|---|

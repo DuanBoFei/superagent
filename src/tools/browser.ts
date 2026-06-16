@@ -2,6 +2,7 @@ import { z } from "zod";
 import { executeBrowserAction } from "../browser/actions";
 import type { BrowserArtifactWriter } from "../browser/artifacts";
 import { BrowserSessionManager } from "../browser/session";
+import type { LogEvent } from "../observability/types";
 import type { BrowserAction, BrowserProfile } from "../browser/types";
 import type { ToolFunction, ToolResult } from "./types";
 
@@ -30,6 +31,7 @@ export interface CreateBrowserToolInput {
   sessions: BrowserSessionManager;
   artifactWriter?: BrowserArtifactWriter;
   now?: Date;
+  emit?: (event: LogEvent) => void;
 }
 
 export function createBrowserTool(input: CreateBrowserToolInput): ToolFunction {
@@ -49,6 +51,7 @@ export function createBrowserTool(input: CreateBrowserToolInput): ToolFunction {
       sessions: input.sessions,
       artifactWriter: input.artifactWriter,
       now: input.now,
+      emit: input.emit,
     });
 
     return {
