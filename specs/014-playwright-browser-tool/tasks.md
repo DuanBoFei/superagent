@@ -19,7 +19,7 @@ All tasks include:
 
 Write browser configuration and permission-order contract tests before implementation.
 
-- [ ] T001 [BE] Add browser config contract tests in tests/config/browser-config.test.ts
+- [x] T001 [BE] Add browser config contract tests in tests/config/browser-config.test.ts
 
 | | |
 |---|---|
