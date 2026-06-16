@@ -109,7 +109,7 @@ Normalize:
 - oversized visible text/action trace truncation
 - secret-like value redaction
 
-- [ ] T006 [P] [BE] Add browser artifact tests in tests/browser/artifacts.test.ts and src/browser/artifacts.ts
+- [x] T006 [P] [BE] Add browser artifact tests in tests/browser/artifacts.test.ts and src/browser/artifacts.ts
 
 | | |
 |---|---|
