@@ -6,6 +6,7 @@ exports[`Config schema contract > field type map matches snapshot 1`] = `
   "baseUrl": "string",
   "fallbackBaseUrl": "string",
   "fallbackModel": "string",
+  "hooks": "default",
   "maxTurns": "number",
   "mcpServers": "default",
   "model": "string",
@@ -14,5 +15,6 @@ exports[`Config schema contract > field type map matches snapshot 1`] = `
   "permissions.autoApprove": "array",
   "permissions.deny": "array",
   "rulesFile": "string",
+  "sandbox": "default",
 }
 `;

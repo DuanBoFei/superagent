@@ -2,7 +2,7 @@ import type { PermissionSystem, ToolCall as SchedulingToolCall } from "../schedu
 import { createScheduler } from "../scheduling/scheduler";
 import { createToolRegistry, registerTool } from "../tools/registry";
 import { registerAllTools } from "../tools/index";
-import type { ToolRegistry } from "../tools/types";
+import type { ToolContext, ToolRegistry } from "../tools/types";
 import { createPostToolUseEvent, createPostToolUseFailureEvent, createPreToolUseEvent } from "../hooks/events";
 import type { HookManager } from "../hooks";
 import type { ToolCall, ToolResult } from "./types";
@@ -17,12 +17,14 @@ export interface ToolDispatcherOptions {
   registry?: ToolRegistry;
   permission?: PermissionSystem;
   hookManager?: HookManager;
+  toolContext?: Partial<ToolContext>;
 }
 
 export function createToolDispatcher(options: ToolDispatcherOptions = {}) {
   const resolvedRegistry = options.registry ?? registry;
   const resolvedPermission = options.permission ?? permissionSystem;
   const resolvedHookManager = options.hookManager;
+  const resolvedToolContext = options.toolContext;
 
   return {
     dispatchTools(calls: ToolCall[]): Promise<ToolResult[]> {
@@ -30,6 +32,7 @@ export function createToolDispatcher(options: ToolDispatcherOptions = {}) {
         registry: resolvedRegistry,
         permission: resolvedPermission,
         hookManager: resolvedHookManager,
+        toolContext: resolvedToolContext,
       });
     },
   };
@@ -71,7 +74,7 @@ export async function dispatchTools(calls: ToolCall[], options: ToolDispatcherOp
     allowedCalls.set(call.id, call);
   }
 
-  const scheduler = createScheduler(options.registry ?? registry, options.permission ?? permissionSystem);
+  const scheduler = createScheduler(options.registry ?? registry, options.permission ?? permissionSystem, options.toolContext);
   const results = allowedCalls.size > 0 ? await scheduler.dispatchTools([...allowedCalls.values()]) : [];
   for (const result of results) {
     const toolResult = {

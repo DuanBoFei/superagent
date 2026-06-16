@@ -1,6 +1,7 @@
 import { exec, execFileSync } from "node:child_process";
 import { relative, resolve } from "node:path";
 import { z } from "zod";
+import { resolveSandboxProfile, executeSandboxedCommand } from "../sandbox";
 import type { ToolContext, ToolResult } from "./types";
 
 const DEFAULT_TIMEOUT_MS = 120_000;
@@ -33,7 +34,40 @@ export async function bashTool(
     };
   }
 
-  const result = await runCommand(command, cwd, parsed.data.timeout_ms ?? DEFAULT_TIMEOUT_MS);
+  const timeoutMs = parsed.data.timeout_ms ?? DEFAULT_TIMEOUT_MS;
+  const sandboxProfile = context.sandbox
+    ? resolveSandboxProfile({
+        config: { ...context.sandbox.config, timeoutMs },
+        hostWorkspace: context.workingDirectory,
+        cwd,
+      })
+    : undefined;
+
+  if (sandboxProfile) {
+    const result = await executeSandboxedCommand({
+      id: `${context.sessionId}:bash`,
+      command,
+      cwd,
+      profile: sandboxProfile,
+    }, {
+      docker: context.sandbox?.docker,
+      emit: context.sandbox?.emit,
+    });
+    return {
+      output: [result.stdout, result.stderr, result.safeError ?? ""].filter((value) => value.length > 0).join(""),
+      error: result.exitCode === 0 ? undefined : result.safeError,
+      metadata: {
+        stdout: result.stdout,
+        stderr: result.stderr,
+        exit_code: result.exitCode,
+        killed_by_timeout: result.timedOut,
+        sandbox: true,
+        sandbox_status: result.status,
+      },
+    };
+  }
+
+  const result = await runCommand(command, cwd, timeoutMs);
   const stdout = truncateOutput(result.stdout);
   const stderr = truncateOutput(result.stderr);
 

@@ -20,4 +20,17 @@ export const defaults: Config = {
   rulesFile: "CLAUDE.md",
   mcpServers: {},
   hooks: {},
+  sandbox: {
+    enabled: false,
+    type: "docker",
+    image: undefined,
+    workspaceMount: "/workspace",
+    network: "none",
+    envAllowlist: [],
+    env: {},
+    pullPolicy: "never",
+    timeoutMs: 120000,
+    memoryMb: undefined,
+    cpus: undefined,
+  },
 };

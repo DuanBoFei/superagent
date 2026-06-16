@@ -57,6 +57,8 @@ describe("defaults", () => {
       "permissions",
       "rulesFile",
       "mcpServers",
+      "hooks",
+      "sandbox",
     ];
     const actualKeys = Object.keys(defaults) as (keyof Config)[];
     for (const key of actualKeys) {

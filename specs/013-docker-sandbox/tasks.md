@@ -59,7 +59,7 @@ Define typed shapes for:
 - `SandboxResult`
 - sandbox lifecycle status values
 
-- [ ] T003 [P] [BE] Add sandbox profile resolution tests in tests/sandbox/config.test.ts and src/sandbox/config.ts
+- [x] T003 [P] [BE] Add sandbox profile resolution tests in tests/sandbox/config.test.ts and src/sandbox/config.ts
 
 | | |
 |---|---|
@@ -75,7 +75,7 @@ Test and implement profile resolution for:
 - explicit env merged after allowlist
 - memory/CPU/timeout defaults
 
-- [ ] T004 [P] [BE] Add sandbox error and redaction tests in tests/sandbox/errors.test.ts and src/sandbox/errors.ts
+- [x] T004 [P] [BE] Add sandbox error and redaction tests in tests/sandbox/errors.test.ts and src/sandbox/errors.ts
 
 | | |
 |---|---|
@@ -91,7 +91,7 @@ Test and implement safe normalization for:
 - oversized stdout/stderr truncation
 - secret-like env/output redaction
 
-- [ ] T005 [P] [BE] Add Docker availability tests in tests/sandbox/availability.test.ts and src/sandbox/availability.ts
+- [x] T005 [P] [BE] Add Docker availability tests in tests/sandbox/availability.test.ts and src/sandbox/availability.ts
 
 | | |
 |---|---|
@@ -118,7 +118,7 @@ A developer can enable Docker sandbox mode and run an approved command inside a 
 
 A fake Docker adapter receives a command with workspace mount, workdir, env allowlist, network, and resource args, then returns a Bash-compatible result.
 
-- [ ] T006 [BE] [US1] Implement sandbox config schema and defaults in src/config/types.ts, src/config/defaults.ts, and src/config/validator.ts
+- [x] T006 [BE] [US1] Implement sandbox config schema and defaults in src/config/types.ts, src/config/defaults.ts, and src/config/validator.ts
 
 | | |
 |---|---|
@@ -133,7 +133,7 @@ Add `sandbox` config with:
 - workspace/network/pullPolicy/timeout/resource validation
 - env redaction support in diagnostics
 
-- [ ] T007 [BE] [US1] Implement Docker CLI adapter abstraction in src/sandbox/docker-cli.ts
+- [x] T007 [BE] [US1] Implement Docker CLI adapter abstraction in src/sandbox/docker-cli.ts
 
 | | |
 |---|---|
@@ -148,7 +148,7 @@ Create an adapter boundary for:
 - capturing stdout/stderr/exit code
 - allowing tests to inject fake Docker behavior without daemon dependency
 
-- [ ] T008 [BE] [US1] Implement sandbox executor in src/sandbox/executor.ts and src/sandbox/index.ts
+- [x] T008 [BE] [US1] Implement sandbox executor in src/sandbox/executor.ts and src/sandbox/index.ts
 
 | | |
 |---|---|
@@ -165,7 +165,7 @@ Implement:
 - timeout and process termination
 - normalized execution result
 
-- [ ] T009 [BE] [US1] Implement sandbox result normalization in src/sandbox/results.ts
+- [x] T009 [BE] [US1] Implement sandbox result normalization in src/sandbox/results.ts
 
 | | |
 |---|---|
@@ -193,7 +193,7 @@ Sandbox mode never bypasses existing permission and dangerous-command policy.
 
 A denied Bash command does not start the sandbox executor; an allowed command does.
 
-- [ ] T010 [INT] [US2] Add sandbox permission-order tests in tests/runtime/sandbox-permissions.test.ts
+- [x] T010 [INT] [US2] Add sandbox permission-order tests in tests/runtime/sandbox-permissions.test.ts
 
 | | |
 |---|---|
@@ -207,7 +207,7 @@ Test:
 - allow routes to sandbox executor when enabled
 - dangerous command policy remains authoritative
 
-- [ ] T011 [INT] [US2] Route Bash execution through sandbox after permission approval in src/tools/bash.ts and src/runtime/tool-dispatcher.ts
+- [x] T011 [INT] [US2] Route Bash execution through sandbox after permission approval in src/tools/bash.ts and src/runtime/tool-dispatcher.ts
 
 | | |
 |---|---|
@@ -233,7 +233,7 @@ Sandbox failures are diagnosable through observability and do not crash the Agen
 
 Docker unavailable, command timeout, and command non-zero exit produce safe results and redacted sandbox lifecycle events.
 
-- [ ] T012 [INT] [US3] Add sandbox observability event types in src/observability/types.ts
+- [x] T012 [INT] [US3] Add sandbox observability event types in src/observability/types.ts
 
 | | |
 |---|---|
@@ -248,7 +248,7 @@ Add events:
 
 Fields include executionId, image, workspaceMount, network, commandSummary, duration, success, timedOut, and safeError.
 
-- [ ] T013 [INT] [US3] Emit sandbox lifecycle events from src/sandbox/executor.ts
+- [x] T013 [INT] [US3] Emit sandbox lifecycle events from src/sandbox/executor.ts
 
 | | |
 |---|---|
@@ -262,7 +262,7 @@ Emit:
 - failure on Docker unavailable/startup/image/timeout failures
 - redacted command/env/output summaries
 
-- [ ] T014 [INT] [US3] Add end-to-end sandbox integration coverage in tests/sandbox/integration.test.ts
+- [x] T014 [INT] [US3] Add end-to-end sandbox integration coverage in tests/sandbox/integration.test.ts
 
 | | |
 |---|---|

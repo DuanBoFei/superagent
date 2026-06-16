@@ -1,4 +1,4 @@
-import type { ToolRegistry } from "../tools/types";
+import type { ToolContext, ToolRegistry } from "../tools/types";
 import type { BatchPlan, PermissionSystem, ToolResult } from "./types";
 
 const MAX_CONCURRENCY = 5;
@@ -7,6 +7,7 @@ export async function executeBatch(
   plan: BatchPlan,
   registry: ToolRegistry,
   permission: PermissionSystem,
+  toolContext?: Partial<ToolContext>,
 ): Promise<ToolResult[]> {
   const results: ToolResult[] = [];
 
@@ -15,7 +16,7 @@ export async function executeBatch(
   for (let i = 0; i < concurrent.length; i += MAX_CONCURRENCY) {
     const chunk = concurrent.slice(i, i + MAX_CONCURRENCY);
     const settled = await Promise.allSettled(
-      chunk.map((call) => executeOne(call, registry, permission)),
+      chunk.map((call) => executeOne(call, registry, permission, toolContext)),
     );
     for (const s of settled) {
       results.push(
@@ -37,7 +38,7 @@ export async function executeBatch(
       });
       continue;
     }
-    const result = await executeOne(call, registry, permission);
+    const result = await executeOne(call, registry, permission, toolContext);
     if (!result.success) {
       serialFailed = true;
     }
@@ -51,6 +52,7 @@ async function executeOne(
   call: { name: string; args: Record<string, unknown>; id: number },
   registry: ToolRegistry,
   permission: PermissionSystem,
+  toolContext?: Partial<ToolContext>,
 ): Promise<ToolResult> {
   const tool = registry.get(call.name);
   if (!tool) {
@@ -78,6 +80,7 @@ async function executeOne(
     const toolResult = await tool.fn(call.args, {
       workingDirectory: process.cwd(),
       sessionId: "scheduler",
+      ...toolContext,
     });
     return {
       id: call.id,

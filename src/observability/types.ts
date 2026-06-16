@@ -117,6 +117,37 @@ export type LogEvent =
       message?: string;
     }
   | {
+      type: "sandbox:start";
+      executionId: string;
+      image: string;
+      workspaceMount: string;
+      network: "none" | "host";
+      commandSummary: string;
+    }
+  | {
+      type: "sandbox:end";
+      executionId: string;
+      image: string;
+      workspaceMount: string;
+      network: "none" | "host";
+      commandSummary: string;
+      durationMs: number;
+      success: boolean;
+      exitCode: number | null;
+      timedOut: boolean;
+    }
+  | {
+      type: "sandbox:failure";
+      executionId: string;
+      image: string;
+      workspaceMount: string;
+      network: "none" | "host";
+      commandSummary: string;
+      durationMs: number;
+      timedOut: boolean;
+      safeError: string;
+    }
+  | {
       type: "error";
       message: string;
       stack?: string;

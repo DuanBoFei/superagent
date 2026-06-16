@@ -1,4 +1,4 @@
-import type { ToolRegistry } from "../tools/types";
+import type { ToolContext, ToolRegistry } from "../tools/types";
 import type { BatchPlan, PermissionSystem, ToolCall, ToolResult } from "./types";
 import { partition } from "./partitioner";
 import { executeBatch } from "./executor";
@@ -8,6 +8,7 @@ const MAX_BATCH_SIZE = 8;
 export function createScheduler(
   registry: ToolRegistry,
   permission: PermissionSystem,
+  toolContext?: Partial<ToolContext>,
 ) {
   return {
     async dispatchTools(calls: ToolCall[]): Promise<ToolResult[]> {
@@ -15,7 +16,7 @@ export function createScheduler(
         const kept = calls.slice(0, MAX_BATCH_SIZE);
         const skipped = calls.slice(MAX_BATCH_SIZE);
         const plan = partition(kept, registry);
-        const results = await executeBatch(plan, registry, permission);
+        const results = await executeBatch(plan, registry, permission, toolContext);
         for (const call of skipped) {
           results.push({
             id: call.id,
@@ -28,7 +29,7 @@ export function createScheduler(
         return results;
       }
       const plan = partition(calls, registry);
-      return executeBatch(plan, registry, permission);
+      return executeBatch(plan, registry, permission, toolContext);
     },
   };
 }

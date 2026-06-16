@@ -1,4 +1,5 @@
 import type { HookConfig, HookEventName } from "../hooks/types";
+import type { SandboxConfig } from "../sandbox/types";
 
 export type McpServerConfig = McpStdioServerConfig | McpHttpServerConfig;
 
@@ -32,6 +33,7 @@ export interface Config {
   rulesFile: string;
   mcpServers: Record<string, McpServerConfig>;
   hooks: Partial<Record<HookEventName, HookConfig[]>>;
+  sandbox: SandboxConfig;
 }
 
 export interface ConfigLoadResult {

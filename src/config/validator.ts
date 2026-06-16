@@ -1,6 +1,7 @@
 import { z } from "zod/v4";
 import { ConfigError } from "./types";
 import { defaults } from "./defaults";
+import { sandboxConfigSchema } from "../sandbox/schema";
 import { HOOK_EVENTS, isObserveOnlyHookEvent } from "../hooks/types";
 import type { Config } from "./types";
 import type { HookConfig, HookEventName } from "../hooks/types";
@@ -77,10 +78,11 @@ export const configSchema = z.object({
   rulesFile: z.string(),
   mcpServers: mcpServersSchema,
   hooks: hooksSchema,
+  sandbox: sandboxConfigSchema.default(defaults.sandbox),
 });
 
 const KNOWN_KEYS = new Set(Object.keys(configSchema.shape));
-const NESTED_KEYS = new Set(["permissions", "mcpServers", "hooks"]);
+const NESTED_KEYS = new Set(["permissions", "mcpServers", "hooks", "sandbox"]);
 const PERMISSION_KEYS = new Set(Object.keys(permissionsSchema.shape));
 const HOOK_EVENT_NAMES = new Set<HookEventName>(HOOK_EVENTS);
 
