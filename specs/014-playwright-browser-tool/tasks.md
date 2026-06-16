@@ -241,7 +241,7 @@ Implement:
 - close browser context
 - normalized action trace
 
-- [ ] T013 [INT] [US2] Register browser tool and route through runtime after permission approval in src/tools/browser.ts and src/runtime/tool-dispatcher.ts
+- [x] T013 [INT] [US2] Register browser tool and route through runtime after permission approval in src/tools/browser.ts and src/runtime/tool-dispatcher.ts
 
 | | |
 |---|---|
