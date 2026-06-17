@@ -2,7 +2,8 @@
 
 Status: Complete
 Date: 2026-06-17
-Finish decision: implementation complete on `worktree-feat-021-code-review-agent`; do not delete `specs/021-code-review-agent/`.
+Finish decision: PR handoff from `worktree-feat-021-code-review-agent`; do not delete `specs/021-code-review-agent/`.
+Tag: `v0.1.0-021-code-review-agent`
 
 ## Completed
 
