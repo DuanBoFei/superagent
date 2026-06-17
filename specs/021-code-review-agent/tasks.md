@@ -2,8 +2,8 @@
 
 | # | Task | Label | Dependencies | Verification |
 |---|------|-------|--------------|--------------|
-| T001 | Create `src/review/types.ts` with review domain contracts | [BE] | — | `pnpm test -- tests/review/contract.test.ts` |
-| T002 | Add contract snapshot for `ReviewResult` and categories | [BE] | T001 | `pnpm test -- tests/review/contract.test.ts` |
+| T001 | ✅ Create `src/review/types.ts` with review domain contracts | [BE] | — | `pnpm test -- tests/review/contract.test.ts` |
+| T002 | ✅ Add contract snapshot for `ReviewResult` and categories | [BE] | T001 | `pnpm test -- tests/review/contract.test.ts` |
 | T003 | Implement `ReviewInputBuilder` skeleton | [BE] | T001 | `pnpm test -- tests/review/input-builder.test.ts` |
 | T004 | Include task intent in review input | [BE] | T003 | `pnpm test -- tests/review/input-builder.test.ts` |
 | T005 | Include changed file list and diff text in review input | [BE] | T003 | `pnpm test -- tests/review/input-builder.test.ts` |
