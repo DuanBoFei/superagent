@@ -1,0 +1,19 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`renderSkillContext > matches snapshot for stable format 1`] = `
+"<!-- SKILL CONTEXT BEGIN -->
+## Skill: run-feature
+**Description**: Run a feature workflow from spec to verification.
+**Version**: 1.0.0
+**Suggested Mode**: plan
+
+### Arguments
+- **feature** (required): Feature number or directory. → \`024-skill-system\`
+
+### Instructions
+
+Skill instructions in markdown.
+Run this to execute a feature workflow.
+
+<!-- SKILL CONTEXT END -->"
+`;

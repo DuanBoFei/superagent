@@ -206,6 +206,17 @@ export type LogEvent =
       diagnosticCount: number;
     }
   | {
+      type: "skill:discovered";
+      skillCount: number;
+      diagnosticCount: number;
+      sourceDirectories: string[];
+    }
+  | {
+      type: "skill:invoked";
+      skillName: string;
+      args?: Record<string, string>;
+    }
+  | {
       type: "error";
       message: string;
       stack?: string;

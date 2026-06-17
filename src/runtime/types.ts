@@ -56,6 +56,9 @@ export interface SessionState {
   startedAt: number;
   repoMapFileCount?: number;
   repoMapDiagnosticCount?: number;
+  skillDiscoveryDiagnostics?: number;
+  activeSkill?: { name: string; args: Record<string, string> };
+  skillDiscoveryErrorCount?: number;
 }
 
 export interface TurnContext {

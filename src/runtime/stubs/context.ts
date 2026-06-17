@@ -9,7 +9,10 @@ const defaults: PromptContext = {
   currentTokens: 0,
 };
 
-export function composePrompt(messages: Message[], options?: { repoMapText?: string }): Prompt {
+export function composePrompt(
+  messages: Message[],
+  options?: { repoMapText?: string; skillContext?: string },
+): Prompt {
   const now = Date.now();
   const ctxMessages: ContextMessage[] = messages.map((m, i) => ({
     ...m,
@@ -19,6 +22,7 @@ export function composePrompt(messages: Message[], options?: { repoMapText?: str
   const result = realCompose(ctxMessages, {
     ...defaults,
     repoMapText: options?.repoMapText,
+    skillContext: options?.skillContext,
   });
 
   return {

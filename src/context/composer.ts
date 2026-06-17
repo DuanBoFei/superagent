@@ -26,6 +26,11 @@ export function composePrompt(
     system += "\n\n" + rules;
   }
 
+  // Layer 2.5: Active skill context (if any)
+  if (context.skillContext) {
+    system += "\n\n" + context.skillContext;
+  }
+
   // Layer 3: Tool definitions
   const toolDefs = formatToolDefs(context.toolDefinitions);
   if (toolDefs) {

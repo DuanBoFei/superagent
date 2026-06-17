@@ -85,7 +85,9 @@ export type SkillDiagnosticReason =
   | "parse-error"
   | "body-too-large"
   | "file-missing"
-  | "duplicate-name";
+  | "duplicate-name"
+  | "not-found"
+  | "missing-arg";
 
 export interface SkillDiagnostic {
   readonly skillName: string;

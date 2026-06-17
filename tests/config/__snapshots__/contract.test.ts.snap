@@ -18,5 +18,6 @@ exports[`Config schema contract > field type map matches snapshot 1`] = `
   "repoMap": "default",
   "rulesFile": "string",
   "sandbox": "default",
+  "skills": "default",
 }
 `;

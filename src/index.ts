@@ -8,6 +8,7 @@ import { parseCliMode } from "./cli/args";
 import { detectTerminalProfile } from "./cli/terminal-profile";
 import { runOneShot } from "./cli/one-shot";
 import { createObservability } from "./observability/index";
+import { discoverSkills } from "./skills/discovery";
 
 async function main(): Promise<void> {
   try {
@@ -43,10 +44,26 @@ async function main(): Promise<void> {
       config: { model: config.model, maxTurns: config.maxTurns },
     });
 
+    const skillDirs = config.skills.enabled ? config.skills.directories : [];
+    const discoveryResult = discoverSkills(skillDirs, {
+      maxBodySize: config.skills.maxBodySize,
+    });
+
+    if (discoveryResult.registry.skills.size > 0 || discoveryResult.diagnostics.length > 0) {
+      obs.emit({
+        type: "skill:discovered",
+        skillCount: discoveryResult.registry.skills.size,
+        diagnosticCount: discoveryResult.diagnostics.length,
+        sourceDirectories: discoveryResult.registry.sourceOrder,
+      });
+    }
+
     const runtime = createRuntime({
       maxTurns: config.maxTurns,
       model: config.model,
       emit: (event) => obs.emit(event),
+      skillRegistry: discoveryResult.registry,
+      skillDiagnostics: discoveryResult.diagnostics,
     });
 
     const cliMode = parseCliMode(process.argv);

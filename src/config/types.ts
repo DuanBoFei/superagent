@@ -26,6 +26,12 @@ export interface RepoMapConfig {
   promptBudget: number;
 }
 
+export interface SkillConfig {
+  enabled: boolean;
+  directories: string[];
+  maxBodySize: number;
+}
+
 export interface Config {
   apiKey: string;
   model: string;
@@ -44,6 +50,7 @@ export interface Config {
   sandbox: SandboxConfig;
   browser: BrowserConfig;
   repoMap: RepoMapConfig;
+  skills: SkillConfig;
 }
 
 export interface ConfigLoadResult {

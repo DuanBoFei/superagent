@@ -26,6 +26,11 @@ import { collectFiles } from "../repo-map/collector";
 import { buildRepoMap } from "../repo-map/builder";
 import { renderRepoMap } from "../repo-map/render";
 import { createIgnoreOptions } from "../repo-map/ignore";
+import { discoverSkills } from "../skills/discovery";
+import { validateArgs } from "../skills/invocation";
+import { renderSkillContext } from "../skills/prompt";
+import { getSkill } from "../skills/registry";
+import type { SkillRegistry, SkillDiagnostic } from "../skills/types";
 
 function defaultDeps(): QueryLoopDeps {
   return {
@@ -56,12 +61,17 @@ export interface RuntimeOptions extends Partial<QueryLoopDeps> {
   config?: Config;
   mcpManager?: McpManager;
   promptPermission?: PromptFn;
+  skillRegistry?: SkillRegistry;
+  skillDiagnostics?: SkillDiagnostic[];
 }
 
 export interface RuntimeHandle {
   getSession(): SessionState;
   startTurn(userMessage: string): AsyncGenerator<TurnEvent>;
   resumeSession(sessionId: string): AsyncGenerator<TurnEvent>;
+  setActiveSkill(name: string, args: Record<string, string>): SkillDiagnostic[];
+  clearActiveSkill(): void;
+  getSkillRegistry(): SkillRegistry | undefined;
 }
 
 export function createRuntime(options: RuntimeOptions = {}): RuntimeHandle {
@@ -95,9 +105,13 @@ export function createRuntime(options: RuntimeOptions = {}): RuntimeHandle {
     dispatchTools: dispatcher.dispatchTools,
     hookManager,
   };
-  let session: SessionState = createFreshSession();
+  let session: SessionState = createFreshSession({
+    skillDiscoveryDiagnostics: options.skillDiagnostics?.length ?? 0,
+    skillDiscoveryErrorCount: options.skillDiagnostics?.filter((d) => d.reason !== "duplicate-name").length ?? 0,
+  });
   let mcpConnected = false;
   let repoMapText: string | undefined;
+  const skillRegistry: SkillRegistry | undefined = options.skillRegistry;
 
   async function ensureMcpConnected(): Promise<void> {
     if (mcpConnected) return;
@@ -187,6 +201,30 @@ export function createRuntime(options: RuntimeOptions = {}): RuntimeHandle {
   return {
     getSession() {
       return session;
+    },
+
+    setActiveSkill(name: string, args: Record<string, string>): SkillDiagnostic[] {
+      if (!skillRegistry) return [];
+      const result = getSkill(skillRegistry, name);
+      if (result.error) {
+        return [result.error];
+      }
+      const skill = result.skill!;
+      const argDiags = validateArgs(skill.manifest, args);
+      if (argDiags.length > 0) {
+        return argDiags;
+      }
+      session.activeSkill = { name, args };
+      options.emit?.({ type: "skill:invoked", skillName: name, args });
+      return [];
+    },
+
+    clearActiveSkill(): void {
+      session.activeSkill = undefined;
+    },
+
+    getSkillRegistry(): SkillRegistry | undefined {
+      return skillRegistry;
     },
 
     async *startTurn(userMessage: string) {
@@ -279,7 +317,14 @@ export function createRuntime(options: RuntimeOptions = {}): RuntimeHandle {
     return {
       ...resolvedDeps,
       composePrompt(messages) {
-        const prompt = resolvedDeps.composePrompt(messages, { repoMapText });
+        let skillContext: string | undefined;
+        if (skillRegistry && session.activeSkill) {
+          const result = getSkill(skillRegistry, session.activeSkill.name);
+          if (result.skill) {
+            skillContext = renderSkillContext(result.skill, session.activeSkill.args);
+          }
+        }
+        const prompt = resolvedDeps.composePrompt(messages, { repoMapText, skillContext });
         return {
           ...prompt,
           tools: buildModelToolDefinitions(registry),
