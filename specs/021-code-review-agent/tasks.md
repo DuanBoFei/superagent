@@ -29,4 +29,4 @@
 | T025 | ✅ Add synthetic diff fixture with known defect | [BE] | T017 | `pnpm test -- tests/review/reviewer.test.ts` |
 | T026 | ✅ Add failed-test-output blocking test | [BE] | T017 | `pnpm test -- tests/review/reviewer.test.ts` |
 | T027 | ✅ Run focused review test suite | [INT] | T001-T026 | `pnpm test -- tests/review` |
-| T028 | Update closeout docs `state.md` and `session.md` | [INT] | T027 | Review docs |
+| T028 | ✅ Update closeout docs `state.md` and `session.md` | [INT] | T027 | Review docs |
