@@ -36,6 +36,7 @@ describe("Config schema contract", () => {
       "permissions.askTimeout",
       "permissions.autoApprove",
       "permissions.deny",
+      "repoMap",
       "rulesFile",
       "sandbox",
     ]);

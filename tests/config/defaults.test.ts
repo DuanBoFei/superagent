@@ -60,6 +60,7 @@ describe("defaults", () => {
       "hooks",
       "sandbox",
       "browser",
+      "repoMap",
     ];
     const actualKeys = Object.keys(defaults) as (keyof Config)[];
     for (const key of actualKeys) {

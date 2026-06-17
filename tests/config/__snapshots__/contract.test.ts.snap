@@ -15,6 +15,7 @@ exports[`Config schema contract > field type map matches snapshot 1`] = `
   "permissions.askTimeout": "number",
   "permissions.autoApprove": "array",
   "permissions.deny": "array",
+  "repoMap": "default",
   "rulesFile": "string",
   "sandbox": "default",
 }
