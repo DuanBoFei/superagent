@@ -42,10 +42,11 @@ export function createPlanIntegration(options: PlanIntegrationOptions = {}) {
   const planModelCall = options.planModelCall;
   const maxScopeExpansion = options.maxScopeExpansion ?? 3;
 
-  function detect(userPrompt: string): PlanDecision {
+  function detect(userPrompt: string, skillSuggestedPlan?: boolean): PlanDecision {
     const decision = detectPlanMode({
       userPrompt,
       hasPlanPrefix: hasPlanPrefix(userPrompt),
+      skillSuggestedPlan,
     });
     emit({ type: "plan:decided", decision });
     return decision;

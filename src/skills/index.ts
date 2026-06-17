@@ -38,3 +38,9 @@ export type { GetSkillResult } from "./registry";
 export { validateArgs } from "./invocation";
 
 export { renderSkillContext } from "./prompt";
+
+export {
+  filterByAllowedRoles,
+  hasPlanModeSuggestion,
+  getPlanModeSkills,
+} from "./routing";

@@ -65,6 +65,7 @@ export interface PlanState {
 export interface DetectorInput {
   userPrompt: string;
   hasPlanPrefix: boolean;
+  skillSuggestedPlan?: boolean;
 }
 
 // --- Planner Prompt ---

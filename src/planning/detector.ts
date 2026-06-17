@@ -53,7 +53,7 @@ function isSimpleReadOnly(prompt: string): boolean {
 }
 
 export function detectPlanMode(input: DetectorInput): PlanDecision {
-  if (input.hasPlanPrefix) {
+  if (input.hasPlanPrefix || input.skillSuggestedPlan) {
     return PD.PlanRequested;
   }
 
