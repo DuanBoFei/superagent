@@ -11,8 +11,8 @@
 | T007 | ✅ Include tool failures in review input | [BE] | T003 | `pnpm test -- tests/review/input-builder.test.ts` |
 | T008 | ✅ Add test proving full transcript is excluded | [BE] | T003 | `pnpm test -- tests/review/input-builder.test.ts` |
 | T009 | ✅ Add diff truncation with visible note | [BE] | T005 | `pnpm test -- tests/review/input-builder.test.ts` |
-| T010 | Implement review prompt builder | [BE] | T001 | `pnpm test -- tests/review/prompt.test.ts` |
-| T011 | Snapshot review prompt | [BE] | T010 | `pnpm test -- tests/review/prompt.test.ts` |
+| T010 | ✅ Implement review prompt builder | [BE] | T001 | `pnpm test -- tests/review/prompt.test.ts` |
+| T011 | ✅ Snapshot review prompt | [BE] | T010 | `pnpm test -- tests/review/prompt.test.ts` |
 | T012 | Implement JSON review parser for approved result | [BE] | T001 | `pnpm test -- tests/review/parser.test.ts` |
 | T013 | Implement JSON review parser for blocking findings | [BE] | T012 | `pnpm test -- tests/review/parser.test.ts` |
 | T014 | Treat empty output as inconclusive blocking result | [BE] | T012 | `pnpm test -- tests/review/parser.test.ts` |
