@@ -2,7 +2,9 @@
 
 ## Summary
 
-Feature 020 is implemented as a narrow serial orchestration layer. The default runtime path remains single-agent unless routing selects multi-agent mode through `/multi-agent` or complexity heuristics.
+Feature 020 is complete as a narrow serial orchestration layer. The default runtime path remains single-agent unless routing selects multi-agent mode through `/multi-agent` or complexity heuristics.
+
+This branch is finished and handed off as a PR-ready worktree. The `specs/020-multi-agent-orchestration/` directory stays frozen and must not be deleted; any future requirement changes should start a new numbered feature.
 
 ## Changed Areas
 

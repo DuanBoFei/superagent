@@ -2,6 +2,8 @@
 
 Status: Complete
 Date: 2026-06-17
+Finish decision: PR handoff from `worktree-feat-020-multi-agent-orchestration`; do not delete `specs/020-multi-agent-orchestration/`.
+Tag: `v0.1.0-020-multi-agent-orchestration`
 
 ## Completed
 
