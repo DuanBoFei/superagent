@@ -22,6 +22,10 @@ import type { LogEvent } from "../observability/types";
 import { redactMcpSecrets } from "../mcp/errors";
 import { createHookManager } from "../hooks";
 import { createSessionStartEvent, createStopEvent } from "../hooks/events";
+import { collectFiles } from "../repo-map/collector";
+import { buildRepoMap } from "../repo-map/builder";
+import { renderRepoMap } from "../repo-map/render";
+import { createIgnoreOptions } from "../repo-map/ignore";
 
 function defaultDeps(): QueryLoopDeps {
   return {
@@ -93,6 +97,7 @@ export function createRuntime(options: RuntimeOptions = {}): RuntimeHandle {
   };
   let session: SessionState = createFreshSession();
   let mcpConnected = false;
+  let repoMapText: string | undefined;
 
   async function ensureMcpConnected(): Promise<void> {
     if (mcpConnected) return;
@@ -196,6 +201,19 @@ export function createRuntime(options: RuntimeOptions = {}): RuntimeHandle {
 
       let stopReason: TurnSummary["reason"] | undefined;
       try {
+        if (config.repoMap.enabled && repoMapText === undefined) {
+          const startedAt = Date.now();
+          const snapshot = buildRepoMapSnapshot(process.cwd(), config);
+          repoMapText = snapshot.text;
+          session.repoMapFileCount = snapshot.fileCount;
+          session.repoMapDiagnosticCount = snapshot.diagnosticCount;
+          options.emit?.({
+            type: "repomap:build_end",
+            durationMs: Date.now() - startedAt,
+            fileCount: snapshot.fileCount,
+            diagnosticCount: snapshot.diagnosticCount,
+          });
+        }
         await dispatchSessionStart(false);
         for await (const event of createQueryLoop(session, withModelTools())) {
           if (event.type === "turn_end") {
@@ -231,6 +249,19 @@ export function createRuntime(options: RuntimeOptions = {}): RuntimeHandle {
 
       let stopReason: TurnSummary["reason"] | undefined;
       try {
+        if (config.repoMap.enabled && repoMapText === undefined) {
+          const startedAt = Date.now();
+          const snapshot = buildRepoMapSnapshot(process.cwd(), config);
+          repoMapText = snapshot.text;
+          session.repoMapFileCount = snapshot.fileCount;
+          session.repoMapDiagnosticCount = snapshot.diagnosticCount;
+          options.emit?.({
+            type: "repomap:build_end",
+            durationMs: Date.now() - startedAt,
+            fileCount: snapshot.fileCount,
+            diagnosticCount: snapshot.diagnosticCount,
+          });
+        }
         await dispatchSessionStart(true);
         for await (const event of createQueryLoop(session, withModelTools())) {
           if (event.type === "turn_end") {
@@ -248,7 +279,7 @@ export function createRuntime(options: RuntimeOptions = {}): RuntimeHandle {
     return {
       ...resolvedDeps,
       composePrompt(messages) {
-        const prompt = resolvedDeps.composePrompt(messages);
+        const prompt = resolvedDeps.composePrompt(messages, { repoMapText });
         return {
           ...prompt,
           tools: buildModelToolDefinitions(registry),
@@ -256,4 +287,24 @@ export function createRuntime(options: RuntimeOptions = {}): RuntimeHandle {
       },
     };
   }
+}
+
+interface RepoMapSnapshot {
+  text: string;
+  fileCount: number;
+  diagnosticCount: number;
+}
+
+function buildRepoMapSnapshot(rootPath: string, config: Config): RepoMapSnapshot {
+  const collected = collectFiles(rootPath, {
+    ignore: createIgnoreOptions(),
+    maxFiles: config.repoMap.maxFiles,
+    maxFileBytes: config.repoMap.maxFileBytes,
+  });
+  const repoMap = buildRepoMap(rootPath, collected.files, collected.diagnostics);
+  return {
+    text: renderRepoMap(repoMap, { maxChars: config.repoMap.promptBudget }),
+    fileCount: repoMap.files.length,
+    diagnosticCount: repoMap.diagnostics.length,
+  };
 }

@@ -54,6 +54,8 @@ export interface SessionState {
   state: State;
   interruptFlag: boolean;
   startedAt: number;
+  repoMapFileCount?: number;
+  repoMapDiagnosticCount?: number;
 }
 
 export interface TurnContext {

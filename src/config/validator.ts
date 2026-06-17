@@ -68,6 +68,13 @@ const disabledHookSchema = z.object({
 const hookConfigSchema = z.discriminatedUnion("enabled", [enabledHookSchema, disabledHookSchema]);
 const hooksSchema = z.partialRecord(z.enum(HOOK_EVENTS), z.array(hookConfigSchema)).default({});
 
+export const repoMapConfigSchema = z.object({
+  enabled: z.boolean(),
+  maxFiles: z.number().int().positive(),
+  maxFileBytes: z.number().int().positive(),
+  promptBudget: z.number().int().positive(),
+});
+
 export const configSchema = z.object({
   apiKey: z.string().min(1),
   model: z.string(),
@@ -81,10 +88,11 @@ export const configSchema = z.object({
   hooks: hooksSchema,
   sandbox: sandboxConfigSchema.default(defaults.sandbox),
   browser: browserConfigSchema.default(defaults.browser),
+  repoMap: repoMapConfigSchema.default(defaults.repoMap),
 });
 
 const KNOWN_KEYS = new Set(Object.keys(configSchema.shape));
-const NESTED_KEYS = new Set(["permissions", "mcpServers", "hooks", "sandbox", "browser"]);
+const NESTED_KEYS = new Set(["permissions", "mcpServers", "hooks", "sandbox", "browser", "repoMap"]);
 const PERMISSION_KEYS = new Set(Object.keys(permissionsSchema.shape));
 const HOOK_EVENT_NAMES = new Set<HookEventName>(HOOK_EVENTS);
 

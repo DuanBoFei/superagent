@@ -9,14 +9,17 @@ const defaults: PromptContext = {
   currentTokens: 0,
 };
 
-export function composePrompt(messages: Message[]): Prompt {
+export function composePrompt(messages: Message[], options?: { repoMapText?: string }): Prompt {
   const now = Date.now();
   const ctxMessages: ContextMessage[] = messages.map((m, i) => ({
     ...m,
     timestamp: now - (messages.length - 1 - i) * 1000,
   }));
 
-  const result = realCompose(ctxMessages, defaults);
+  const result = realCompose(ctxMessages, {
+    ...defaults,
+    repoMapText: options?.repoMapText,
+  });
 
   return {
     system: result.system,

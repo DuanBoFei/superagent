@@ -200,6 +200,12 @@ export type LogEvent =
       reason: string;
     }
   | {
+      type: "repomap:build_end";
+      durationMs: number;
+      fileCount: number;
+      diagnosticCount: number;
+    }
+  | {
       type: "error";
       message: string;
       stack?: string;
@@ -213,6 +219,8 @@ export interface SessionStats {
   totalInputTokens: number;
   totalOutputTokens: number;
   totalCost: number;
+  repoMapFileCount?: number;
+  repoMapDiagnosticCount?: number;
 }
 
 // ── Cost model ──

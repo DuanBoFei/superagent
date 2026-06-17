@@ -15,6 +15,11 @@ export function composePrompt(
   // Layer 1: Static system prompt
   let system = SYSTEM_PROMPT;
 
+  // Layer 1.5: Repo-map context block (if available)
+  if (context.repoMapText) {
+    system += `\n\n${context.repoMapText}`;
+  }
+
   // Layer 2: CLAUDE.md rules (if present)
   const rules = loadRules(context.rulesFilePath);
   if (rules) {

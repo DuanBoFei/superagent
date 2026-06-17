@@ -9,6 +9,10 @@ const KEY_MAP: Record<string, string> = {
   permissions_deny: "permissions.deny",
   permissions_asktimeout: "permissions.askTimeout",
   rules_file: "rulesFile",
+  repomap_enabled: "repoMap.enabled",
+  repomap_max_files: "repoMap.maxFiles",
+  repomap_max_file_bytes: "repoMap.maxFileBytes",
+  repomap_prompt_budget: "repoMap.promptBudget",
   verbose: "verbose",
 };
 

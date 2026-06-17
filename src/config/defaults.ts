@@ -42,4 +42,10 @@ export const defaults: Config = {
     network: "enabled",
     captureScreenshots: true,
   },
+  repoMap: {
+    enabled: true,
+    maxFiles: 500,
+    maxFileBytes: 1_048_576,
+    promptBudget: 10_240,
+  },
 };

@@ -19,6 +19,13 @@ export interface McpHttpServerConfig {
   headers: Record<string, string>;
 }
 
+export interface RepoMapConfig {
+  enabled: boolean;
+  maxFiles: number;
+  maxFileBytes: number;
+  promptBudget: number;
+}
+
 export interface Config {
   apiKey: string;
   model: string;
@@ -36,6 +43,7 @@ export interface Config {
   hooks: Partial<Record<HookEventName, HookConfig[]>>;
   sandbox: SandboxConfig;
   browser: BrowserConfig;
+  repoMap: RepoMapConfig;
 }
 
 export interface ConfigLoadResult {
