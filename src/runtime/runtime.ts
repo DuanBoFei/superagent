@@ -202,7 +202,17 @@ export function createRuntime(options: RuntimeOptions = {}): RuntimeHandle {
       let stopReason: TurnSummary["reason"] | undefined;
       try {
         if (config.repoMap.enabled && repoMapText === undefined) {
-          repoMapText = buildRepoMapSnapshot(process.cwd(), config);
+          const startedAt = Date.now();
+          const snapshot = buildRepoMapSnapshot(process.cwd(), config);
+          repoMapText = snapshot.text;
+          session.repoMapFileCount = snapshot.fileCount;
+          session.repoMapDiagnosticCount = snapshot.diagnosticCount;
+          options.emit?.({
+            type: "repomap:build_end",
+            durationMs: Date.now() - startedAt,
+            fileCount: snapshot.fileCount,
+            diagnosticCount: snapshot.diagnosticCount,
+          });
         }
         await dispatchSessionStart(false);
         for await (const event of createQueryLoop(session, withModelTools())) {
@@ -240,7 +250,17 @@ export function createRuntime(options: RuntimeOptions = {}): RuntimeHandle {
       let stopReason: TurnSummary["reason"] | undefined;
       try {
         if (config.repoMap.enabled && repoMapText === undefined) {
-          repoMapText = buildRepoMapSnapshot(process.cwd(), config);
+          const startedAt = Date.now();
+          const snapshot = buildRepoMapSnapshot(process.cwd(), config);
+          repoMapText = snapshot.text;
+          session.repoMapFileCount = snapshot.fileCount;
+          session.repoMapDiagnosticCount = snapshot.diagnosticCount;
+          options.emit?.({
+            type: "repomap:build_end",
+            durationMs: Date.now() - startedAt,
+            fileCount: snapshot.fileCount,
+            diagnosticCount: snapshot.diagnosticCount,
+          });
         }
         await dispatchSessionStart(true);
         for await (const event of createQueryLoop(session, withModelTools())) {
@@ -269,12 +289,22 @@ export function createRuntime(options: RuntimeOptions = {}): RuntimeHandle {
   }
 }
 
-function buildRepoMapSnapshot(rootPath: string, config: Config): string | undefined {
+interface RepoMapSnapshot {
+  text: string;
+  fileCount: number;
+  diagnosticCount: number;
+}
+
+function buildRepoMapSnapshot(rootPath: string, config: Config): RepoMapSnapshot {
   const collected = collectFiles(rootPath, {
     ignore: createIgnoreOptions(),
     maxFiles: config.repoMap.maxFiles,
     maxFileBytes: config.repoMap.maxFileBytes,
   });
   const repoMap = buildRepoMap(rootPath, collected.files, collected.diagnostics);
-  return renderRepoMap(repoMap, { maxChars: config.repoMap.promptBudget });
+  return {
+    text: renderRepoMap(repoMap, { maxChars: config.repoMap.promptBudget }),
+    fileCount: repoMap.files.length,
+    diagnosticCount: repoMap.diagnostics.length,
+  };
 }

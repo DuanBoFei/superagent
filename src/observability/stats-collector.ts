@@ -11,6 +11,8 @@ export function createStatsCollector(): StatsCollector {
   let totalInputTokens = 0;
   let totalOutputTokens = 0;
   let totalCost = 0;
+  let repoMapFileCount: number | undefined;
+  let repoMapDiagnosticCount: number | undefined;
 
   function record(event: LogEvent): void {
     switch (event.type) {
@@ -29,6 +31,10 @@ export function createStatsCollector(): StatsCollector {
           }
         }
         break;
+      case "repomap:build_end":
+        repoMapFileCount = event.fileCount;
+        repoMapDiagnosticCount = event.diagnosticCount;
+        break;
     }
   }
 
@@ -39,6 +45,8 @@ export function createStatsCollector(): StatsCollector {
       totalInputTokens,
       totalOutputTokens,
       totalCost,
+      repoMapFileCount,
+      repoMapDiagnosticCount,
     };
   }
 
