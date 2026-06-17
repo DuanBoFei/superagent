@@ -59,4 +59,43 @@ describe("runCodeReview", () => {
       findings: [expect.objectContaining({ severity: "blocking" })],
     });
   });
+
+  it("returns blocking findings for a synthetic defect diff", async () => {
+    const requester = vi.fn<ReviewRequester>().mockResolvedValue(
+      "BLOCKING correctness: The diff inverts the authentication success condition",
+    );
+
+    await expect(runCodeReview(input, { requester })).resolves.toMatchObject({
+      approved: false,
+      findings: [
+        expect.objectContaining({
+          severity: "blocking",
+          category: "correctness",
+          description: "The diff inverts the authentication success condition",
+        }),
+      ],
+    });
+  });
+
+  it("keeps failed test output blocking by default", async () => {
+    const requester = vi.fn<ReviewRequester>().mockImplementation(async (prompt) => {
+      if (prompt.includes("1 failed")) {
+        return "BLOCKING tests: Test output reports one failure";
+      }
+      return JSON.stringify({ approved: true, summary: "ok", findings: [] });
+    });
+
+    await expect(
+      runCodeReview({ ...input, testOutput: "1 failed" }, { requester }),
+    ).resolves.toMatchObject({
+      approved: false,
+      findings: [
+        expect.objectContaining({
+          severity: "blocking",
+          category: "tests",
+          description: "Test output reports one failure",
+        }),
+      ],
+    });
+  });
 });
