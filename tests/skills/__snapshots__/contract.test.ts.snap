@@ -1,0 +1,13 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Skill domain contracts > manifest field keys are stable (snapshot) 1`] = `
+[
+  "allowedRoles",
+  "arguments",
+  "description",
+  "entry",
+  "name",
+  "suggestedMode",
+  "version",
+]
+`;
