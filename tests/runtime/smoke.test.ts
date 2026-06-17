@@ -1,10 +1,11 @@
-import { describe, expect, it } from "vitest";
+import { afterAll, describe, expect, it } from "vitest";
 import { execSync } from "node:child_process";
-import { existsSync, unlinkSync } from "fs";
+import { existsSync, mkdtempSync, rmSync } from "fs";
 import { join } from "path";
-import { homedir } from "os";
+import { tmpdir } from "os";
 
 const NPX = process.platform === "win32" ? "npx.cmd" : "npx";
+const TEST_HOME = mkdtempSync(join(tmpdir(), "superagent-smoke-"));
 
 function run(args: string[] = []): { stdout: string; exitCode: number } {
   try {
@@ -17,6 +18,8 @@ function run(args: string[] = []): { stdout: string; exitCode: number } {
         stdio: "pipe",
         env: {
           ...process.env,
+          HOME: TEST_HOME,
+          USERPROFILE: TEST_HOME,
           SUPERAGENT_API_KEY: "stub-key",
         },
       },
@@ -31,7 +34,11 @@ function run(args: string[] = []): { stdout: string; exitCode: number } {
   }
 }
 
-const DB_PATH = join(homedir(), ".superagent", "sessions.db");
+const DB_PATH = join(TEST_HOME, ".superagent", "sessions.db");
+
+afterAll(() => {
+  rmSync(TEST_HOME, { recursive: true, force: true });
+});
 
 describe("End-to-end smoke test", () => {
   it("default run prints SuperAgent and exits 0", () => {

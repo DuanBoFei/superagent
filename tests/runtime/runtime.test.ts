@@ -69,7 +69,7 @@ describe("Runtime public API", () => {
   });
 
   it("resumeSession loads with given sessionId and yields text", async () => {
-    const runtime = createRuntime({ sendMessage: textModel });
+    const runtime = createRuntime({ sendMessage: textModel, loadSession: () => null });
     const stream = runtime.resumeSession("test-session-id");
 
     const events = await collect(stream);

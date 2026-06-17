@@ -77,6 +77,23 @@ describe("runOneShot", () => {
     expect(result).toBe(0);
   });
 
+  it("writes multi-agent phase labels to stdout", async () => {
+    const rt = fakeRuntime([
+      { type: "agent_phase", role: "explore", lifecycle: "result" } as any,
+      { type: "text", content: "Explore done" },
+    ]);
+    const out = captureStreams();
+
+    const result = await runOneShot(rt, "/multi-agent hi", "test-model", {
+      emit: vi.fn(),
+      close: vi.fn(),
+    });
+
+    expect(out.stdout).toContain("[explore] result");
+    expect(out.stdout).toContain("Explore done");
+    expect(result).toBe(0);
+  });
+
   it("emits session:end and calls close on success", async () => {
     const rt = fakeRuntime([{ type: "text", content: "ok" }]);
     const obs = { emit: vi.fn(), close: vi.fn() };

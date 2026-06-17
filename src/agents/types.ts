@@ -56,3 +56,31 @@ export interface OrchestrationRun {
   updatedAt: Date;
   completedAt?: Date;
 }
+
+export type RoutingMode = "single" | "multi";
+
+export interface RoutingDecision {
+  mode: RoutingMode;
+  prompt: string;
+  reason: "simple" | "forced" | "complex";
+}
+
+export interface PhaseInput {
+  prompt: string;
+  role: AgentRole;
+  findings?: string[];
+  changedFiles?: string[];
+  tests?: string[];
+}
+
+export type PhaseLifecycleEvent = "start" | "result" | "failure" | "skipped";
+
+export interface PhaseSummary {
+  role: AgentRole;
+  status: PhaseStatus;
+  summary: string;
+  findings: string[];
+  changedFiles: string[];
+  tests: string[];
+  defects: ReviewFinding[];
+}

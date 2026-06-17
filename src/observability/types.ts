@@ -2,6 +2,12 @@
 
 export type LogEvent =
   | {
+      type: "agent:phase";
+      runId: string;
+      role: "explore" | "implement" | "review";
+      lifecycle: "start" | "result" | "failure" | "skipped";
+    }
+  | {
       type: "session:start";
       sessionId: string;
       config: { model: string; maxTurns: number };

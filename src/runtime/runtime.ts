@@ -1,3 +1,8 @@
+import { runMultiAgentOrchestration, type PhaseRunner } from "../agents/orchestrator";
+import { createRolePermissionSystem } from "../agents/role-permissions";
+import { getRolePrompt } from "../agents/role-prompts";
+import { routeMultiAgentPrompt } from "../agents/router";
+import type { AgentRole, PhaseInput, PhaseResult, ReviewFinding } from "../agents/types";
 import { resolveBrowserProfile } from "../browser/config";
 import { PlaywrightBrowserAdapter } from "../browser/playwright-adapter";
 import { BrowserSessionManager } from "../browser/session";
@@ -187,7 +192,8 @@ export function createRuntime(options: RuntimeOptions = {}): RuntimeHandle {
     async *startTurn(userMessage: string) {
       await ensureMcpConnected();
       await refreshMcpTools();
-      session.messages.push({ role: "user", content: userMessage });
+      const routing = routeMultiAgentPrompt(userMessage);
+      session.messages.push({ role: "user", content: routing.prompt });
 
       const sigintHandler = () => {
         session.interruptFlag = true;
@@ -197,11 +203,42 @@ export function createRuntime(options: RuntimeOptions = {}): RuntimeHandle {
       let stopReason: TurnSummary["reason"] | undefined;
       try {
         await dispatchSessionStart(false);
-        for await (const event of createQueryLoop(session, withModelTools())) {
-          if (event.type === "turn_end") {
-            stopReason = event.summary.reason;
+        if (routing.mode === "multi") {
+          const run = await runMultiAgentOrchestration(routing.prompt, {
+            runPhase: ((input) => runRolePhase(input.role, formatPhasePrompt(input))) satisfies PhaseRunner,
+            emit(event) {
+              options.emit?.(event);
+            },
+          });
+
+          for (const phase of run.phases) {
+            yield { type: "agent_phase", role: phase.role, lifecycle: "result" };
+            yield { type: "text", content: `[${phase.role}] ${phase.summary}\n` };
           }
-          yield event;
+
+          session.messages.push({
+            role: "assistant",
+            content: `Multi-agent run ${run.status}: ${run.phases.map((phase) => `${phase.role}: ${phase.summary}`).join(" | ")}`,
+          });
+          session.turnNumber++;
+          stopReason = run.status === "interrupted" ? "interrupted" : run.status === "failed" || run.status === "blocked" ? "error" : "completed";
+          yield {
+            type: "turn_end",
+            summary: {
+              turnNumber: session.turnNumber,
+              totalTokens: 0,
+              totalCost: 0,
+              reason: stopReason,
+            },
+          };
+          resolvedDeps.saveSession(session);
+        } else {
+          for await (const event of createQueryLoop(session, withModelTools())) {
+            if (event.type === "turn_end") {
+              stopReason = event.summary.reason;
+            }
+            yield event;
+          }
         }
       } finally {
         process.off("SIGINT", sigintHandler);
@@ -244,16 +281,119 @@ export function createRuntime(options: RuntimeOptions = {}): RuntimeHandle {
     },
   };
 
-  function withModelTools(): QueryLoopDeps {
+  function withModelTools(role?: AgentRole): QueryLoopDeps {
+    const rolePermission = role ? createRolePermissionSystem(role, permission) : permission;
+    const roleDispatcher = role
+      ? createToolDispatcher({ registry, permission: rolePermission, hookManager })
+      : dispatcher;
+
     return {
       ...resolvedDeps,
+      checkPermission(toolName, args) {
+        if (role === "review" && toolName === "ReviewFinding") {
+          return { allowed: true };
+        }
+        return resolvedDeps.checkPermission(toolName, args);
+      },
+      async dispatchTools(calls) {
+        const externalCalls = calls.filter((call) => !(role === "review" && call.name === "ReviewFinding"));
+        const results = externalCalls.length > 0 ? await roleDispatcher.dispatchTools(externalCalls) : [];
+        return [
+          ...calls.filter((call) => role === "review" && call.name === "ReviewFinding").map((call) => ({
+            name: call.name,
+            success: true,
+            output: JSON.stringify(call.args),
+          })),
+          ...results,
+        ];
+      },
       composePrompt(messages) {
         const prompt = resolvedDeps.composePrompt(messages);
         return {
           ...prompt,
+          system: role ? `${getRolePrompt(role)}\n\n${prompt.system}` : prompt.system,
           tools: buildModelToolDefinitions(registry),
         };
       },
+    };
+  }
+
+  function formatPhasePrompt(input: PhaseInput): string {
+    const context = [
+      input.findings?.length ? `Explore findings:\n${input.findings.join("\n")}` : undefined,
+      input.changedFiles?.length ? `Changed files:\n${input.changedFiles.join("\n")}` : undefined,
+      input.tests?.length ? `Verification:\n${input.tests.join("\n")}` : undefined,
+    ].filter(Boolean).join("\n\n");
+
+    return context ? `${input.prompt}\n\n${context}` : input.prompt;
+  }
+
+  function parseReviewFinding(args: Record<string, unknown>): ReviewFinding {
+    return {
+      category: isReviewFindingCategory(args.category) ? args.category : "correctness",
+      description: typeof args.description === "string" ? args.description : "Review finding",
+      priority: args.priority === "low" || args.priority === "medium" ? args.priority : "high",
+      file: typeof args.file === "string" ? args.file : undefined,
+      line: typeof args.line === "number" ? args.line : undefined,
+      blocking: args.blocking === true,
+    };
+  }
+
+  function isReviewFindingCategory(value: unknown): value is ReviewFinding["category"] {
+    return value === "correctness" || value === "security" || value === "test" || value === "permission" || value === "maintainability";
+  }
+
+  async function runRolePhase(role: AgentRole, prompt: string): Promise<PhaseResult> {
+    const phaseSession = createFreshSession({
+      sessionId: `${session.sessionId}:${role}`,
+      messages: [{ role: "user", content: prompt }],
+    });
+    const text: string[] = [];
+    const changedFiles = new Set<string>();
+    const tests = new Set<string>();
+    const defects: ReviewFinding[] = [];
+
+    for await (const event of createQueryLoop(phaseSession, { ...withModelTools(role), saveSession: () => {} })) {
+      if (event.type === "text") {
+        text.push(event.content);
+      } else if (event.type === "tool_call") {
+        if (role === "review" && event.name === "ReviewFinding") {
+          const defect = parseReviewFinding(event.args);
+          defects.push(defect);
+          if (defect.blocking) {
+            return {
+              role,
+              status: "completed",
+              summary: text.join("") || "Review blocked by defects",
+              defects,
+            };
+          }
+          continue;
+        }
+        if ((event.name === "Write" || event.name === "Edit") && typeof event.args.file_path === "string") {
+          changedFiles.add(event.args.file_path);
+        }
+        if (event.name === "Bash" && typeof event.args.command === "string") {
+          tests.add(event.args.command);
+        }
+      } else if (event.type === "error") {
+        return {
+          role,
+          status: "failed",
+          summary: text.join("") || "Phase failed",
+          error: event.message,
+        };
+      }
+    }
+
+    return {
+      role,
+      status: phaseSession.interruptFlag ? "interrupted" : "completed",
+      summary: text.join("") || (defects.some((defect) => defect.blocking) ? "Review blocked by defects" : `${role} completed`),
+      findings: role === "explore" ? text.filter(Boolean) : undefined,
+      changedFiles: changedFiles.size > 0 ? [...changedFiles] : undefined,
+      tests: tests.size > 0 ? [...tests] : undefined,
+      defects: defects.length > 0 ? defects : undefined,
     };
   }
 }
