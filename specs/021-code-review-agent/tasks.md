@@ -18,15 +18,15 @@
 | T014 | ✅ Treat empty output as inconclusive blocking result | [BE] | T012 | `pnpm test -- tests/review/parser.test.ts` |
 | T015 | ✅ Treat malformed output as inconclusive blocking result | [BE] | T012 | `pnpm test -- tests/review/parser.test.ts` |
 | T016 | ✅ Add fallback text parser for simple finding lists | [BE] | T012 | `pnpm test -- tests/review/parser.test.ts` |
-| T017 | Implement `runCodeReview()` with fake provider boundary | [BE] | T010,T012 | `pnpm test -- tests/review/reviewer.test.ts` |
-| T018 | Add reviewer test for approved response | [BE] | T017 | `pnpm test -- tests/review/reviewer.test.ts` |
-| T019 | Add reviewer test for blocking findings | [BE] | T017 | `pnpm test -- tests/review/reviewer.test.ts` |
-| T020 | Add reviewer test for malformed provider output | [BE] | T017 | `pnpm test -- tests/review/reviewer.test.ts` |
+| T017 | ✅ Implement `runCodeReview()` with fake provider boundary | [BE] | T010,T012 | `pnpm test -- tests/review/reviewer.test.ts` |
+| T018 | ✅ Add reviewer test for approved response | [BE] | T017 | `pnpm test -- tests/review/reviewer.test.ts` |
+| T019 | ✅ Add reviewer test for blocking findings | [BE] | T017 | `pnpm test -- tests/review/reviewer.test.ts` |
+| T020 | ✅ Add reviewer test for malformed provider output | [BE] | T017 | `pnpm test -- tests/review/reviewer.test.ts` |
 | T021 | Add observability event names for review start/end | [BE] | T017 | `pnpm test -- tests/observability` |
 | T022 | Render review findings table in CLI helper | [FE] | T001 | `pnpm test -- tests/cli` |
 | T023 | Add public export from `src/review/index.ts` | [BE] | T017 | `pnpm test -- tests/review` |
 | T024 | Add 020 integration adapter for Review phase | [INT] | T017 | `pnpm test -- tests/agents tests/review` |
 | T025 | Add synthetic diff fixture with known defect | [BE] | T017 | `pnpm test -- tests/review/reviewer.test.ts` |
 | T026 | Add failed-test-output blocking test | [BE] | T017 | `pnpm test -- tests/review/reviewer.test.ts` |
-| T027 | Run focused review test suite | [INT] | T001-T026 | `pnpm test -- tests/review` |
+| T027 | ✅ Run focused review test suite | [INT] | T001-T026 | `pnpm test -- tests/review` |
 | T028 | Update closeout docs `state.md` and `session.md` | [INT] | T027 | Review docs |
