@@ -48,3 +48,6 @@ export { type RenderOptions, renderRepoMap } from "./render";
 
 // ── Refresh ──
 export { type RefreshOptions, refreshRepoMap } from "./refresh";
+
+// ── Query ──
+export { type QueryRepoMapOptions, queryRepoMap } from "./query";
