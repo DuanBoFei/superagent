@@ -20,6 +20,7 @@ export interface PromptContext {
   toolDefinitions: ToolDef[];
   contextWindowTokens: number;
   currentTokens: number;
+  repoMapText?: string;
 }
 
 export interface Prompt {
