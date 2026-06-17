@@ -4,13 +4,13 @@
 |---|------|-------|--------------|--------------|
 | T001 | ✅ Create `src/review/types.ts` with review domain contracts | [BE] | — | `pnpm test -- tests/review/contract.test.ts` |
 | T002 | ✅ Add contract snapshot for `ReviewResult` and categories | [BE] | T001 | `pnpm test -- tests/review/contract.test.ts` |
-| T003 | Implement `ReviewInputBuilder` skeleton | [BE] | T001 | `pnpm test -- tests/review/input-builder.test.ts` |
-| T004 | Include task intent in review input | [BE] | T003 | `pnpm test -- tests/review/input-builder.test.ts` |
-| T005 | Include changed file list and diff text in review input | [BE] | T003 | `pnpm test -- tests/review/input-builder.test.ts` |
-| T006 | Include test output in review input | [BE] | T003 | `pnpm test -- tests/review/input-builder.test.ts` |
-| T007 | Include tool failures in review input | [BE] | T003 | `pnpm test -- tests/review/input-builder.test.ts` |
-| T008 | Add test proving full transcript is excluded | [BE] | T003 | `pnpm test -- tests/review/input-builder.test.ts` |
-| T009 | Add diff truncation with visible note | [BE] | T005 | `pnpm test -- tests/review/input-builder.test.ts` |
+| T003 | ✅ Implement `ReviewInputBuilder` skeleton | [BE] | T001 | `pnpm test -- tests/review/input-builder.test.ts` |
+| T004 | ✅ Include task intent in review input | [BE] | T003 | `pnpm test -- tests/review/input-builder.test.ts` |
+| T005 | ✅ Include changed file list and diff text in review input | [BE] | T003 | `pnpm test -- tests/review/input-builder.test.ts` |
+| T006 | ✅ Include test output in review input | [BE] | T003 | `pnpm test -- tests/review/input-builder.test.ts` |
+| T007 | ✅ Include tool failures in review input | [BE] | T003 | `pnpm test -- tests/review/input-builder.test.ts` |
+| T008 | ✅ Add test proving full transcript is excluded | [BE] | T003 | `pnpm test -- tests/review/input-builder.test.ts` |
+| T009 | ✅ Add diff truncation with visible note | [BE] | T005 | `pnpm test -- tests/review/input-builder.test.ts` |
 | T010 | Implement review prompt builder | [BE] | T001 | `pnpm test -- tests/review/prompt.test.ts` |
 | T011 | Snapshot review prompt | [BE] | T010 | `pnpm test -- tests/review/prompt.test.ts` |
 | T012 | Implement JSON review parser for approved result | [BE] | T001 | `pnpm test -- tests/review/parser.test.ts` |
