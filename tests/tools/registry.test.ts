@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { z } from "zod";
 import {
   createToolRegistry,
@@ -9,6 +9,10 @@ import {
 } from "../../src/tools/registry";
 import type { ToolContext, ToolResult } from "../../src/tools/types";
 import { registerAllTools } from "../../src/tools/index";
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
 
 describe("tool registry", () => {
   it("registers, retrieves, and lists tools", async () => {
@@ -83,6 +87,16 @@ describe("all-tools integration", () => {
   });
 
   it("each tool returns a valid ToolResult (no throws)", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () =>
+        new Response(
+          '<div class="result"><a class="result__a" href="https://example.test">Docs</a><a class="result__snippet">API reference</a></div>',
+          { status: 200, headers: { "content-type": "text/html" } },
+        ),
+      ),
+    );
+
     const registry = createToolRegistry();
     registerAllTools(registry);
     const context: ToolContext = {
@@ -91,7 +105,6 @@ describe("all-tools integration", () => {
     };
 
     for (const tool of listTools(registry)) {
-      // Call each tool with minimal safe args to verify they run without throwing
       const args = minimalArgs(tool.name);
       const result = await tool.fn(args, context);
       expect(result).toHaveProperty("output");
