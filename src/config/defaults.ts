@@ -48,4 +48,9 @@ export const defaults: Config = {
     maxFileBytes: 1_048_576,
     promptBudget: 10_240,
   },
+  skills: {
+    enabled: true,
+    directories: [".claude/skills"],
+    maxBodySize: 65536,
+  },
 };

@@ -21,6 +21,7 @@ export interface PromptContext {
   contextWindowTokens: number;
   currentTokens: number;
   repoMapText?: string;
+  skillContext?: string;
 }
 
 export interface Prompt {

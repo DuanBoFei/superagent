@@ -35,6 +35,10 @@ function baseConfig(overrides: Partial<Config> = {}): Config {
     rulesFile: "CLAUDE.md",
     mcpServers: {},
     hooks: {},
+    sandbox: { enabled: false, type: "docker" as const, workspaceMount: "/workspace", network: "none" as const, envAllowlist: [], env: {}, pullPolicy: "never" as const, timeoutMs: 120000 },
+    browser: { enabled: false, headless: true, defaultTimeoutMs: 30000, artifactDir: ".superagent/browser-artifacts", viewport: { width: 1280, height: 720 }, network: "enabled" as const, captureScreenshots: true },
+    repoMap: { enabled: false, maxFiles: 500, maxFileBytes: 1_048_576, promptBudget: 10_240 },
+    skills: { enabled: false, directories: [], maxBodySize: 65536 },
     ...overrides,
   };
 }

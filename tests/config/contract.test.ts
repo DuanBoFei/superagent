@@ -39,6 +39,7 @@ describe("Config schema contract", () => {
       "repoMap",
       "rulesFile",
       "sandbox",
+      "skills",
     ]);
   });
 

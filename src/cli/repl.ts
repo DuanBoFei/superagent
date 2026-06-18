@@ -6,6 +6,7 @@ import { dispatchEvent } from "./renderer";
 import { renderSummary } from "./summary";
 import { createPrompt, isCommand, parseCommand, HELP_TEXT } from "./input";
 import { createSafeWriter } from "./safe-writer";
+import { parseSkillArgs } from "./skill-args";
 
 export async function startRepl(
   runtime: RuntimeHandle,
@@ -58,6 +59,43 @@ export async function startRepl(
             continue;
           case "/model":
             process.stdout.write(`Model: ${config.model}\n\n`);
+            continue;
+          case "/skills":
+            {
+              const registry = runtime.getSkillRegistry();
+              if (!registry || registry.skills.size === 0) {
+                process.stdout.write("No skills available.\n\n");
+              } else {
+                const names = [...registry.skills.keys()].sort();
+                process.stdout.write(`Available skills (${names.length}):\n`);
+                for (const name of names) {
+                  const skill = registry.skills.get(name)!;
+                  process.stdout.write(`  ${name} — ${skill.manifest.description}\n`);
+                }
+                process.stdout.write("\n");
+              }
+            }
+            continue;
+          case "/skill":
+            {
+              const argsParts = parsed.args.trim().split(/\s+/).filter(Boolean);
+              if (argsParts.length === 0) {
+                process.stdout.write("Usage: /skill <name> [args...]\n\n");
+                continue;
+              }
+              const skillName = argsParts[0];
+              const skillArgs = parseSkillArgs(skillName, argsParts.slice(1), runtime.getSkillRegistry());
+
+              const diags = runtime.setActiveSkill(skillName, skillArgs);
+              if (diags.length > 0) {
+                for (const d of diags) {
+                  process.stdout.write(`✗ ${d.message}\n`);
+                }
+                process.stdout.write("\n");
+              } else {
+                process.stdout.write(`✓ Skill "${skillName}" activated.\n\n`);
+              }
+            }
             continue;
           default:
             process.stdout.write(`Unknown command: ${parsed.command}\n\n`);

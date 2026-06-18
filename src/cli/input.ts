@@ -48,8 +48,10 @@ export function parseCommand(input: string): ParsedCommand {
 }
 
 export const HELP_TEXT = `
-/help    Show this help message
-/exit    Exit SuperAgent
-/plan    Toggle plan-and-execute mode
-/model   Show current model
+/help     Show this help message
+/exit     Exit SuperAgent
+/plan     Toggle plan-and-execute mode
+/model    Show current model
+/skills   List available skills
+/skill    Invoke a skill (/skill <name> [args...])
 `.trim();

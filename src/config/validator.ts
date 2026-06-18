@@ -75,6 +75,12 @@ export const repoMapConfigSchema = z.object({
   promptBudget: z.number().int().positive(),
 });
 
+const skillConfigSchema = z.object({
+  enabled: z.boolean(),
+  directories: z.array(z.string()),
+  maxBodySize: z.number().int().positive(),
+});
+
 export const configSchema = z.object({
   apiKey: z.string().min(1),
   model: z.string(),
@@ -89,10 +95,11 @@ export const configSchema = z.object({
   sandbox: sandboxConfigSchema.default(defaults.sandbox),
   browser: browserConfigSchema.default(defaults.browser),
   repoMap: repoMapConfigSchema.default(defaults.repoMap),
+  skills: skillConfigSchema.default(defaults.skills),
 });
 
 const KNOWN_KEYS = new Set(Object.keys(configSchema.shape));
-const NESTED_KEYS = new Set(["permissions", "mcpServers", "hooks", "sandbox", "browser", "repoMap"]);
+const NESTED_KEYS = new Set(["permissions", "mcpServers", "hooks", "sandbox", "browser", "repoMap", "skills"]);
 const PERMISSION_KEYS = new Set(Object.keys(permissionsSchema.shape));
 const HOOK_EVENT_NAMES = new Set<HookEventName>(HOOK_EVENTS);
 
