@@ -30,6 +30,7 @@ import { discoverSkills } from "../skills/discovery";
 import { validateArgs } from "../skills/invocation";
 import { renderSkillContext } from "../skills/prompt";
 import { getSkill } from "../skills/registry";
+import { hasPlanModeSuggestion } from "../skills/routing";
 import type { SkillRegistry, SkillDiagnostic } from "../skills/types";
 
 function defaultDeps(): QueryLoopDeps {
@@ -71,6 +72,7 @@ export interface RuntimeHandle {
   resumeSession(sessionId: string): AsyncGenerator<TurnEvent>;
   setActiveSkill(name: string, args: Record<string, string>): SkillDiagnostic[];
   clearActiveSkill(): void;
+  hasActiveSkillPlanSuggestion(): boolean;
   getSkillRegistry(): SkillRegistry | undefined;
 }
 
@@ -221,6 +223,13 @@ export function createRuntime(options: RuntimeOptions = {}): RuntimeHandle {
 
     clearActiveSkill(): void {
       session.activeSkill = undefined;
+    },
+
+    hasActiveSkillPlanSuggestion(): boolean {
+      if (!skillRegistry || !session.activeSkill) return false;
+      const result = getSkill(skillRegistry, session.activeSkill.name);
+      if (result.error || !result.skill) return false;
+      return hasPlanModeSuggestion(result.skill);
     },
 
     getSkillRegistry(): SkillRegistry | undefined {

@@ -6,7 +6,7 @@ import { dispatchEvent } from "./renderer";
 import { renderSummary } from "./summary";
 import { createPrompt, isCommand, parseCommand, HELP_TEXT } from "./input";
 import { createSafeWriter } from "./safe-writer";
-import type { SkillRegistry } from "../skills/types";
+import { parseSkillArgs } from "./skill-args";
 
 export async function startRepl(
   runtime: RuntimeHandle,
@@ -84,30 +84,7 @@ export async function startRepl(
                 continue;
               }
               const skillName = argsParts[0];
-              const skillArgs: Record<string, string> = {};
-              for (let i = 1; i < argsParts.length; i++) {
-                const eqIdx = argsParts[i].indexOf("=");
-                if (eqIdx !== -1) {
-                  skillArgs[argsParts[i].slice(0, eqIdx)] = argsParts[i].slice(eqIdx + 1);
-                } else {
-                  // Positional arg — assign to first argument without a value
-                  const registry = runtime.getSkillRegistry();
-                  if (registry) {
-                    const skill = registry.skills.get(skillName);
-                    if (skill) {
-                      const posArg = skill.manifest.arguments.find(
-                        (a) => !(a.name in skillArgs),
-                      );
-                      if (posArg) {
-                        skillArgs[posArg.name] = argsParts[i];
-                        continue;
-                      }
-                    }
-                  }
-                  // Fallback: use positional index
-                  skillArgs[`arg${i}`] = argsParts[i];
-                }
-              }
+              const skillArgs = parseSkillArgs(skillName, argsParts.slice(1), runtime.getSkillRegistry());
 
               const diags = runtime.setActiveSkill(skillName, skillArgs);
               if (diags.length > 0) {
