@@ -93,7 +93,20 @@ export async function startRepl(
                 }
                 process.stdout.write("\n");
               } else {
-                process.stdout.write(`✓ Skill "${skillName}" activated.\n\n`);
+                process.stdout.write(`✓ Skill "${skillName}" activated. Starting execution...\n\n`);
+                // Auto-start skill execution with args as context
+                const argsSummary = Object.entries(skillArgs)
+                  .map(([k, v]) => `${k}=${v}`)
+                  .join(", ");
+                const initialPrompt = argsSummary
+                  ? `Execute the ${skillName} skill with parameters: ${argsSummary}`
+                  : `Execute the ${skillName} skill`;
+                for await (const event of runtime.startTurn(initialPrompt)) {
+                  dispatchEvent(event, terminal);
+                  if (event.type === "turn_end") {
+                    safeWriter.write("\n");
+                  }
+                }
               }
             }
             continue;
