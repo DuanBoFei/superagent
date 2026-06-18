@@ -57,7 +57,15 @@ pnpm test -- tests/models/fallback-policy.test.ts \
 ## Branch & Tag
 
 Developed on `worktree-feat-011-mcp-server-integration` (shared with 011 MCP, 015 tool calling).
+Merged to `master` as commit `d8c3d27`.
 Tag: `v0.1.0-016-model-fallback`.
+
+## Merge Notes
+
+- 5 merge conflicts resolved: `src/observability/types.ts`, `src/runtime/types.ts`, `src/runtime/runtime.ts`, `tests/runtime/query-loop.test.ts`, `tests/runtime/runtime.test.ts`
+- All conflicts were "both sides added different things" — combined both sides' event types, Prompt fields, and test cases
+- `runtime.ts` resolution: combined hook dispatch (`dispatchSessionStart`/`dispatchStop`) with `withModelTools()` wrapping
+- Git history scrubbed of pre-existing OpenRouter API key (231 commits, `git filter-repo`) before merge
 
 ## Notes
 
