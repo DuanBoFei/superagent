@@ -6,7 +6,7 @@ const promptFn: PromptFn = async (_toolName, _command) => "denied";
 
 const checker = createChecker(
   {
-    autoApprove: ["Read:*", "Grep:*", "Glob:*"],
+    autoApprove: ["Read:*", "Grep:*", "Glob:*", "WebSearch:*"],
     deny: [],
     askTimeout: 30000,
   },

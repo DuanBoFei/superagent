@@ -1,5 +1,9 @@
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
 import { z } from "zod";
 import type { ToolContext, ToolResult } from "./types";
+
+const execFileAsync = promisify(execFile);
 
 const DEFAULT_ENDPOINT = "https://api.search.local/query";
 const TIMEOUT_MS = 30_000;
@@ -74,6 +78,13 @@ async function customSearch(
 }
 
 async function builtinSearch(query: string): Promise<ToolResult> {
+  const result = await fetchBasedSearch(query);
+  if (result.error !== "network error") return result;
+
+  return curlBasedSearch(query);
+}
+
+async function fetchBasedSearch(query: string): Promise<ToolResult> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
@@ -89,15 +100,72 @@ async function builtinSearch(query: string): Promise<ToolResult> {
     }
 
     const html = await response.text();
+
+    if (/anomaly-modal|challenge-form/.test(html)) {
+      return {
+        output: "Search unavailable: this network is blocked by the search provider. Set SUPERAGENT_WEBSEARCH_API_KEY to use a custom search endpoint.",
+        error: "blocked by search provider",
+        metadata: { results: [], note: "blocked by provider anti-bot detection" },
+      };
+    }
+
     const results = parseDuckDuckGoHtml(html);
     if (results.length === 0) {
       return { output: "No results found.", metadata: { results: [], note: undefined } };
     }
     return formatOutput(results);
   } catch {
-    return unavailable("request failed");
+    return {
+      output: "",
+      error: "network error",
+      metadata: { results: [], note: "network unreachable" },
+    };
   } finally {
     clearTimeout(timeout);
+  }
+}
+
+async function curlBasedSearch(query: string): Promise<ToolResult> {
+  const url = `${DDG_URL}?q=${encodeURIComponent(query)}`;
+
+  try {
+    const { stdout } = await execFileAsync("curl", [
+      "-s",
+      "-L",
+      "-m", "30",
+      "-A", "SuperAgent/1.0",
+      url,
+    ], {
+      timeout: TIMEOUT_MS,
+      maxBuffer: 1024 * 1024,
+      windowsHide: true,
+    });
+
+    const html = String(stdout);
+
+    if (!html || html.length < 100) {
+      return unavailable("empty response from search provider");
+    }
+
+    if (/anomaly-modal|challenge-form/.test(html)) {
+      return {
+        output: "Search unavailable: this network is blocked by the search provider. Set SUPERAGENT_WEBSEARCH_API_KEY to use a custom search endpoint.",
+        error: "blocked by search provider",
+        metadata: { results: [], note: "blocked by provider anti-bot detection" },
+      };
+    }
+
+    const results = parseDuckDuckGoHtml(html);
+    if (results.length === 0) {
+      return { output: "No results found.", metadata: { results: [], note: undefined } };
+    }
+    return formatOutput(results);
+  } catch {
+    return {
+      output: "Search unavailable: network error connecting to search provider. If you are behind a firewall or proxy, set SUPERAGENT_WEBSEARCH_API_KEY to use a custom search endpoint.",
+      error: "network error",
+      metadata: { results: [], note: "network unreachable" },
+    };
   }
 }
 

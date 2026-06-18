@@ -2,6 +2,19 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { webSearchTool } from "../../src/tools/web-search";
 import type { ToolContext } from "../../src/tools/types";
 
+const { mockExecFile } = vi.hoisted(() => ({
+  mockExecFile: vi.fn(),
+}));
+
+vi.mock("node:child_process", () => ({
+  execFile: (_cmd: string, _args: string[], _opts: unknown, cb: (err: Error | null, stdout: string, stderr: string) => void) => {
+    mockExecFile().then(
+      (result: { stdout?: string; stderr?: string } | undefined) => cb(null, result?.stdout ?? "", result?.stderr ?? ""),
+      (err: Error) => cb(err, "", ""),
+    );
+  },
+}));
+
 const context: ToolContext = {
   workingDirectory: process.cwd(),
   sessionId: "test-session",
@@ -32,6 +45,7 @@ afterEach(() => {
   vi.unstubAllEnvs();
   vi.unstubAllGlobals();
   vi.useRealTimers();
+  mockExecFile.mockReset();
 });
 
 describe("WebSearch tool", () => {
@@ -222,11 +236,12 @@ describe("WebSearch tool", () => {
         throw new Error("ECONNREFUSED");
       }),
     );
+    mockExecFile.mockRejectedValue(new Error("curl not available"));
 
     const result = await webSearchTool({ query: "test" }, context);
 
-    expect(result.output).toBe("Search unavailable: request failed");
-    expect(result.error).toBeUndefined();
+    expect(result.output).toBe("Search unavailable: network error connecting to search provider. If you are behind a firewall or proxy, set SUPERAGENT_WEBSEARCH_API_KEY to use a custom search endpoint.");
+    expect(result.error).toBe("network error");
   });
 
   it("gracefully degrades when DuckDuckGo returns HTTP 429", async () => {
@@ -344,6 +359,7 @@ describe("WebSearch tool", () => {
         });
       }),
     );
+    mockExecFile.mockRejectedValue(new Error("curl not available"));
 
     const resultPromise = webSearchTool({ query: "timeout" }, context);
 
@@ -351,7 +367,7 @@ describe("WebSearch tool", () => {
 
     const result = await resultPromise;
 
-    expect(result.output).toBe("Search unavailable: request failed");
-    expect(result.error).toBeUndefined();
+    expect(result.output).toBe("Search unavailable: network error connecting to search provider. If you are behind a firewall or proxy, set SUPERAGENT_WEBSEARCH_API_KEY to use a custom search endpoint.");
+    expect(result.error).toBe("network error");
   });
 });
