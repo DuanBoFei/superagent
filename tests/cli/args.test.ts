@@ -42,4 +42,21 @@ describe("parseCliMode", () => {
     const result = parseCliMode(["node", "index.js", "--list"]);
     expect(result).toEqual({ mode: "interactive" });
   });
+
+  it("returns web mode with parsed flags", () => {
+    const result = parseCliMode([
+      "node",
+      "index.js",
+      "web",
+      "--port",
+      "3457",
+      "--verbose",
+      "--no-open",
+    ]);
+
+    expect(result).toEqual({
+      mode: "web",
+      options: { port: 3457, verbose: true, noOpen: true },
+    });
+  });
 });

@@ -7,6 +7,7 @@ import { startRepl } from "./cli/repl";
 import { parseCliMode } from "./cli/args";
 import { detectTerminalProfile } from "./cli/terminal-profile";
 import { runOneShot } from "./cli/one-shot";
+import { startWebCommand } from "./cli/web";
 import { createObservability } from "./observability/index";
 import { discoverSkills } from "./skills/discovery";
 
@@ -75,6 +76,11 @@ async function main(): Promise<void> {
 
     if (cliMode.mode === "one-shot") {
       const exitCode = await runOneShot(runtime, cliMode.prompt, config.model, obs);
+      process.exit(exitCode);
+    }
+
+    if (cliMode.mode === "web") {
+      const exitCode = await startWebCommand(cliMode.options);
       process.exit(exitCode);
     }
 

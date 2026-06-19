@@ -23,7 +23,7 @@
 - **验证方式**: TypeScript 编译通过，无类型错误
 - **预计时间**: 2 min
 
-#### T002: 在 src/cli/repl.ts 中添加 web 命令分支
+#### T002: 在 src/cli/repl.ts 中添加 web 命令分支 ✅
 
 - **FR 来源**: FR-WS-01
 - **依赖**: T001
