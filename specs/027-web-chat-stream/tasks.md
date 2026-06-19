@@ -29,7 +29,7 @@
 - **验证方式**: TypeScript 编译无错误，类型覆盖完整
 - **预计时间**: 30 min
 
-#### T002 [BE]: 配置 Markdown 解析器 (marked + GFM)
+#### [x] T002 [BE]: 配置 Markdown 解析器 (marked + GFM)
 
 - **FR 来源**: FR-MD-01 ~ FR-MD-12
 - **依赖**: T001
