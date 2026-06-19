@@ -43,7 +43,7 @@
 - **验证方式**: 单元测试：注入 `<script>alert(1)</script>` 验证被转义
 - **预计时间**: 2 min
 
-#### T003 [BE]: 在 WebServer 挂载 Socket.io 服务端
+#### T003 [BE]: 在 WebServer 挂载 Socket.io 服务端 ✅
 
 - **FR 来源**: FR-MI-06, FR-MI-07
 - **依赖**: 025 Feature 的 WebServer
