@@ -76,7 +76,7 @@
 
 ### 并行组 B: 核心组件 (6 任务，可并行)
 
-#### T005 [FE]: 基础 Markdown 元素组件
+#### [x] T005 [FE]: 基础 Markdown 元素组件
 
 - **FR 来源**: FR-MD-02, FR-MD-03, FR-MD-04, FR-MD-06, FR-MD-08, FR-MD-11, FR-MD-12
 - **依赖**: T001
