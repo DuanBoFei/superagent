@@ -63,13 +63,12 @@ function sanitizeAttributes(tag: string, rawAttrs: string, addLinkSecurityAttrs:
   }
 
   const attrs: string[] = [];
-  for (const match of rawAttrs.matchAll(/\s([a-zA-Z:-]+)=("[^"]*"|'[^']*')/g)) {
+  for (const match of rawAttrs.matchAll(/\s([a-zA-Z:-]+)=(?:"([^"]*)"|'([^']*)'|([^\s>]+))/g)) {
     const name = match[1]?.toLowerCase();
-    const quotedValue = match[2];
-    if (!name || !quotedValue || !safeAttrs.has(name)) {
+    const value = match[2] ?? match[3] ?? match[4];
+    if (!name || value === undefined || !safeAttrs.has(name)) {
       continue;
     }
-    const value = quotedValue.slice(1, -1);
     if (((name === "href" || name === "src") && !isSafeUrl(value)) || /javascript:/i.test(value)) {
       continue;
     }
