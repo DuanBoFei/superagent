@@ -1,7 +1,7 @@
 # 实施进度 · web-chat-stream
 
 ## 当前任务
-[ ] T014 · 性能优化与样式精调（进行中）
+[ ] T015 · 编写核心单元测试与组件测试（进行中）
 
 ## 已完成
 - [x] T001 · 创建 Markdown 类型定义
@@ -17,6 +17,7 @@
 - [x] T011 · useCopyToClipboard hook
 - [x] T012 · useMarkdownStream hook
 - [x] T013 · Store 扩展 + MessageBubble 集成
+- [x] T014 · 性能优化与样式精调
 
 ## 阻塞项
 （无）

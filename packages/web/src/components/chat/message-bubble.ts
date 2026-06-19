@@ -15,11 +15,13 @@ export function renderMessageBubble(message: Message): string {
   const alignment = message.role === "user" ? "justify-end" : "justify-start";
   const surface = message.role === "user" ? "bg-neutral-800 border-neutral-700" : "bg-neutral-950 border-neutral-800";
   const content = message.role === "assistant" && message.ast ? renderMarkdown(message.ast) : sanitizeHtml(message.content);
+  const contentClass = message.role === "assistant" && message.ast ? "message-content markdown-content font-mono text-[13px] min-h-6" : "message-content font-mono text-[13px]";
+  const partialStructure = message.partialStructure ? ` data-partial-structure="${message.partialStructure}"` : "";
   const error = message.status === "error" && message.error ? renderError(message.error) : "";
 
   return `<article class="message-row flex ${alignment} py-1" data-message-id="${escapeAttribute(message.id)}" data-role="${message.role}" data-status="${message.status}">
   <div class="message-bubble max-w-[80%] rounded border ${surface} px-3 py-2 text-sm leading-6 text-neutral-100 shadow-sm">
-    <div class="message-content font-mono text-[13px]">${content}</div>
+    <div class="${contentClass}"${partialStructure}>${content}</div>
     <div class="message-meta mt-1 flex items-center gap-2 text-[11px] uppercase tracking-wide text-neutral-500">
       <span>${STATUS_LABELS[message.status]}</span>
       ${message.status === "streaming" ? '<span class="text-emerald-400">●</span>' : ""}

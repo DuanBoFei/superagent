@@ -102,6 +102,6 @@ describe("renderMarkdown", () => {
     const html = renderMarkdown(ast);
 
     expect(html).toContain(' data-collapsed="true"');
-    expect(html).toContain('<button class="markdown-code-toggle" type="button" data-expanded="false">Expand 31 lines</button>');
+    expect(html).toContain('<button class="markdown-code-toggle" type="button" data-expanded="false" aria-expanded="false">Expand 31 lines</button>');
   });
 });
