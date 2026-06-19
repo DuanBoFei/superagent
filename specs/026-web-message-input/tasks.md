@@ -138,7 +138,7 @@
 
 ### 并行组 C：UI 组件（可并行，依赖 A）
 
-#### T009 [FE]: 创建 MessageBubble 消息气泡组件
+#### T009 [FE]: 创建 MessageBubble 消息气泡组件 ✅
 
 - **FR 来源**: FR-MI-09, FR-MI-10, FR-MI-11
 - **依赖**: T001
