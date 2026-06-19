@@ -26,6 +26,8 @@ function renderNode(node: MarkdownNode): string {
       return renderList(node);
     case "listItem":
       return renderListItem(node);
+    case "link":
+      return renderLink(node);
     case "inlineCode":
       return `<code class="markdown-inline-code">${escapeHtml(node.value)}</code>`;
     case "thematicBreak":
@@ -51,6 +53,12 @@ function renderListItem(node: MarkdownNode & { type: "listItem" }): string {
   return `<li class="markdown-list-item">${checkbox}${renderMarkdown(node.children)}</li>`;
 }
 
+function renderLink(node: MarkdownNode & { type: "link" }): string {
+  const href = isSafeUrl(node.url) ? ` href="${escapeAttribute(node.url)}"` : "";
+  const title = node.title ? ` title="${escapeAttribute(node.title)}"` : "";
+  return `<a class="markdown-link"${href}${title} target="_blank" rel="noopener noreferrer">${renderMarkdown(node.children)}</a>`;
+}
+
 function renderTaskCheckbox(checked: boolean | undefined): string {
   if (checked === undefined) {
     return "";
@@ -58,6 +66,14 @@ function renderTaskCheckbox(checked: boolean | undefined): string {
   return checked
     ? '<input type="checkbox" checked disabled aria-label="Completed task">'
     : '<input type="checkbox" disabled aria-label="Incomplete task">';
+}
+
+function isSafeUrl(value: string): boolean {
+  return /^(https?:|mailto:|#|\/)/i.test(value);
+}
+
+function escapeAttribute(value: string): string {
+  return escapeHtml(value);
 }
 
 function escapeHtml(value: string): string {

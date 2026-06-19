@@ -31,4 +31,21 @@ describe("renderMarkdown", () => {
     expect(html).toContain("&lt;tag&gt;");
     expect(html).not.toContain("<unsafe>");
   });
+
+  it("renders safe links with new-tab security attributes", () => {
+    const ast = parseMarkdown('[Docs](https://example.com "Read docs")');
+    const html = renderMarkdown(ast);
+
+    expect(html).toContain(
+      '<a class="markdown-link" href="https://example.com" title="Read docs" target="_blank" rel="noopener noreferrer">Docs</a>',
+    );
+  });
+
+  it("drops unsafe javascript link urls", () => {
+    const ast = parseMarkdown("[bad](javascript:alert(1))");
+    const html = renderMarkdown(ast);
+
+    expect(html).toContain('<a class="markdown-link" target="_blank" rel="noopener noreferrer">bad</a>');
+    expect(html).not.toContain("javascript:");
+  });
 });
