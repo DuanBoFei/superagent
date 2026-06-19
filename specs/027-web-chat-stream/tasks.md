@@ -168,7 +168,7 @@
 
 ### 并行组 C: 流式渲染集成 (3 任务，串行依赖)
 
-#### T011 [FE]: 实现 useCopyToClipboard hook
+#### [x] T011 [FE]: 实现 useCopyToClipboard hook
 
 - **FR 来源**: FR-HL-03, FR-HL-04, NFR-MD-05
 - **依赖**: 无

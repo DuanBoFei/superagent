@@ -1,7 +1,7 @@
 # 实施进度 · web-chat-stream
 
 ## 当前任务
-[ ] T011 · 实现 useCopyToClipboard hook（进行中）
+[ ] T012 · 实现 useMarkdownStream hook（进行中）
 
 ## 已完成
 - [x] T001 · 创建 Markdown 类型定义
@@ -14,6 +14,7 @@
 - [x] T008 · Table 组件
 - [x] T009 · CodeBlock 核心组件
 - [x] T010 · CodeBlock 高级功能
+- [x] T011 · useCopyToClipboard hook
 
 ## 阻塞项
 （无）
