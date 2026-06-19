@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SuperAgent | Tool Card Detail View</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Custom scrollbar for high-density tool cards */
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0d0e15;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #262626;
+            border-radius: 0px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #10b981;
+        }
+        .code-block-mask {
+            mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
+        }
+        /* Sharp corners as requested */
+        * {
+            border-radius: 0 !important;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "tertiary-fixed": "#ffdad7",
+                      "secondary": "#c0c1ff",
+                      "on-tertiary": "#650911",
+                      "primary-fixed": "#6ffbbe",
+                      "tertiary-fixed-dim": "#ffb3af",
+                      "on-secondary-fixed": "#07006c",
+                      "inverse-surface": "#e3e1ec",
+                      "outline-variant": "#262626",
+                      "primary-container": "#10b981",
+                      "secondary-container": "#3131c0",
+                      "on-surface-variant": "#a3a3a3",
+                      "inverse-on-surface": "#2f3038",
+                      "error": "#ef4444",
+                      "on-secondary-container": "#b0b2ff",
+                      "on-secondary": "#1000a9",
+                      "error-container": "#450a0a",
+                      "outline": "#404040",
+                      "on-tertiary-container": "#711419",
+                      "on-background": "#e3e1ec",
+                      "inverse-primary": "#006c49",
+                      "surface-container-low": "#171717",
+                      "surface": "#0a0a0a",
+                      "secondary-fixed": "#e1e0ff",
+                      "on-primary-fixed": "#002113",
+                      "on-tertiary-fixed-variant": "#842225",
+                      "on-primary-container": "#00422b",
+                      "on-primary": "#ffffff",
+                      "surface-container-highest": "#262626",
+                      "on-error": "#ffffff",
+                      "on-surface": "#e5e5e5",
+                      "tertiary-container": "#fc7c78",
+                      "surface-container-high": "#1c1c1c",
+                      "on-primary-fixed-variant": "#005236",
+                      "surface-bright": "#262626",
+                      "background": "#0a0a0a",
+                      "surface-container": "#121212",
+                      "on-tertiary-fixed": "#410005",
+                      "primary-fixed-dim": "#10b981",
+                      "surface-variant": "#262626",
+                      "surface-dim": "#0a0a0a",
+                      "on-error-container": "#fca5a5",
+                      "primary": "#10b981",
+                      "surface-tint": "#10b981",
+                      "tertiary": "#ffb3af",
+                      "secondary-fixed-dim": "#c0c1ff",
+                      "surface-container-lowest": "#000000",
+                      "on-secondary-fixed-variant": "#2f2ebe"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0px",
+                      "lg": "0px",
+                      "xl": "0px",
+                      "full": "0px"
+              },
+              "spacing": {
+                      "lg": "24px",
+                      "sm": "8px",
+                      "md": "16px",
+                      "base": "4px",
+                      "container-padding": "12px",
+                      "panel-gap": "1px",
+                      "xs": "4px"
+              },
+              "fontFamily": {
+                      "label-xs": ["Inter"],
+                      "headline-sm": ["Inter"],
+                      "code-sm": ["JetBrains Mono"],
+                      "body-sm": ["Inter"],
+                      "code-md": ["JetBrains Mono"],
+                      "body-md": ["Inter"]
+              },
+              "fontSize": {
+                      "label-xs": ["11px", {"lineHeight": "14px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                      "headline-sm": ["18px", {"lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "code-sm": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                      "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                      "code-md": ["13px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+              }
+            },
+          },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface font-body-sm selection:bg-primary/30">
+<!-- Shell Layout -->
+<div class="flex min-h-screen overflow-hidden">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-full flex flex-col z-40 bg-surface-container-low h-screen w-64 border-r border-outline-variant">
+<!-- Header -->
+<div class="p-md border-b border-outline-variant">
+<div class="flex items-center gap-sm mb-base">
+<span class="font-headline-sm text-headline-sm font-bold text-primary">SuperAgent</span>
+</div>
+<div class="flex items-center gap-xs">
+<span class="w-1.5 h-1.5 bg-primary"></span>
+<span class="font-label-xs text-label-xs text-on-surface-variant font-medium">Local Runtime: Active</span>
+</div>
+</div>
+<!-- Main Nav -->
+<nav class="flex-1 overflow-y-auto py-sm">
+<div class="space-y-0 px-0">
+<a class="flex items-center gap-md px-md py-sm bg-surface-container-highest text-primary border-l-2 border-primary transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+<span class="font-label-xs text-label-xs">Sessions</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container transition-colors duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="smart_toy">smart_toy</span>
+<span class="font-label-xs text-label-xs">Models</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container transition-colors duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="terminal">terminal</span>
+<span class="font-label-xs text-label-xs">Prompts</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container transition-colors duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="rocket_launch">rocket_launch</span>
+<span class="font-label-xs text-label-xs">Deployments</span>
+</a>
+</div>
+<div class="mt-lg pt-lg border-t border-outline-variant px-md">
+<button class="w-full flex items-center justify-center gap-sm bg-primary text-on-primary font-bold py-sm border border-primary hover:brightness-110 transition-all">
+<span class="material-symbols-outlined text-[18px]" data-icon="add">add</span>
+<span class="font-label-xs uppercase tracking-wider">New Chat</span>
+</button>
+</div>
+</nav>
+<!-- Footer Nav -->
+<div class="p-sm space-y-0 border-t border-outline-variant">
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container transition-colors duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label-xs text-label-xs">Settings</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container transition-colors duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="menu_book">menu_book</span>
+<span class="font-label-xs text-label-xs">Docs</span>
+</a>
+<div class="pt-sm px-md flex items-center justify-between">
+<img class="w-8 h-8 border border-outline-variant object-cover grayscale" data-alt="A professional portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB-lrPMwhnwPZwt7o7HLppZdjouFFizg5jMEEKQRzdO4cwv_I-XDbQ3pbqGTzoQ7syo6mp9bSHD3M2McId17hrzPMhL33lJjdRgtoOsMGGyFzeWv_wKm0cDl7w9gqPLeL7e0aEfzONraCkdNqqd1ZeItqBmpwn_pH3brTPBv06tboyD3p4c19I64PIkPff-rVdaHBcsddSfrERIL-7acfP9TxX_yaEP_PjfZ0QhEf6iicW9eOFcdXDSn00lPCgXQuWWU-6Mzdqt7_k"/>
+<div class="flex-1 ml-sm overflow-hidden">
+<p class="font-label-xs text-on-surface truncate">dev-user-01</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-64 flex-1 h-screen overflow-y-auto bg-surface flex flex-col">
+<!-- TopAppBar -->
+<header class="flex justify-between items-center px-md w-full sticky top-0 z-30 bg-surface h-14 w-full border-b border-outline-variant">
+<div class="flex items-center gap-lg">
+<span class="font-headline-sm text-headline-sm font-black text-on-surface">Review Mode</span>
+<div class="hidden md:flex items-center gap-md">
+<a class="font-label-xs text-primary border-b border-primary pb-base" href="#">Explorer</a>
+<a class="font-label-xs text-on-surface-variant hover:text-on-surface" href="#">Console</a>
+<a class="font-label-xs text-on-surface-variant hover:text-on-surface" href="#">Monitor</a>
+</div>
+</div>
+<div class="flex-1 max-w-md mx-lg">
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-sm text-outline" data-icon="search">search</span>
+<input class="w-full bg-surface-container-lowest border border-outline-variant py-xs pl-lg pr-sm font-code-sm text-code-sm focus:outline-none focus:border-primary" placeholder="Search operations..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<button class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-highest p-base transition-all" data-icon="notifications">notifications</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-highest p-base transition-all" data-icon="help_outline">help_outline</button>
+<button class="bg-primary text-on-primary font-bold px-md py-xs font-label-xs">Deploy</button>
+</div>
+</header>
+<!-- Review Content Flow -->
+<div class="max-w-4xl mx-auto w-full p-lg space-y-md pb-32">
+<!-- 1. TASK CARD (Claude aesthetic: Minimal, Monospace labels) -->
+<section class="bg-surface-container border border-outline-variant overflow-hidden">
+<div class="px-md py-sm bg-surface-container-high border-b border-outline-variant flex items-center justify-between">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary" data-icon="assignment">assignment</span>
+<span class="font-code-sm uppercase tracking-tight text-on-surface">INITIALIZATION TASK</span>
+</div>
+<span class="font-code-sm text-primary">66% Complete</span>
+</div>
+<div class="p-md space-y-md">
+<!-- Thin Progress Bar -->
+<div class="w-full h-0.5 bg-surface-container-highest overflow-hidden">
+<div class="h-full bg-primary w-[66%]"></div>
+</div>
+<!-- Subtasks -->
+<div class="space-y-sm">
+<label class="flex items-center gap-md group">
+<div class="w-3.5 h-3.5 border border-primary bg-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-[10px] text-on-primary font-bold" data-icon="check">check</span>
+</div>
+<span class="font-code-sm text-on-surface">Scaffolding environment variables</span>
+</label>
+<label class="flex items-center gap-md group">
+<div class="w-3.5 h-3.5 border border-primary bg-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-[10px] text-on-primary font-bold" data-icon="check">check</span>
+</div>
+<span class="font-code-sm text-on-surface">Fetching remote dependencies</span>
+</label>
+<label class="flex items-center gap-md group">
+<div class="w-3.5 h-3.5 border border-outline-variant"></div>
+<span class="font-code-sm text-on-surface-variant">Synchronizing local state with runtime</span>
+</label>
+</div>
+</div>
+</section>
+<!-- 2. READ CARD -->
+<section class="bg-surface-container border border-outline-variant overflow-hidden">
+<div class="px-md py-sm bg-surface-container-high border-b border-outline-variant flex items-center justify-between">
+<div class="flex items-center gap-sm overflow-hidden">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="description">description</span>
+<span class="font-code-sm text-on-surface truncate">src/core/agent_runtime.py</span>
+</div>
+<button class="flex items-center gap-xs font-code-sm text-on-surface-variant hover:text-primary">
+<span class="material-symbols-outlined text-[16px]" data-icon="unfold_less">unfold_less</span>
+                            Collapse
+                        </button>
+</div>
+<div class="bg-black/80 overflow-x-auto">
+<div class="font-code-sm text-code-sm p-sm flex">
+<div class="text-outline-variant pr-md text-right select-none border-r border-outline-variant/30 mr-md">
+                                01<br/>02<br/>03<br/>04<br/>05<br/>06<br/>07<br/>08
+                            </div>
+<div class="whitespace-pre text-neutral-400 font-code-sm">
+<span class="text-neutral-500">import</span> asyncio
+<span class="text-neutral-500">from</span> typing <span class="text-neutral-500">import</span> List, Optional
+
+<span class="text-on-surface">class</span> <span class="text-primary">AgentRuntime</span>:
+    <span class="text-on-surface">def</span> <span class="text-primary">__init__</span>(self, <span class="text-neutral-300">config</span>: dict):
+        self.config = config
+        self.active = <span class="text-neutral-300">True</span>
+<span class="text-neutral-600"># Log initialization</span>
+</div>
+</div>
+</div>
+</section>
+<!-- 3. EDIT/WRITE CARD (Claude aesthetic: Subtle tints, high contrast) -->
+<section class="bg-surface-container border border-outline-variant overflow-hidden">
+<div class="px-md py-sm bg-surface-container-high border-b border-outline-variant flex items-center justify-between">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="edit_note">edit_note</span>
+<span class="font-code-sm uppercase tracking-tight text-on-surface">MODIFIED: RUNTIME_HOOKS.TS</span>
+</div>
+<div class="flex items-center gap-sm">
+<span class="px-xs py-base bg-error/10 text-error font-code-sm">-1</span>
+<span class="px-xs py-base bg-primary/10 text-primary font-code-sm">+2</span>
+</div>
+</div>
+<div class="font-code-sm text-code-sm bg-surface-container-lowest">
+<div class="flex bg-error/5 border-l-2 border-error/50">
+<div class="w-12 text-center text-error/50 py-xs border-r border-outline-variant/10">42</div>
+<div class="flex-1 px-md py-xs text-on-surface"><span class="text-error mr-2">-</span>return this.process(data, false);</div>
+</div>
+<div class="flex bg-primary/5 border-l-2 border-primary/50">
+<div class="w-12 text-center text-primary/50 py-xs border-r border-outline-variant/10">42</div>
+<div class="flex-1 px-md py-xs text-on-surface"><span class="text-primary mr-2">+</span>const options = { silent: true };</div>
+</div>
+<div class="flex bg-primary/5 border-l-2 border-primary/50">
+<div class="w-12 text-center text-primary/50 py-xs border-r border-outline-variant/10">43</div>
+<div class="flex-1 px-md py-xs text-on-surface"><span class="text-primary mr-2">+</span>return this.process(data, options);</div>
+</div>
+</div>
+</section>
+<!-- 4. BASH CARD (Claude aesthetic: Pure Black, Monochrome/Emerald) -->
+<section class="bg-black border border-outline-variant overflow-hidden font-code-sm">
+<div class="px-md py-base bg-surface-container border-b border-outline-variant flex items-center gap-sm">
+<div class="flex gap-1.5">
+<div class="w-2.5 h-2.5 border border-outline-variant"></div>
+<div class="w-2.5 h-2.5 border border-outline-variant"></div>
+<div class="w-2.5 h-2.5 border border-outline-variant"></div>
+</div>
+<span class="text-on-surface-variant font-code-sm text-[10px] uppercase opacity-60">zsh — tool_output</span>
+</div>
+<div class="p-md text-neutral-400 leading-relaxed overflow-x-auto whitespace-nowrap font-code-sm">
+<p class="flex items-center gap-sm">
+<span class="text-primary font-bold">➜</span>
+<span class="text-white">~/workspace/superagent</span>
+<span class="text-neutral-400">git checkout -b feature/ui-refactor</span>
+</p>
+<p class="text-neutral-500">Switched to a new branch 'feature/ui-refactor'</p>
+<p class="flex items-center gap-sm mt-1">
+<span class="text-primary font-bold">➜</span>
+<span class="text-white">~/workspace/superagent</span>
+<span class="text-neutral-400">./bin/test_runtime --all</span>
+</p>
+<p class="flex items-center gap-sm">
+<span class="text-primary">✔</span>
+<span class="text-neutral-400">Core engine loaded in 142ms</span>
+</p>
+<p class="flex items-center gap-sm">
+<span class="text-primary">✔</span>
+<span class="text-neutral-400">Schema validation passed</span>
+</p>
+<p class="flex items-center gap-sm">
+<span class="text-error">✘</span>
+<span class="text-error opacity-80">Memory buffer overflow at segment 0x4F2A</span>
+</p>
+<p class="bg-white/10 w-2 h-4 inline-block align-middle ml-1"></p>
+</div>
+</section>
+<!-- Review Mode Actions (Claude aesthetic: Sharp, flat) -->
+<div class="flex justify-center pt-lg">
+<div class="p-base bg-surface-container border border-outline-variant flex items-center gap-base">
+<button class="flex items-center gap-sm px-md py-sm bg-surface-container-highest border border-outline-variant text-on-surface font-code-sm hover:bg-error hover:text-white transition-all">
+<span class="material-symbols-outlined text-[18px]" data-icon="close">close</span>
+                            Reject Changes
+                        </button>
+<button class="flex items-center gap-sm px-md py-sm bg-primary text-on-primary border border-primary font-code-sm hover:brightness-110 transition-all">
+<span class="material-symbols-outlined text-[18px]" data-icon="done_all">done_all</span>
+                            Approve All
+                        </button>
+</div>
+</div>
+</div>
+<!-- Footer -->
+<footer class="mt-auto h-8 border-t border-outline-variant bg-surface-container-lowest flex justify-between items-center px-md z-50">
+<div class="flex items-center gap-md">
+<span class="font-code-sm text-code-sm text-primary font-bold uppercase tracking-wider">v1.0.4-beta</span>
+<span class="h-3 w-[1px] bg-outline-variant"></span>
+<span class="font-code-sm text-code-sm text-on-surface-variant">Connected: 127.0.0.1:8080</span>
+</div>
+<div class="flex items-center gap-md">
+<span class="font-code-sm text-code-sm text-on-surface-variant">~/workspace</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant">Uptime: 24h</span>
+</div>
+</footer>
+</main>
+</div>
+<!-- Floating Atmosphere Micro-interaction Layer (Reduced opacity to match Claude minimal vibe) -->
+<div class="pointer-events-none fixed inset-0 z-0">
+<div class="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/2 blur-[120px]"></div>
+</div>
+</body></html>

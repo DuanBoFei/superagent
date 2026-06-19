@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SuperAgent | Session Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            font-size: 18px;
+        }
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3c4a42;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #86948a;
+        }
+        .session-item:hover .session-actions {
+            opacity: 1;
+        }
+        .terminal-glow {
+            box-shadow: inset 0 0 20px rgba(78, 222, 163, 0.05);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-fixed": "#ffdad7",
+                        "secondary": "#c0c1ff",
+                        "on-tertiary": "#650911",
+                        "primary-fixed": "#6ffbbe",
+                        "tertiary-fixed-dim": "#ffb3af",
+                        "on-secondary-fixed": "#07006c",
+                        "inverse-surface": "#e3e1ec",
+                        "outline-variant": "#3c4a42",
+                        "primary-container": "#10b981",
+                        "secondary-container": "#3131c0",
+                        "on-surface-variant": "#bbcabf",
+                        "inverse-on-surface": "#2f3038",
+                        "error": "#ffb4ab",
+                        "on-secondary-container": "#b0b2ff",
+                        "on-secondary": "#1000a9",
+                        "error-container": "#93000a",
+                        "outline": "#86948a",
+                        "on-tertiary-container": "#711419",
+                        "on-background": "#e3e1ec",
+                        "inverse-primary": "#006c49",
+                        "surface-container-low": "#1a1b22",
+                        "surface": "#12131a",
+                        "secondary-fixed": "#e1e0ff",
+                        "on-primary-fixed": "#002113",
+                        "on-tertiary-fixed-variant": "#842225",
+                        "on-primary-container": "#00422b",
+                        "on-primary": "#003824",
+                        "surface-container-highest": "#33343c",
+                        "on-error": "#690005",
+                        "on-surface": "#e3e1ec",
+                        "tertiary-container": "#fc7c78",
+                        "surface-container-high": "#292931",
+                        "on-primary-fixed-variant": "#005236",
+                        "surface-bright": "#383941",
+                        "background": "#12131a",
+                        "surface-container": "#1e1f26",
+                        "on-tertiary-fixed": "#410005",
+                        "primary-fixed-dim": "#4edea3",
+                        "surface-variant": "#33343c",
+                        "surface-dim": "#12131a",
+                        "on-error-container": "#ffdad6",
+                        "primary": "#4edea3",
+                        "surface-tint": "#4edea3",
+                        "tertiary": "#ffb3af",
+                        "secondary-fixed-dim": "#c0c1ff",
+                        "surface-container-lowest": "#0d0e15",
+                        "on-secondary-fixed-variant": "#2f2ebe"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "lg": "24px",
+                        "sm": "8px",
+                        "md": "16px",
+                        "base": "4px",
+                        "container-padding": "12px",
+                        "panel-gap": "1px",
+                        "xs": "4px"
+                    },
+                    "fontFamily": {
+                        "label-xs": ["JetBrains Mono"],
+                        "headline-sm": ["Inter"],
+                        "code-sm": ["JetBrains Mono"],
+                        "body-sm": ["Inter"],
+                        "code-md": ["JetBrains Mono"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-xs": ["11px", {"lineHeight": "14px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                        "headline-sm": ["18px", {"lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "code-sm": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                        "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                        "code-md": ["13px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface font-body-md overflow-hidden">
+<!-- Shell Container -->
+<div class="flex h-screen w-full">
+<!-- SideNavBar (Expanded Session Management Focus) -->
+<aside class="fixed left-0 top-0 h-full flex flex-col z-40 bg-surface-container-low border-r border-outline-variant w-80">
+<!-- Header -->
+<div class="p-md space-y-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-sm">
+<div class="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
+<h1 class="font-headline-sm text-headline-sm font-bold text-primary">SuperAgent</h1>
+</div>
+<span class="font-code-sm text-label-xs text-on-surface-variant opacity-60">Local Runtime: Active</span>
+</div>
+<button class="w-full bg-primary text-on-primary py-sm rounded flex items-center justify-center gap-sm font-label-xs text-label-xs hover:opacity-90 transition-all active:scale-[0.98]">
+<span class="material-symbols-outlined">add</span>
+                    New Chat
+                </button>
+<!-- Search/Filter Header -->
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant text-[16px]">search</span>
+<input class="w-full bg-surface-container-lowest border border-outline-variant rounded py-sm pl-lg pr-lg font-body-sm text-body-sm focus:outline-none focus:border-primary transition-colors" placeholder="Search sessions..." type="text"/>
+<button class="absolute right-sm top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[16px]">filter_list</span>
+</button>
+</div>
+</div>
+<!-- Session List -->
+<nav class="flex-1 overflow-y-auto px-sm pb-md space-y-base">
+<div class="px-sm pb-base">
+<span class="font-label-xs text-label-xs text-outline uppercase tracking-widest opacity-50">Recent Sessions</span>
+</div>
+<!-- Active Session (Highlighted) -->
+<div class="session-item relative group flex flex-col gap-xs p-md bg-surface-container-highest border-l-2 border-primary cursor-pointer transition-all">
+<div class="flex justify-between items-start">
+<h3 class="font-body-sm text-body-sm text-primary font-semibold line-clamp-2 leading-tight">Refactor user authentication middleware to use JWT</h3>
+<div class="flex items-center gap-xs ml-sm">
+<div class="w-1.5 h-1.5 rounded-full bg-primary"></div>
+</div>
+</div>
+<div class="flex items-center justify-between mt-base">
+<div class="flex items-center gap-md">
+<span class="font-label-xs text-label-xs text-on-surface-variant">2h ago</span>
+<div class="flex items-center gap-xs bg-primary/10 px-xs py-[2px] rounded">
+<span class="material-symbols-outlined text-[12px] text-primary">terminal</span>
+<span class="font-label-xs text-label-xs text-primary">12 tools</span>
+</div>
+</div>
+</div>
+<!-- Hover Actions -->
+<div class="session-actions opacity-0 absolute top-sm right-sm flex gap-xs bg-surface-container-highest p-xs rounded-sm transition-opacity">
+<button class="p-base hover:text-primary transition-colors"><span class="material-symbols-outlined text-[14px]">edit</span></button>
+<button class="p-base hover:text-error transition-colors"><span class="material-symbols-outlined text-[14px]">delete</span></button>
+</div>
+</div>
+<!-- Session Item -->
+<div class="session-item relative group flex flex-col gap-xs p-md hover:bg-surface-container transition-all cursor-pointer">
+<div class="flex justify-between items-start">
+<h3 class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2 leading-tight">Analyze memory leak in the production logs for node-1</h3>
+<div class="flex items-center gap-xs ml-sm">
+<div class="w-1.5 h-1.5 rounded-full bg-outline opacity-40"></div>
+</div>
+</div>
+<div class="flex items-center justify-between mt-base">
+<div class="flex items-center gap-md">
+<span class="font-label-xs text-label-xs text-on-surface-variant opacity-60">5h ago</span>
+<div class="flex items-center gap-xs px-xs py-[2px] rounded border border-outline-variant">
+<span class="material-symbols-outlined text-[12px] text-on-surface-variant">terminal</span>
+<span class="font-label-xs text-label-xs text-on-surface-variant">8 tools</span>
+</div>
+</div>
+</div>
+<div class="session-actions opacity-0 absolute top-sm right-sm flex gap-xs bg-surface-container p-xs rounded-sm transition-opacity">
+<button class="p-base hover:text-primary transition-colors"><span class="material-symbols-outlined text-[14px]">edit</span></button>
+<button class="p-base hover:text-error transition-colors"><span class="material-symbols-outlined text-[14px]">delete</span></button>
+</div>
+</div>
+<!-- Session Item -->
+<div class="session-item relative group flex flex-col gap-xs p-md hover:bg-surface-container transition-all cursor-pointer">
+<div class="flex justify-between items-start">
+<h3 class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2 leading-tight">Scaffold new microservice with Go and gRPC</h3>
+<div class="flex items-center gap-xs ml-sm">
+<div class="w-1.5 h-1.5 rounded-full bg-outline opacity-40"></div>
+</div>
+</div>
+<div class="flex items-center justify-between mt-base">
+<div class="flex items-center gap-md">
+<span class="font-label-xs text-label-xs text-on-surface-variant opacity-60">Yesterday</span>
+<div class="flex items-center gap-xs px-xs py-[2px] rounded border border-outline-variant">
+<span class="material-symbols-outlined text-[12px] text-on-surface-variant">terminal</span>
+<span class="font-label-xs text-label-xs text-on-surface-variant">42 tools</span>
+</div>
+</div>
+</div>
+<div class="session-actions opacity-0 absolute top-sm right-sm flex gap-xs bg-surface-container p-xs rounded-sm transition-opacity">
+<button class="p-base hover:text-primary transition-colors"><span class="material-symbols-outlined text-[14px]">edit</span></button>
+<button class="p-base hover:text-error transition-colors"><span class="material-symbols-outlined text-[14px]">delete</span></button>
+</div>
+</div>
+</nav>
+<!-- Footer -->
+<div class="border-t border-outline-variant p-sm flex items-center justify-between">
+<div class="flex gap-base">
+<button class="p-sm text-on-surface-variant hover:bg-surface-container-highest rounded transition-all">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<button class="p-sm text-on-surface-variant hover:bg-surface-container-highest rounded transition-all">
+<span class="material-symbols-outlined">menu_book</span>
+</button>
+</div>
+<div class="flex items-center gap-sm pr-sm">
+<div class="text-right">
+<p class="font-label-xs text-label-xs text-on-surface">Admin</p>
+<p class="font-label-xs text-[10px] text-on-surface-variant">v1.2.0</p>
+</div>
+<div class="w-8 h-8 rounded bg-surface-container-highest border border-outline-variant flex items-center justify-center overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A professional studio portrait of a software engineer with a minimalist background, cinematic lighting, sharp focus, 8k resolution, neutral tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDlvq1ksh10AucTktfJOWd0j7LzuGGWl0hYHlSfR1lhHrkjNuzreaUOUCyorf8dpxnZvZGnMpiOADRMHov-FPY0m8vH7LogfM8IV69ftEy2xy7LBphgwTJTk7M03s3v_TRvTPV-TVidb4SbQ6OsiLqRE2V1LP62ZLkLS8MBQBTIoAMwjryf0yG6WOYWAXBIFvVcA0EtgSm-qJgadBN7UGllt3yYe_LuqezEyPIHCo9cTZcZ1ndmy1EOULMdwYfdY5poOxj8JRXq7oc"/>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-80 flex-1 flex flex-col h-full bg-surface-container-lowest">
+<!-- TopAppBar -->
+<header class="h-14 w-full flex justify-between items-center px-md border-b border-outline-variant sticky top-0 z-30 bg-surface/80 backdrop-blur-md">
+<div class="flex items-center gap-md">
+<span class="font-headline-sm text-headline-sm font-black text-on-surface">SuperAgent</span>
+<nav class="hidden md:flex items-center gap-lg ml-lg">
+<a class="font-label-xs text-label-xs text-on-surface-variant hover:text-on-surface transition-colors" href="#">Explorer</a>
+<a class="font-label-xs text-label-xs text-primary border-b-2 border-primary pb-base transition-all" href="#">Console</a>
+<a class="font-label-xs text-label-xs text-on-surface-variant hover:text-on-surface transition-colors" href="#">Monitor</a>
+</nav>
+</div>
+<div class="flex items-center gap-sm">
+<button class="flex items-center gap-xs px-md py-sm bg-primary/10 text-primary rounded font-label-xs text-label-xs hover:bg-primary/20 transition-all">
+<span class="material-symbols-outlined text-[16px]">rocket_launch</span>
+                        Deploy
+                    </button>
+<button class="p-sm text-on-surface-variant hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-sm text-on-surface-variant hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+</div>
+</header>
+<!-- Workspace / Replay Area -->
+<div class="flex-1 overflow-y-auto p-lg max-w-5xl mx-auto w-full">
+<!-- Session Replay Header -->
+<div class="mb-lg flex items-center justify-between">
+<div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Session Replay</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Refactor user authentication middleware to use JWT</p>
+</div>
+<div class="flex gap-sm">
+<button class="bg-surface-container border border-outline-variant px-md py-sm rounded font-label-xs text-label-xs text-on-surface hover:bg-surface-container-high transition-all">Download Logs</button>
+<button class="bg-primary text-on-primary px-md py-sm rounded font-label-xs text-label-xs hover:opacity-90 transition-all">Resume Session</button>
+</div>
+</div>
+<!-- Timeline of Tool Cards -->
+<div class="space-y-md">
+<!-- User Message -->
+<div class="flex gap-md">
+<div class="w-8 h-8 rounded bg-secondary-container flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-secondary">person</span>
+</div>
+<div class="flex-1">
+<div class="bg-surface border border-outline-variant p-md rounded-lg">
+<p class="font-body-md text-body-md text-on-surface">I need to refactor our current session-based authentication to use JWT. Start by finding where the middleware is currently defined.</p>
+</div>
+<span class="font-label-xs text-[10px] text-on-surface-variant mt-xs block">14:02:11</span>
+</div>
+</div>
+<!-- Tool Card: Grep -->
+<div class="flex gap-md relative">
+<div class="absolute left-4 top-8 bottom-0 w-px bg-outline-variant/30"></div>
+<div class="w-8 h-8 rounded bg-surface-container-highest border border-outline-variant flex items-center justify-center shrink-0 z-10">
+<span class="material-symbols-outlined text-primary text-[16px]">search</span>
+</div>
+<div class="flex-1">
+<div class="bg-surface-container border border-outline-variant rounded-lg overflow-hidden terminal-glow">
+<div class="px-md py-xs bg-surface-container-high border-b border-outline-variant flex items-center justify-between">
+<span class="font-label-xs text-label-xs text-primary font-bold">GREP</span>
+<span class="font-code-sm text-[10px] text-on-surface-variant">Success</span>
+</div>
+<div class="p-md bg-black/40">
+<code class="font-code-sm text-code-sm text-on-surface-variant block">
+                                        $ grep -r "middleware" ./src/auth<br/>
+<span class="text-primary">./src/auth/session_middleware.go:24: func SessionMiddleware(next http.Handler) http.Handler {</span><br/>
+                                        ./src/auth/session_middleware.go:58: // Check session validity...
+                                    </code>
+</div>
+</div>
+<span class="font-label-xs text-[10px] text-on-surface-variant mt-xs block">14:02:14</span>
+</div>
+</div>
+<!-- Tool Card: Read -->
+<div class="flex gap-md relative">
+<div class="absolute left-4 top-8 bottom-0 w-px bg-outline-variant/30"></div>
+<div class="w-8 h-8 rounded bg-surface-container-highest border border-outline-variant flex items-center justify-center shrink-0 z-10">
+<span class="material-symbols-outlined text-secondary text-[16px]">auto_stories</span>
+</div>
+<div class="flex-1">
+<div class="bg-surface-container border border-outline-variant rounded-lg overflow-hidden">
+<div class="px-md py-xs bg-surface-container-high border-b border-outline-variant flex items-center justify-between">
+<span class="font-label-xs text-label-xs text-secondary font-bold">READ</span>
+<span class="font-code-sm text-[10px] text-on-surface-variant">./src/auth/session_middleware.go</span>
+</div>
+<div class="p-md bg-black/40">
+<pre class="font-code-sm text-code-sm text-on-surface-variant leading-relaxed"><span class="text-blue-400">func</span> <span class="text-green-400">SessionMiddleware</span>(next http.Handler) http.Handler {
+    <span class="text-blue-400">return</span> http.HandlerFunc(<span class="text-blue-400">func</span>(w http.ResponseWriter, r *http.Request) {
+        session, err := store.Get(r, <span class="text-orange-400">"session-id"</span>)
+        <span class="text-gray-500">// ... existing session logic ...</span>
+        next.ServeHTTP(w, r)
+    })
+}</pre>
+</div>
+</div>
+<span class="font-label-xs text-[10px] text-on-surface-variant mt-xs block">14:02:22</span>
+</div>
+</div>
+<!-- Tool Card: Bash (Write/Edit) -->
+<div class="flex gap-md relative">
+<div class="w-8 h-8 rounded bg-surface-container-highest border border-outline-variant flex items-center justify-center shrink-0 z-10">
+<span class="material-symbols-outlined text-tertiary-container text-[16px]">terminal</span>
+</div>
+<div class="flex-1">
+<div class="bg-surface-container border border-outline-variant rounded-lg overflow-hidden relative">
+<div class="absolute inset-0 border border-primary/20 pointer-events-none animate-pulse"></div>
+<div class="px-md py-xs bg-surface-container-high border-b border-outline-variant flex items-center justify-between">
+<span class="font-label-xs text-label-xs text-tertiary font-bold">BASH</span>
+<div class="flex items-center gap-base">
+<div class="w-2 h-2 rounded-full bg-primary shadow-[0_0_5px_rgba(78,222,163,0.5)]"></div>
+<span class="font-code-sm text-[10px] text-primary">Applying changes...</span>
+</div>
+</div>
+<div class="p-md bg-black/40">
+<code class="font-code-sm text-code-sm text-on-surface-variant block">
+                                        $ sed -i 's/SessionMiddleware/JWTMiddleware/g' ./src/auth/session_middleware.go<br/>
+                                        $ cat &lt;&lt;EOF &gt; ./src/auth/jwt_utils.go<br/>
+                                        package auth...
+                                    </code>
+</div>
+</div>
+<span class="font-label-xs text-[10px] text-on-surface-variant mt-xs block">14:02:45</span>
+</div>
+</div>
+<!-- AI Response -->
+<div class="flex gap-md">
+<div class="w-8 h-8 rounded bg-primary-container flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-on-primary-container">smart_toy</span>
+</div>
+<div class="flex-1">
+<div class="bg-surface border border-primary/30 p-md rounded-lg terminal-glow">
+<p class="font-body-md text-body-md text-on-surface leading-relaxed">
+                                    I've located the middleware and started the refactor. I have:
+                                    </p><ul class="list-disc list-inside mt-sm text-on-surface-variant space-y-xs">
+<li>Renamed the middleware to <code class="text-primary font-code-sm bg-primary/10 px-1">JWTMiddleware</code></li>
+<li>Created a new utility file <code class="text-primary font-code-sm bg-primary/10 px-1">jwt_utils.go</code> for token signing</li>
+<li>Added the <code class="text-primary font-code-sm bg-primary/10 px-1">golang-jwt/jwt</code> dependency</li>
+</ul>
+                                    Would you like me to proceed with updating the login handler to issue tokens?
+                                <p></p>
+</div>
+<span class="font-label-xs text-[10px] text-on-surface-variant mt-xs block">14:03:02</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer Meta -->
+<footer class="fixed bottom-0 ml-80 w-[calc(100%-320px)] h-8 border-t border-outline-variant bg-surface-container-lowest flex justify-between items-center px-md z-50">
+<div class="flex items-center gap-md">
+<span class="font-code-sm text-code-sm text-primary">Connected</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant opacity-40">/</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant">~/workspace/auth-service</span>
+</div>
+<div class="flex items-center gap-md">
+<span class="font-code-sm text-code-sm text-on-surface-variant">Uptime: 24h 12m</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant">v1.0.4-beta | 127.0.0.1:8080</span>
+</div>
+</footer>
+</main>
+</div>
+<!-- Micro-interaction Script -->
+<script>
+        document.querySelectorAll('.session-item').forEach(item => {
+            item.addEventListener('click', () => {
+                document.querySelectorAll('.session-item').forEach(i => {
+                    i.classList.remove('bg-surface-container-highest', 'border-l-2', 'border-primary');
+                    i.querySelector('h3').classList.remove('text-primary');
+                });
+                item.classList.add('bg-surface-container-highest', 'border-l-2', 'border-primary');
+                item.querySelector('h3').classList.add('text-primary');
+            });
+        });
+    </script>
+</body></html>

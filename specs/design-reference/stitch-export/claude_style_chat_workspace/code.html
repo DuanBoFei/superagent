@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SuperAgent | Claude Code Aesthetic</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "background": "#0a0a0a",
+                    "sidebar": "#171717",
+                    "border-ui": "#262626",
+                    "primary": "#10b981",
+                    "on-surface": "#e5e2e1",
+                    "on-surface-variant": "#a3a3a3",
+                    "surface-container": "#171717",
+                    "surface-container-low": "#111111",
+                    "surface-container-highest": "#262626",
+            },
+            "borderRadius": {
+                    "none": "0",
+                    "sm": "2px",
+                    "DEFAULT": "4px",
+                    "lg": "4px",
+                    "xl": "4px",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "ui": ["Inter", "sans-serif"],
+                    "mono": ["JetBrains Mono", "monospace"]
+            },
+            "fontSize": {
+                    "label-xs": ["11px", {"lineHeight": "14px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                    "ui-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                    "ui-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "mono-sm": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                    "mono-md": ["13px", {"lineHeight": "20px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #0a0a0a;
+            color: #e5e2e1;
+            -webkit-font-smoothing: antialiased;
+            font-family: 'Inter', sans-serif;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #262626;
+        }
+        .tool-spinner {
+            animation: rotate 1.2s linear infinite;
+        }
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        pre, code {
+            font-family: 'JetBrains Mono', monospace !important;
+        }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden text-ui-sm">
+<!-- Left Sidebar -->
+<aside class="fixed left-0 top-0 h-full flex flex-col z-40 bg-sidebar border-r border-border-ui w-60">
+<div class="p-4 border-b border-border-ui">
+<div class="flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-primary text-[20px]" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+<h1 class="font-bold text-ui-md tracking-tight">SuperAgent</h1>
+</div>
+<button class="w-full bg-primary text-black px-3 py-1.5 flex items-center justify-center gap-2 font-medium text-ui-sm hover:opacity-90 transition-all rounded active:scale-[0.98]">
+<span class="material-symbols-outlined text-[18px]">add</span>
+            New Chat
+        </button>
+</div>
+<div class="flex-1 overflow-y-auto custom-scrollbar p-2">
+<div class="relative mb-3 px-2">
+<input class="w-full bg-background border border-border-ui px-2 py-1 pl-8 font-mono text-mono-sm focus:border-primary outline-none text-on-surface rounded" placeholder="Search sessions..." type="text"/>
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant text-[14px]">search</span>
+</div>
+<div class="space-y-0.5">
+<div class="px-3 py-1 text-[10px] font-bold text-on-surface-variant uppercase tracking-widest opacity-60">Today</div>
+<div class="flex items-center gap-3 px-3 py-1.5 bg-border-ui text-primary border-l border-primary cursor-pointer">
+<span class="material-symbols-outlined text-[16px]">history</span>
+<span class="truncate">Optimize src/main.ts</span>
+</div>
+<div class="flex items-center gap-3 px-3 py-1.5 text-on-surface-variant hover:bg-border-ui transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-[16px]">history</span>
+<span class="truncate">Refactor API middleware</span>
+</div>
+<div class="px-3 py-1 mt-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-widest opacity-60">Yesterday</div>
+<div class="flex items-center gap-3 px-3 py-1.5 text-on-surface-variant hover:bg-border-ui transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-[16px]">history</span>
+<span class="truncate">Database migration help</span>
+</div>
+</div>
+</div>
+<div class="mt-auto border-t border-border-ui p-2 space-y-0.5">
+<div class="flex items-center gap-3 px-3 py-1.5 text-on-surface-variant hover:bg-border-ui transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-[18px]">settings</span>
+<span class="text-ui-sm">Settings</span>
+</div>
+<div class="flex items-center gap-3 px-3 py-1.5 text-on-surface-variant hover:bg-border-ui transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-[18px]">menu_book</span>
+<span class="text-ui-sm">Docs</span>
+</div>
+<div class="flex items-center gap-2 px-3 py-3 mt-1 border-t border-border-ui pt-3">
+<div class="w-6 h-6 rounded-sm bg-border-ui flex items-center justify-center text-primary font-bold text-[10px]">JD</div>
+<div class="flex flex-col">
+<span class="text-[11px] font-bold font-mono">127.0.0.1:8080</span>
+<span class="text-[10px] text-primary font-mono uppercase tracking-tighter">Active</span>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Workspace Area -->
+<main class="flex-1 flex flex-col ml-60 relative bg-background">
+<!-- Header -->
+<header class="flex justify-between items-center px-4 h-12 w-full sticky top-0 z-30 bg-background border-b border-border-ui">
+<div class="flex items-center gap-4">
+<div class="flex flex-col">
+<h2 class="text-ui-md font-bold text-on-surface">Optimize src/main.ts</h2>
+<div class="flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+<span class="text-[10px] font-mono text-primary uppercase tracking-widest">Active</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-2 bg-sidebar px-2 py-0.5 border border-border-ui rounded-sm">
+<span class="material-symbols-outlined text-[14px] text-on-surface-variant">token</span>
+<span class="font-mono text-mono-sm text-on-surface-variant">1,248 / 8k</span>
+</div>
+<div class="flex items-center gap-2 bg-sidebar border border-border-ui px-2 py-0.5 cursor-pointer hover:bg-border-ui transition-all rounded-sm">
+<span class="font-mono text-[11px] text-on-surface-variant">gpt-4o-mini-local</span>
+<span class="material-symbols-outlined text-[14px]">expand_more</span>
+</div>
+<div class="h-4 w-px bg-border-ui mx-1"></div>
+<button class="bg-primary text-black px-3 py-0.5 font-medium text-ui-sm hover:opacity-90 transition-all rounded-sm">
+                Deploy
+            </button>
+<span class="material-symbols-outlined text-on-surface-variant hover:text-on-surface cursor-pointer text-[20px]">notifications</span>
+<span class="material-symbols-outlined text-on-surface-variant hover:text-on-surface cursor-pointer text-[20px]">help_outline</span>
+</div>
+</header>
+<!-- Chat Stream -->
+<div class="flex-1 overflow-y-auto custom-scrollbar px-10 py-8 space-y-10 pb-40">
+<!-- User Message -->
+<div class="flex flex-col items-end gap-2 max-w-2xl ml-auto">
+<div class="bg-sidebar border border-border-ui px-4 py-3 rounded text-ui-sm leading-relaxed">
+                Can you scan my project, find all API endpoints in <code class="text-primary font-mono bg-border-ui/30 px-1 rounded-sm">src/main.ts</code>, and optimize the error handling blocks?
+            </div>
+<span class="text-[10px] font-mono text-on-surface-variant opacity-50 uppercase tracking-widest">10:42 AM</span>
+</div>
+<!-- Assistant Message -->
+<div class="flex flex-col items-start gap-4 max-w-3xl">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[18px]" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+<span class="font-mono text-[11px] font-bold uppercase tracking-widest text-primary">SuperAgent</span>
+</div>
+<div class="space-y-4 text-on-surface leading-relaxed w-full">
+<p>Understood. I am initiating a multi-step scan of your workspace. I will first read the source file, search for all instances of API routes, and then propose a set of optimizations for your middleware. </p>
+<!-- Tool Progress Grid -->
+<div class="grid grid-cols-2 gap-2 w-full max-w-xl">
+<div class="bg-background border border-border-ui p-2 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[14px] tool-spinner">refresh</span>
+<span class="font-mono text-[11px]">Read src/main.ts</span>
+</div>
+<span class="font-mono text-[11px] text-primary">82%</span>
+</div>
+<div class="bg-background border border-border-ui p-2 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[14px] tool-spinner">refresh</span>
+<span class="font-mono text-[11px]">Grep 'api'</span>
+</div>
+<span class="font-mono text-[11px] text-primary">45%</span>
+</div>
+</div>
+<p>I found several inconsistencies in how <code class="font-mono text-primary">axios</code> errors are handled in your route definitions. I am preparing a patch now.</p>
+<!-- Tool Result Cards -->
+<div class="space-y-4">
+<!-- Bash Output Card -->
+<div class="border border-border-ui rounded-sm bg-background overflow-hidden">
+<div class="bg-sidebar px-3 py-1.5 flex justify-between items-center border-b border-border-ui">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[14px]">terminal</span>
+<span class="font-mono text-[11px] uppercase tracking-widest font-bold">bash output</span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant text-[14px] cursor-pointer hover:text-white">content_copy</span>
+</div>
+<div class="p-3 font-mono text-mono-sm leading-tight">
+<div class="text-primary">$ ls -la src/</div>
+<div class="opacity-60 mt-1">
+                                drwxr-xr-x  10 user staff  320 May 20 10:41 .<br/>
+                                -rw-r--r--   1 user staff 4291 May 20 10:41 main.ts<br/>
+                                -rw-r--r--   1 user staff  892 May 20 10:41 types.d.ts
+                            </div>
+</div>
+</div>
+<!-- File Edit Card (Diff) -->
+<div class="border border-border-ui rounded-sm bg-background overflow-hidden">
+<div class="bg-sidebar px-3 py-1.5 flex justify-between items-center border-b border-border-ui">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[14px]">edit_note</span>
+<span class="font-mono text-[11px] uppercase tracking-widest font-bold">src/main.ts - diff</span>
+</div>
+<div class="flex gap-2">
+<span class="text-[10px] font-mono bg-red-900/40 text-red-400 px-1 border border-red-900/50">-3</span>
+<span class="text-[10px] font-mono bg-primary/20 text-primary px-1 border border-primary/30">+12</span>
+</div>
+</div>
+<div class="p-3 font-mono text-mono-sm overflow-x-auto whitespace-pre">
+<div class="opacity-30">@@ -42,7 +42,12 @@</div>
+<div class="bg-red-950/30 text-red-400/80">- catch (e) { console.error(e) }</div>
+<div class="bg-primary/5 text-primary">+ catch (error) {</div>
+<div class="bg-primary/5 text-primary">+   if (axios.isAxiosError(error)) {</div>
+<div class="bg-primary/5 text-primary">+     logger.error(`API Error: ${error.response?.status} - ${error.message}`);</div>
+<div class="bg-primary/5 text-primary">+     throw new AppError(error.response?.data?.message || "Internal Service Error");</div>
+<div class="bg-primary/5 text-primary">+   }</div>
+<div class="bg-primary/5 text-primary">+   throw error;</div>
+<div class="bg-primary/5 text-primary">+ }</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Input Footer -->
+<footer class="absolute bottom-8 w-full p-6 z-40">
+<div class="max-w-4xl mx-auto border border-border-ui bg-sidebar focus-within:border-primary transition-colors rounded">
+<textarea class="w-full bg-transparent px-4 py-3 border-none focus:ring-0 font-ui-sm text-ui-sm resize-none custom-scrollbar max-h-32" placeholder="Type a command or ask a question..." rows="1"></textarea>
+<div class="flex items-center justify-between px-4 pb-3">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-on-surface-variant hover:text-primary cursor-pointer transition-colors text-[20px]">attach_file</span>
+<span class="material-symbols-outlined text-on-surface-variant hover:text-primary cursor-pointer transition-colors text-[20px]">mic</span>
+<div class="h-3 w-px bg-border-ui mx-1"></div>
+<div class="flex items-center gap-1.5 cursor-pointer group">
+<span class="material-symbols-outlined text-[14px] text-primary group-hover:scale-110 transition-transform">bolt</span>
+<span class="font-mono text-[10px] text-on-surface-variant uppercase tracking-widest">Agent Active</span>
+</div>
+</div>
+<button class="bg-primary text-black px-5 py-1 rounded font-bold text-ui-sm flex items-center gap-2 hover:opacity-90 active:scale-[0.98] transition-all">
+                    Send
+                    <span class="material-symbols-outlined text-[16px]">send</span>
+</button>
+</div>
+</div>
+</footer>
+<!-- Global Status Footer -->
+<footer class="fixed bottom-0 w-full h-8 border-t border-border-ui bg-background flex justify-between items-center px-4 z-50">
+<div class="flex items-center gap-4">
+<span class="font-mono text-[10px] text-primary font-bold uppercase tracking-widest">Connected</span>
+<span class="font-mono text-[10px] text-on-surface-variant opacity-60">~/workspace/superagent-project</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="font-mono text-[10px] text-on-surface-variant opacity-60 uppercase tracking-widest">Uptime: 24h 12m</span>
+<span class="font-mono text-[10px] text-on-surface-variant opacity-60">v1.0.4-beta | 127.0.0.1:8080</span>
+</div>
+</footer>
+</main>
+<script>
+    const textarea = document.querySelector('textarea');
+    textarea.addEventListener('input', () => {
+        textarea.style.height = 'auto';
+        textarea.style.height = (textarea.scrollHeight) + 'px';
+    });
+
+    const sendBtn = document.querySelector('button.bg-primary');
+    sendBtn.addEventListener('click', () => {
+        if(textarea.value.trim() !== '') {
+            textarea.value = '';
+            textarea.style.height = 'auto';
+        }
+    });
+</script>
+</body></html>
