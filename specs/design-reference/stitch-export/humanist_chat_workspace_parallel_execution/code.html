@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SuperAgent | Workspace</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-tint": "#924a31",
+                    "surface-soft": "#f5f0e8",
+                    "primary-fixed-dim": "#ffb59d",
+                    "surface-container-lowest": "#ffffff",
+                    "secondary-container": "#e6e2de",
+                    "surface-container-highest": "#efdfdb",
+                    "surface-cream-strong": "#e8e0d2",
+                    "secondary": "#605e5b",
+                    "primary-active": "#a9583e",
+                    "muted-soft": "#8e8b82",
+                    "on-dark": "#faf9f5",
+                    "tertiary": "#00685f",
+                    "surface-container-low": "#fff1ed",
+                    "outline": "#87736d",
+                    "inverse-primary": "#ffb59d",
+                    "on-surface": "#211a18",
+                    "surface-container-high": "#f4e5e1",
+                    "tertiary-fixed": "#94f3e6",
+                    "surface-variant": "#efdfdb",
+                    "surface-bright": "#fff8f6",
+                    "on-background": "#211a18",
+                    "primary-container": "#ad5f45",
+                    "hairline-soft": "#ebe6df",
+                    "on-error-container": "#93000a",
+                    "inverse-on-surface": "#fdede9",
+                    "surface-card": "#efe9de",
+                    "on-primary-container": "#fffbff",
+                    "on-dark-soft": "#a09d96",
+                    "body-strong": "#252523",
+                    "surface-dark-soft": "#1f1e1b",
+                    "surface-container": "#faebe6",
+                    "muted": "#6c6a64",
+                    "tertiary-fixed-dim": "#77d7ca",
+                    "on-primary-fixed-variant": "#75331c",
+                    "error-container": "#ffdad6",
+                    "background": "#fff8f6",
+                    "secondary-fixed-dim": "#cac6c2",
+                    "surface": "#fff8f6",
+                    "on-surface-variant": "#54433e",
+                    "primary": "#8f482f",
+                    "on-secondary": "#ffffff",
+                    "primary-fixed": "#ffdbd0",
+                    "tertiary-container": "#0f8378",
+                    "canvas": "#faf9f5",
+                    "on-primary-fixed": "#390c00",
+                    "on-tertiary-fixed-variant": "#005049",
+                    "on-primary": "#ffffff",
+                    "secondary-fixed": "#e6e2de",
+                    "on-tertiary": "#ffffff",
+                    "inverse-surface": "#372e2c",
+                    "surface-dim": "#e6d7d3",
+                    "primary-disabled": "#e6dfd8",
+                    "on-secondary-container": "#666461",
+                    "body": "#3d3d3a",
+                    "error": "#ba1a1a",
+                    "on-tertiary-container": "#f4fffc",
+                    "on-secondary-fixed": "#1c1b19",
+                    "on-secondary-fixed-variant": "#484644",
+                    "outline-variant": "#dac1ba",
+                    "surface-dark-elevated": "#252320",
+                    "on-error": "#ffffff",
+                    "hairline": "#e6dfd8",
+                    "ink": "#141413",
+                    "on-tertiary-fixed": "#00201d"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "section": "96px",
+                    "md": "16px",
+                    "xs": "4px",
+                    "xl": "32px",
+                    "lg": "24px",
+                    "sm": "8px"
+            },
+            "fontFamily": {
+                    "code": ["JetBrains Mono, monospace"],
+                    "display-xl": ["Georgia, serif"],
+                    "display-md": ["Georgia, serif"],
+                    "body-sm": ["Inter, sans-serif"],
+                    "title-md": ["Inter, sans-serif"],
+                    "display-lg": ["Georgia, serif"],
+                    "title-lg": ["Inter, sans-serif"],
+                    "display-sm": ["Georgia, serif"],
+                    "body-md": ["Inter, sans-serif"]
+            },
+            "fontSize": {
+                    "code": ["14px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "display-xl": ["64px", {"lineHeight": "1.05", "letterSpacing": "-1.5px", "fontWeight": "400"}],
+                    "display-md": ["36px", {"lineHeight": "1.15", "letterSpacing": "-0.5px", "fontWeight": "400"}],
+                    "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "title-md": ["18px", {"lineHeight": "1.4", "fontWeight": "500"}],
+                    "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-1px", "fontWeight": "400"}],
+                    "title-lg": ["22px", {"lineHeight": "1.3", "fontWeight": "500"}],
+                    "display-sm": ["28px", {"lineHeight": "1.2", "letterSpacing": "-0.3px", "fontWeight": "400"}],
+                    "body-md": ["16px", {"lineHeight": "1.55", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .serif-display { font-family: 'Georgia', serif; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e6dfd8; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #dcd4cc; }
+        .radial-spike {
+            mask: radial-gradient(circle, transparent 30%, black 100%);
+            -webkit-mask: radial-gradient(circle, transparent 30%, black 100%);
+        }
+    </style>
+</head>
+<body class="bg-canvas text-body selection:bg-primary-fixed selection:text-primary overflow-hidden">
+<div class="flex h-screen w-full">
+<!-- SideNavBar -->
+<aside class="w-80 h-full flex flex-col sticky top-0 bg-surface-soft border-r border-hairline-soft transition-all duration-200">
+<div class="p-lg flex items-center justify-between">
+<div class="font-display-sm text-display-sm text-primary flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">bolt</span>
+<span class="tracking-tight font-bold">SuperAgent</span>
+</div>
+</div>
+<div class="px-md mt-md">
+<button class="w-full bg-primary-container text-on-primary-container py-md px-lg rounded-lg font-title-md flex items-center justify-center gap-sm hover:opacity-90 transition-all active:opacity-80">
+<span class="material-symbols-outlined">add</span>
+<span>New Analysis</span>
+</button>
+</div>
+<div class="flex-1 overflow-y-auto mt-lg px-md custom-scrollbar">
+<div class="mb-lg">
+<h3 class="px-md font-display-sm text-display-sm opacity-50 mb-sm">Session History</h3>
+<nav class="space-y-xs">
+<a class="flex items-center gap-sm p-md rounded-lg bg-white/50 text-primary font-bold transition-all" href="#">
+<span class="material-symbols-outlined">history</span>
+<span class="font-body-md">Optimize src/main.ts</span>
+</a>
+<a class="flex items-center gap-sm p-md rounded-lg text-body hover:bg-surface-cream-strong transition-all" href="#">
+<span class="material-symbols-outlined">history</span>
+<span class="font-body-md text-muted">All Sessions</span>
+</a>
+<a class="flex items-center gap-sm p-md rounded-lg text-body hover:bg-surface-cream-strong transition-all" href="#">
+<span class="material-symbols-outlined">edit_note</span>
+<span class="font-body-md text-muted">Drafts</span>
+</a>
+<a class="flex items-center gap-sm p-md rounded-lg text-body hover:bg-surface-cream-strong transition-all" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-body-md text-muted">Archived</span>
+</a>
+<a class="flex items-center gap-sm p-md rounded-lg text-body hover:bg-surface-cream-strong transition-all" href="#">
+<span class="material-symbols-outlined">delete</span>
+<span class="font-body-md text-muted">Trash</span>
+</a>
+</nav>
+</div>
+</div>
+<div class="p-lg border-t border-hairline-soft">
+<div class="flex items-center gap-md mb-lg">
+<div class="w-10 h-10 rounded-full bg-surface-cream-strong flex items-center justify-center overflow-hidden border border-hairline-soft">
+<img class="w-full h-full object-cover" data-alt="A clean professional profile headshot of a user against a warm cream studio background with soft Rembrandt lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuidyTZDvJmMvs3tTo34Ad0lveYQ2LQIOu3UovFditK12rQM6AokOE1ie5Qn55XD6N50OSxK3imXe0Xdfyg5pWkJtTYV3s4zL1tw5tYAPhCgN11AOu94_oQeovepswvB6wkaEqkAUQdvDvjzgz7WYqI-gzP3GnSPnxrre6Su66L0AdoUnQNmv66-_KZjbQ651EMvVuSsVr2WFtfKfpMKf5opev7T930FZz0F42E3N8WEnC9SaEuMQohjm-Gp7KhH9mvXsFM1sWBU0"/>
+</div>
+<div>
+<div class="font-title-md text-body-strong">User Profile</div>
+<div class="text-xs text-muted">Recent Conversations</div>
+</div>
+</div>
+<div class="space-y-sm">
+<a class="flex items-center gap-sm text-muted hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">cloud_done</span>
+<span class="font-body-md">System Status</span>
+</a>
+<a class="flex items-center gap-sm text-muted hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-body-md">Logout</span>
+</a>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col h-full bg-canvas relative">
+<!-- TopNavBar -->
+<header class="w-full h-16 flex justify-between items-center px-lg border-b border-hairline-soft bg-canvas sticky top-0 z-10">
+<div class="flex items-center gap-xl">
+<div class="font-display-sm text-display-sm text-primary tracking-tight font-extrabold">SuperAgent</div>
+<nav class="hidden md:flex gap-lg">
+<a class="font-body-md text-muted hover:text-primary transition-colors" href="#">Models</a>
+<a class="font-body-md text-muted hover:text-primary transition-colors" href="#">Workflows</a>
+<a class="font-body-md text-muted hover:text-primary transition-colors" href="#">Plugins</a>
+</nav>
+</div>
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-muted cursor-pointer hover:text-primary transition-colors">settings</span>
+<span class="material-symbols-outlined text-muted cursor-pointer hover:text-primary transition-colors">help</span>
+<button class="bg-primary text-white px-lg py-sm rounded-lg text-body-sm font-medium hover:bg-primary-active transition-all active:opacity-80">
+                        Create Session
+                    </button>
+</div>
+</header>
+<!-- Chat Container -->
+<div class="flex-1 overflow-y-auto custom-scrollbar">
+<div class="max-w-[800px] mx-auto px-lg py-section flex flex-col gap-section">
+<!-- Session Header -->
+<div class="text-center">
+<h1 class="font-display-lg text-display-lg text-body-strong italic leading-tight">
+                            Optimize src/main.ts
+                        </h1>
+<p class="text-muted mt-md font-body-md">Refactoring for performance and clarity</p>
+</div>
+<!-- User Message -->
+<div class="flex justify-end">
+<div class="bg-surface-card max-w-[80%] p-lg rounded-2xl rounded-tr-none border border-hairline-soft">
+<p class="font-body-md text-body leading-relaxed">
+                                Can you analyze the performance of the main entry point? I'm worried about the initialization lag. We need to parallelize the plugin loading and optimize the logger startup.
+                            </p>
+</div>
+</div>
+<!-- Assistant Response -->
+<div class="flex gap-lg">
+<div class="pt-1">
+<div class="w-8 h-8 flex items-center justify-center rounded-full bg-primary-fixed text-primary">
+<span class="material-symbols-outlined text-[18px]">auto_awesome</span>
+</div>
+</div>
+<div class="flex-1 space-y-lg">
+<div class="flex items-start gap-xs">
+<span class="text-primary text-2xl leading-none mt-1">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+</span>
+<div class="font-display-sm text-display-sm leading-relaxed text-body-strong italic">
+                                    Understood. I've analyzed the current synchronous flow. Initializing the logger and plugins sequentially is causing a 450ms bottleneck.
+                                </div>
+</div>
+<p class="font-body-md text-body leading-relaxed">
+                                I'm initiating a parallel refactor. While I modify the bootstrap sequence, I'll run diagnostic tests on the existing modules to ensure no race conditions are introduced.
+                            </p>
+<!-- Tool Grid: Parallel Execution -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md py-md">
+<div class="bg-surface-cream-strong/50 border border-hairline-soft p-lg rounded-xl">
+<div class="flex justify-between items-center mb-sm">
+<span class="text-xs font-bold uppercase tracking-widest text-muted">Plugin Audit</span>
+<span class="text-xs text-primary font-mono">82%</span>
+</div>
+<div class="h-1 bg-white/50 rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[82%] transition-all duration-1000"></div>
+</div>
+<p class="text-xs text-muted mt-sm font-mono">Analyzing dependency graph...</p>
+</div>
+<div class="bg-surface-cream-strong/50 border border-hairline-soft p-lg rounded-xl">
+<div class="flex justify-between items-center mb-sm">
+<span class="text-xs font-bold uppercase tracking-widest text-muted">Logger Optimization</span>
+<span class="text-xs text-primary font-mono">100%</span>
+</div>
+<div class="h-1 bg-white/50 rounded-full overflow-hidden">
+<div class="h-full bg-primary w-full transition-all"></div>
+</div>
+<p class="text-xs text-muted mt-sm font-mono">Lazy-loading configured.</p>
+</div>
+<div class="bg-surface-cream-strong/50 border border-hairline-soft p-lg rounded-xl">
+<div class="flex justify-between items-center mb-sm">
+<span class="text-xs font-bold uppercase tracking-widest text-muted">AST Transformation</span>
+<span class="text-xs text-primary font-mono">Running</span>
+</div>
+<div class="h-1 bg-white/50 rounded-full overflow-hidden relative">
+<div class="absolute inset-0 bg-primary/20 animate-pulse"></div>
+<div class="h-full bg-primary w-1/3 animate-[slide_2s_infinite_linear]"></div>
+</div>
+<p class="text-xs text-muted mt-sm font-mono">Injecting Promise.all() wrappers...</p>
+</div>
+<div class="bg-surface-cream-strong/50 border border-hairline-soft p-lg rounded-xl">
+<div class="flex justify-between items-center mb-sm">
+<span class="text-xs font-bold uppercase tracking-widest text-muted">Unit Tests</span>
+<span class="text-xs text-primary font-mono">Queued</span>
+</div>
+<div class="h-1 bg-white/50 rounded-full overflow-hidden">
+<div class="h-full bg-primary w-0"></div>
+</div>
+<p class="text-xs text-muted mt-sm font-mono">Waiting for build artifacts...</p>
+</div>
+</div>
+<!-- Tool Cards: Technical Output -->
+<div class="space-y-md">
+<!-- Bash Output -->
+<div class="bg-[#181715] rounded-xl overflow-hidden shadow-xl border border-white/5">
+<div class="flex items-center gap-sm px-lg py-md bg-white/5 border-b border-white/5">
+<span class="material-symbols-outlined text-sm text-primary-fixed-dim">terminal</span>
+<span class="text-xs font-mono text-on-dark-soft uppercase">terminal — bash</span>
+</div>
+<div class="p-lg font-code text-code text-[#D4D4D4] leading-relaxed overflow-x-auto whitespace-pre">
+<span class="text-primary-fixed-dim">$</span> npm run build:optimize
+<span class="text-secondary-fixed-dim">[12:44:01]</span> Compiling main.ts...
+<span class="text-tertiary-fixed-dim">[12:44:05]</span> Successfully applied AST transformation: 12 replacements.
+<span class="text-primary-fixed-dim">$</span> ls -lh dist/main.js
+-rw-r--r--  1 superagent  staff  <span class="text-primary-fixed-dim">142KB</span> Feb 24 12:44 dist/main.js</div>
+</div>
+<!-- Unified Diff -->
+<div class="bg-[#181715] rounded-xl overflow-hidden shadow-xl border border-white/5">
+<div class="flex items-center gap-sm px-lg py-md bg-white/5 border-b border-white/5">
+<span class="material-symbols-outlined text-sm text-primary-fixed-dim">difference</span>
+<span class="text-xs font-mono text-on-dark-soft uppercase">unified diff — main.ts</span>
+</div>
+<div class="p-lg font-code text-code text-[#D4D4D4] leading-relaxed overflow-x-auto">
+<div class="flex"><span class="w-8 opacity-30 select-none">@@</span><span class="text-blue-400">-12,18 +12,14 @@</span></div>
+<div class="flex bg-red-900/30"><span class="w-8 text-red-500 select-none">-</span><span>const logger = initLogger();</span></div>
+<div class="flex bg-red-900/30"><span class="w-8 text-red-500 select-none">-</span><span>const plugins = loadPlugins();</span></div>
+<div class="flex bg-red-900/30"><span class="w-8 text-red-500 select-none">-</span><span>const session = createSession(logger, plugins);</span></div>
+<div class="flex bg-green-900/30"><span class="w-8 text-green-500 select-none">+</span><span>const [logger, plugins] = await Promise.all([</span></div>
+<div class="flex bg-green-900/30"><span class="w-8 text-green-500 select-none">+</span><span>  initLoggerAsync(),</span></div>
+<div class="flex bg-green-900/30"><span class="w-8 text-green-500 select-none">+</span><span>  loadPluginsAsync()</span></div>
+<div class="flex bg-green-900/30"><span class="w-8 text-green-500 select-none">+</span><span>]);</span></div>
+<div class="flex bg-green-900/30"><span class="w-8 text-green-500 select-none">+</span><span>const session = createSession(logger, plugins);</span></div>
+</div>
+</div>
+</div>
+<p class="font-body-md text-body leading-relaxed pt-md">
+                                The transition to <code class="bg-surface-cream-strong px-1 rounded font-code text-xs">Promise.all</code> has been implemented. Total startup time is projected to decrease from 450ms to approximately 180ms. Would you like me to deploy these changes to the staging environment?
+                            </p>
+</div>
+</div>
+</div>
+</div>
+<!-- Input Area -->
+<div class="w-full bg-canvas/80 backdrop-blur-md pb-xl pt-lg border-t border-hairline-soft">
+<div class="max-w-[800px] mx-auto px-lg relative">
+<div class="relative group">
+<textarea class="w-full bg-surface-cream-strong border-hairline-soft border p-lg pr-[120px] rounded-xl font-body-md focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all resize-none shadow-sm placeholder:text-muted/60" placeholder="Message SuperAgent..." rows="1"></textarea>
+<div class="absolute right-md bottom-md flex items-center gap-sm">
+<span class="material-symbols-outlined text-muted cursor-pointer hover:text-primary p-sm">attach_file</span>
+<button class="bg-primary hover:bg-primary-active text-white px-lg py-sm rounded-lg font-title-md transition-all active:scale-95 flex items-center gap-xs">
+<span>Send</span>
+<span class="material-symbols-outlined text-[18px]">send</span>
+</button>
+</div>
+</div>
+<div class="flex justify-center gap-xl mt-md">
+<div class="flex items-center gap-xs text-xs text-muted">
+<span class="material-symbols-outlined text-xs">bolt</span>
+<span>Powered by Copernicus v2</span>
+</div>
+<div class="flex items-center gap-xs text-xs text-muted">
+<span class="material-symbols-outlined text-xs">security</span>
+<span>AES-256 Encrypted</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+<style>
+        @keyframes slide {
+            from { transform: translateX(-100%); }
+            to { transform: translateX(300%); }
+        }
+    </style>
+<script>
+        // Simple auto-expand for textarea
+        const tx = document.getElementsByTagName("textarea");
+        for (let i = 0; i < tx.length; i++) {
+            tx[i].setAttribute("style", "height:" + (tx[i].scrollHeight) + "px;overflow-y:hidden;");
+            tx[i].addEventListener("input", OnInput, false);
+        }
+
+        function OnInput() {
+            this.style.height = 0;
+            this.style.height = (this.scrollHeight) + "px";
+        }
+    </script>
+</body></html>

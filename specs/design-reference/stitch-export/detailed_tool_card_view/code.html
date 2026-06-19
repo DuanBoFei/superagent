@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SuperAgent | Tool Card Detail View</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Custom scrollbar for high-density tool cards */
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0d0e15;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3c4a42;
+            border-radius: 2px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4edea3;
+        }
+        .code-block-mask {
+            mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "tertiary-fixed": "#ffdad7",
+                      "secondary": "#c0c1ff",
+                      "on-tertiary": "#650911",
+                      "primary-fixed": "#6ffbbe",
+                      "tertiary-fixed-dim": "#ffb3af",
+                      "on-secondary-fixed": "#07006c",
+                      "inverse-surface": "#e3e1ec",
+                      "outline-variant": "#3c4a42",
+                      "primary-container": "#10b981",
+                      "secondary-container": "#3131c0",
+                      "on-surface-variant": "#bbcabf",
+                      "inverse-on-surface": "#2f3038",
+                      "error": "#ffb4ab",
+                      "on-secondary-container": "#b0b2ff",
+                      "on-secondary": "#1000a9",
+                      "error-container": "#93000a",
+                      "outline": "#86948a",
+                      "on-tertiary-container": "#711419",
+                      "on-background": "#e3e1ec",
+                      "inverse-primary": "#006c49",
+                      "surface-container-low": "#1a1b22",
+                      "surface": "#12131a",
+                      "secondary-fixed": "#e1e0ff",
+                      "on-primary-fixed": "#002113",
+                      "on-tertiary-fixed-variant": "#842225",
+                      "on-primary-container": "#00422b",
+                      "on-primary": "#003824",
+                      "surface-container-highest": "#33343c",
+                      "on-error": "#690005",
+                      "on-surface": "#e3e1ec",
+                      "tertiary-container": "#fc7c78",
+                      "surface-container-high": "#292931",
+                      "on-primary-fixed-variant": "#005236",
+                      "surface-bright": "#383941",
+                      "background": "#12131a",
+                      "surface-container": "#1e1f26",
+                      "on-tertiary-fixed": "#410005",
+                      "primary-fixed-dim": "#4edea3",
+                      "surface-variant": "#33343c",
+                      "surface-dim": "#12131a",
+                      "on-error-container": "#ffdad6",
+                      "primary": "#4edea3",
+                      "surface-tint": "#4edea3",
+                      "tertiary": "#ffb3af",
+                      "secondary-fixed-dim": "#c0c1ff",
+                      "surface-container-lowest": "#0d0e15",
+                      "on-secondary-fixed-variant": "#2f2ebe"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "lg": "24px",
+                      "sm": "8px",
+                      "md": "16px",
+                      "base": "4px",
+                      "container-padding": "12px",
+                      "panel-gap": "1px",
+                      "xs": "4px"
+              },
+              "fontFamily": {
+                      "label-xs": ["JetBrains Mono"],
+                      "headline-sm": ["Inter"],
+                      "code-sm": ["JetBrains Mono"],
+                      "body-sm": ["Inter"],
+                      "code-md": ["JetBrains Mono"],
+                      "body-md": ["Inter"]
+              },
+              "fontSize": {
+                      "label-xs": ["11px", {"lineHeight": "14px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                      "headline-sm": ["18px", {"lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "code-sm": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                      "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                      "code-md": ["13px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+              }
+            },
+          },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface font-body-sm selection:bg-primary/30">
+<!-- Shell Layout -->
+<div class="flex min-h-screen overflow-hidden">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-full flex flex-col z-40 bg-surface-container-low dark:bg-surface-container-low h-screen w-64 border-r border-outline-variant">
+<!-- Header -->
+<div class="p-md border-b border-outline-variant">
+<div class="flex items-center gap-sm mb-base">
+<span class="font-headline-sm text-headline-sm font-bold text-primary dark:text-primary">SuperAgent</span>
+</div>
+<div class="flex items-center gap-xs">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+<span class="font-label-xs text-label-xs text-on-surface-variant">Local Runtime: Active</span>
+</div>
+</div>
+<!-- Main Nav -->
+<nav class="flex-1 overflow-y-auto py-sm">
+<div class="space-y-base px-sm">
+<a class="flex items-center gap-md px-md py-sm bg-surface-container-highest dark:bg-surface-container-highest text-primary border-l-2 border-primary active:opacity-90 active:scale-[0.99] transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+<span class="font-label-xs text-label-xs">Sessions</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container dark:hover:bg-surface-container transition-colors duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="smart_toy">smart_toy</span>
+<span class="font-label-xs text-label-xs">Models</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container dark:hover:bg-surface-container transition-colors duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="terminal">terminal</span>
+<span class="font-label-xs text-label-xs">Prompts</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container dark:hover:bg-surface-container transition-colors duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="rocket_launch">rocket_launch</span>
+<span class="font-label-xs text-label-xs">Deployments</span>
+</a>
+</div>
+<div class="mt-lg pt-lg border-t border-outline-variant px-sm">
+<button class="w-full flex items-center justify-center gap-sm bg-primary text-on-primary font-bold py-sm rounded hover:brightness-110 transition-all">
+<span class="material-symbols-outlined text-[18px]" data-icon="add">add</span>
+<span class="font-label-xs">New Chat</span>
+</button>
+</div>
+</nav>
+<!-- Footer Nav -->
+<div class="p-sm space-y-base border-t border-outline-variant">
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container dark:hover:bg-surface-container transition-colors duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label-xs text-label-xs">Settings</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container dark:hover:bg-surface-container transition-colors duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="menu_book">menu_book</span>
+<span class="font-label-xs text-label-xs">Docs</span>
+</a>
+<div class="pt-sm px-md flex items-center justify-between">
+<img class="w-8 h-8 rounded-full border border-outline-variant object-cover" data-alt="A professional high-resolution close-up portrait of a digital avatar representating a tech-savvy software engineer with neutral lighting and a clean aesthetic. The avatar is integrated into a high-density developer tool UI with a primary color palette of deep charcoal and emerald green accents." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB-lrPMwhnwPZwt7o7HLppZdjouFFizg5jMEEKQRzdO4cwv_I-XDbQ3pbqGTzoQ7syo6mp9bSHD3M2McId17hrzPMhL33lJjdRgtoOsMGGyFzeWv_wKm0cDl7w9gqPLeL7e0aEfzONraCkdNqqd1ZeItqBmpwn_pH3brTPBv06tboyD3p4c19I64PIkPff-rVdaHBcsddSfrERIL-7acfP9TxX_yaEP_PjfZ0QhEf6iicW9eOFcdXDSn00lPCgXQuWWU-6Mzdqt7_k"/>
+<div class="flex-1 ml-sm overflow-hidden">
+<p class="font-label-xs text-on-surface truncate">dev-user-01</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-64 flex-1 h-screen overflow-y-auto bg-surface flex flex-col">
+<!-- TopAppBar -->
+<header class="flex justify-between items-center px-md w-full sticky top-0 z-30 bg-surface dark:bg-surface h-14 w-full border-b border-outline-variant">
+<div class="flex items-center gap-lg">
+<span class="font-headline-sm text-headline-sm font-black text-on-surface">Review Mode</span>
+<div class="hidden md:flex items-center gap-md">
+<a class="font-label-xs text-primary border-b-2 border-primary pb-base transition-transform active:scale-95" href="#">Explorer</a>
+<a class="font-label-xs text-on-surface-variant hover:text-on-surface transition-all" href="#">Console</a>
+<a class="font-label-xs text-on-surface-variant hover:text-on-surface transition-all" href="#">Monitor</a>
+</div>
+</div>
+<div class="flex-1 max-w-md mx-lg">
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-sm text-outline" data-icon="search">search</span>
+<input class="w-full bg-surface-container-lowest border border-outline-variant py-xs pl-lg pr-sm rounded font-code-sm text-code-sm focus:outline-none focus:border-primary" placeholder="Search operations..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<button class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-highest p-base rounded transition-all" data-icon="notifications">notifications</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-highest p-base rounded transition-all" data-icon="help_outline">help_outline</button>
+<button class="bg-primary text-on-primary font-bold px-md py-xs rounded font-label-xs active:scale-95 transition-transform">Deploy</button>
+</div>
+</header>
+<!-- Review Content Flow -->
+<div class="max-w-4xl mx-auto w-full p-lg space-y-lg pb-32">
+<!-- 1. TASK CARD (Progress & Subtasks) -->
+<section class="bg-surface-container border border-outline-variant rounded shadow-none overflow-hidden">
+<div class="px-md py-sm bg-surface-container-high border-b border-outline-variant flex items-center justify-between">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary" data-icon="assignment">assignment</span>
+<span class="font-label-xs uppercase tracking-wider text-on-surface">Initialization Task</span>
+</div>
+<span class="font-code-sm text-primary">66% Complete</span>
+</div>
+<div class="p-md space-y-md">
+<!-- Progress Bar -->
+<div class="w-full h-1 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[66%] transition-all duration-1000 ease-out"></div>
+</div>
+<!-- Subtasks -->
+<div class="space-y-sm">
+<label class="flex items-center gap-md group cursor-pointer">
+<div class="w-4 h-4 rounded-sm border border-primary bg-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-[12px] text-on-primary" data-icon="check">check</span>
+</div>
+<span class="font-body-sm text-on-surface">Scaffolding environment variables</span>
+</label>
+<label class="flex items-center gap-md group cursor-pointer">
+<div class="w-4 h-4 rounded-sm border border-primary bg-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-[12px] text-on-primary" data-icon="check">check</span>
+</div>
+<span class="font-body-sm text-on-surface">Fetching remote dependencies</span>
+</label>
+<label class="flex items-center gap-md group cursor-pointer">
+<div class="w-4 h-4 rounded-sm border border-outline-variant hover:border-primary transition-colors"></div>
+<span class="font-body-sm text-on-surface-variant group-hover:text-on-surface">Synchronizing local state with runtime</span>
+</label>
+</div>
+</div>
+</section>
+<!-- 2. READ CARD (Syntax Highlighting) -->
+<section class="bg-surface-container border border-outline-variant rounded shadow-none overflow-hidden">
+<div class="px-md py-sm bg-surface-container-high border-b border-outline-variant flex items-center justify-between">
+<div class="flex items-center gap-sm overflow-hidden">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="description">description</span>
+<span class="font-code-sm text-on-surface truncate">src/core/agent_runtime.py</span>
+</div>
+<button class="flex items-center gap-xs font-label-xs text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[16px]" data-icon="unfold_less">unfold_less</span>
+                            Collapse
+                        </button>
+</div>
+<div class="bg-black/50 overflow-x-auto">
+<div class="font-code-sm text-code-sm p-sm flex">
+<div class="text-outline-variant pr-md text-right select-none border-r border-outline-variant/30 mr-md">
+                                01<br/>02<br/>03<br/>04<br/>05<br/>06<br/>07<br/>08
+                            </div>
+<div class="whitespace-pre text-[#d1d5db]">
+<span class="text-[#c0c1ff]">import</span> asyncio
+<span class="text-[#c0c1ff]">from</span> typing <span class="text-[#c0c1ff]">import</span> List, Optional
+
+<span class="text-[#4edea3]">class</span> <span class="text-[#ffb3af]">AgentRuntime</span>:
+    <span class="text-[#4edea3]">def</span> <span class="text-[#ffb3af]">__init__</span>(self, <span class="text-secondary">config</span>: dict):
+        self.config = config
+        self.active = <span class="text-secondary">True</span>
+<span class="text-outline"># Log initialization</span>
+</div>
+</div>
+</div>
+</section>
+<!-- 3. EDIT/WRITE CARD (Diff View) -->
+<section class="bg-surface-container border border-outline-variant rounded shadow-none overflow-hidden">
+<div class="px-md py-sm bg-surface-container-high border-b border-outline-variant flex items-center justify-between">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-secondary" data-icon="edit_note">edit_note</span>
+<span class="font-label-xs uppercase tracking-wider text-on-surface">Modified: runtime_hooks.ts</span>
+</div>
+<div class="flex items-center gap-sm">
+<span class="px-xs py-base bg-error-container/20 text-error rounded font-code-sm">-1</span>
+<span class="px-xs py-base bg-primary-container/20 text-primary rounded font-code-sm">+2</span>
+</div>
+</div>
+<div class="font-code-sm text-code-sm bg-surface-container-lowest">
+<div class="flex bg-error-container/10 border-l-4 border-error/50">
+<div class="w-12 text-center text-error/60 py-xs border-r border-outline-variant/20">- 42</div>
+<div class="flex-1 px-md py-xs text-error">return this.process(data, false);</div>
+</div>
+<div class="flex bg-primary-container/10 border-l-4 border-primary/50">
+<div class="w-12 text-center text-primary/60 py-xs border-r border-outline-variant/20">+ 42</div>
+<div class="flex-1 px-md py-xs text-primary">const options = { silent: true };</div>
+</div>
+<div class="flex bg-primary-container/10 border-l-4 border-primary/50">
+<div class="w-12 text-center text-primary/60 py-xs border-r border-outline-variant/20">+ 43</div>
+<div class="flex-1 px-md py-xs text-primary">return this.process(data, options);</div>
+</div>
+</div>
+</section>
+<!-- 4. BASH CARD (Terminal Output) -->
+<section class="bg-[#050505] border border-outline-variant rounded shadow-none overflow-hidden font-code-sm">
+<div class="px-md py-base bg-[#111111] border-b border-outline-variant flex items-center gap-sm">
+<div class="flex gap-xs">
+<div class="w-2 h-2 rounded-full bg-error/40"></div>
+<div class="w-2 h-2 rounded-full bg-tertiary/40"></div>
+<div class="w-2 h-2 rounded-full bg-primary/40"></div>
+</div>
+<span class="text-on-surface-variant font-label-xs opacity-60">zsh — tool_output</span>
+</div>
+<div class="p-md text-[#e3e1ec] leading-relaxed overflow-x-auto whitespace-nowrap">
+<p class="flex items-center gap-sm">
+<span class="text-primary font-bold">➜</span>
+<span class="text-secondary">~/workspace/superagent</span>
+<span class="text-on-surface-variant">git checkout -b feature/ui-refactor</span>
+</p>
+<p class="text-on-surface-variant">Switched to a new branch 'feature/ui-refactor'</p>
+<p class="flex items-center gap-sm">
+<span class="text-primary font-bold">➜</span>
+<span class="text-secondary">~/workspace/superagent</span>
+<span class="text-on-surface-variant">./bin/test_runtime --all</span>
+</p>
+<p class="flex items-center gap-sm">
+<span class="text-primary">✔</span>
+<span>Core engine loaded in 142ms</span>
+</p>
+<p class="flex items-center gap-sm">
+<span class="text-primary">✔</span>
+<span>Schema validation passed</span>
+</p>
+<p class="flex items-center gap-sm">
+<span class="text-error">✘</span>
+<span class="text-error">Memory buffer overflow at segment 0x4F2A</span>
+</p>
+<p class="animate-pulse">_</p>
+</div>
+</section>
+<!-- Review Mode Actions -->
+<div class="flex justify-center pt-lg">
+<div class="bg-surface-container-high p-xs rounded-full border border-outline-variant flex items-center gap-xs shadow-xl">
+<button class="flex items-center gap-sm px-md py-sm bg-error-container text-on-error-container rounded-full font-label-xs hover:brightness-110 active:scale-95 transition-all">
+<span class="material-symbols-outlined" data-icon="close">close</span>
+                            Reject Changes
+                        </button>
+<button class="flex items-center gap-sm px-md py-sm bg-primary text-on-primary rounded-full font-label-xs hover:brightness-110 active:scale-95 transition-all">
+<span class="material-symbols-outlined" data-icon="done_all">done_all</span>
+                            Approve All
+                        </button>
+</div>
+</div>
+</div>
+<!-- Footer -->
+<footer class="mt-auto h-8 border-t border-outline-variant bg-surface-container-lowest flex justify-between items-center px-md z-50">
+<div class="flex items-center gap-md">
+<span class="font-code-sm text-code-sm text-primary font-bold">v1.0.4-beta | 127.0.0.1:8080</span>
+<span class="h-3 w-[1px] bg-outline-variant"></span>
+<span class="font-code-sm text-code-sm text-on-surface-variant hover:text-primary cursor-pointer transition-opacity duration-200">Connected</span>
+</div>
+<div class="flex items-center gap-md">
+<span class="font-code-sm text-code-sm text-on-surface-variant hover:text-primary cursor-pointer transition-opacity duration-200">~/workspace</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant hover:text-primary cursor-pointer transition-opacity duration-200">Uptime: 24h</span>
+</div>
+</footer>
+</main>
+</div>
+<!-- Floating Atmosphere Micro-interaction Layer -->
+<div class="pointer-events-none fixed inset-0 z-0">
+<div class="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/5 blur-[120px] rounded-full"></div>
+<div class="absolute bottom-0 left-64 w-[300px] h-[300px] bg-secondary/5 blur-[100px] rounded-full"></div>
+</div>
+<script>
+        // Micro-interaction for collapse buttons
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('mousedown', () => btn.classList.add('scale-95'));
+            btn.addEventListener('mouseup', () => btn.classList.remove('scale-95'));
+            btn.addEventListener('mouseleave', () => btn.classList.remove('scale-95'));
+        });
+
+        // Simple terminal typing simulator for the bash card
+        const cursor = document.querySelector('.animate-pulse');
+        if(cursor) {
+            setInterval(() => {
+                cursor.style.opacity = cursor.style.opacity === '0' ? '1' : '0';
+            }, 500);
+        }
+    </script>
+</body></html>

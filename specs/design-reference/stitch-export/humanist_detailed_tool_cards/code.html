@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SuperAgent - Tool Analysis View</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        @font-face {
+            font-family: 'Copernicus';
+            src: url('https://fonts.cdnfonts.com/css/copernicus') format('woff2');
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .diff-added { background-color: rgba(0, 104, 95, 0.15); color: #77d7ca; }
+        .diff-removed { background-color: rgba(186, 26, 26, 0.15); color: #ffb59d; }
+        .terminal-scroll::-webkit-scrollbar { width: 4px; }
+        .terminal-scroll::-webkit-scrollbar-track { background: transparent; }
+        .terminal-scroll::-webkit-scrollbar-thumb { background: #3d3d3a; border-radius: 10px; }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-tint": "#924a31",
+                      "surface-soft": "#f5f0e8",
+                      "primary-fixed-dim": "#ffb59d",
+                      "surface-container-lowest": "#ffffff",
+                      "secondary-container": "#e6e2de",
+                      "surface-container-highest": "#efdfdb",
+                      "surface-cream-strong": "#e8e0d2",
+                      "secondary": "#605e5b",
+                      "primary-active": "#a9583e",
+                      "muted-soft": "#8e8b82",
+                      "on-dark": "#faf9f5",
+                      "tertiary": "#00685f",
+                      "surface-container-low": "#fff1ed",
+                      "outline": "#87736d",
+                      "inverse-primary": "#ffb59d",
+                      "on-surface": "#211a18",
+                      "surface-container-high": "#f4e5e1",
+                      "tertiary-fixed": "#94f3e6",
+                      "surface-variant": "#efdfdb",
+                      "surface-bright": "#fff8f6",
+                      "on-background": "#211a18",
+                      "primary-container": "#ad5f45",
+                      "hairline-soft": "#ebe6df",
+                      "on-error-container": "#93000a",
+                      "inverse-on-surface": "#fdede9",
+                      "surface-card": "#efe9de",
+                      "on-primary-container": "#fffbff",
+                      "on-dark-soft": "#a09d96",
+                      "body-strong": "#252523",
+                      "surface-dark-soft": "#1f1e1b",
+                      "surface-container": "#faebe6",
+                      "muted": "#6c6a64",
+                      "tertiary-fixed-dim": "#77d7ca",
+                      "on-primary-fixed-variant": "#75331c",
+                      "error-container": "#ffdad6",
+                      "background": "#fff8f6",
+                      "secondary-fixed-dim": "#cac6c2",
+                      "surface": "#fff8f6",
+                      "on-surface-variant": "#54433e",
+                      "primary": "#8f482f",
+                      "on-secondary": "#ffffff",
+                      "primary-fixed": "#ffdbd0",
+                      "tertiary-container": "#0f8378",
+                      "canvas": "#faf9f5",
+                      "on-primary-fixed": "#390c00",
+                      "on-tertiary-fixed-variant": "#005049",
+                      "on-primary": "#ffffff",
+                      "secondary-fixed": "#e6e2de",
+                      "on-tertiary": "#ffffff",
+                      "inverse-surface": "#372e2c",
+                      "surface-dim": "#e6d7d3",
+                      "primary-disabled": "#e6dfd8",
+                      "on-secondary-container": "#666461",
+                      "body": "#3d3d3a",
+                      "error": "#ba1a1a",
+                      "on-tertiary-container": "#f4fffc",
+                      "on-secondary-fixed": "#1c1b19",
+                      "on-secondary-fixed-variant": "#484644",
+                      "outline-variant": "#dac1ba",
+                      "surface-dark-elevated": "#252320",
+                      "on-error": "#ffffff",
+                      "hairline": "#e6dfd8",
+                      "ink": "#141413",
+                      "on-tertiary-fixed": "#00201d"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "section": "96px",
+                      "md": "16px",
+                      "xs": "4px",
+                      "xl": "32px",
+                      "lg": "24px",
+                      "sm": "8px"
+              },
+              "fontFamily": {
+                      "code": ["JetBrains Mono, monospace"],
+                      "display-xl": ["Copernicus, serif"],
+                      "display-md": ["Copernicus, serif"],
+                      "body-sm": ["Inter, sans-serif"],
+                      "title-md": ["Inter, sans-serif"],
+                      "display-lg": ["Copernicus, serif"],
+                      "title-lg": ["Inter, sans-serif"],
+                      "display-sm": ["Copernicus, serif"],
+                      "body-md": ["Inter, sans-serif"]
+              },
+              "fontSize": {
+                      "code": ["14px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                      "display-xl": ["64px", {"lineHeight": "1.05", "letterSpacing": "-1.5px", "fontWeight": "400"}],
+                      "display-md": ["36px", {"lineHeight": "1.15", "letterSpacing": "-0.5px", "fontWeight": "400"}],
+                      "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                      "title-md": ["18px", {"lineHeight": "1.4", "fontWeight": "500"}],
+                      "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-1px", "fontWeight": "400"}],
+                      "title-lg": ["22px", {"lineHeight": "1.3", "fontWeight": "500"}],
+                      "display-sm": ["28px", {"lineHeight": "1.2", "letterSpacing": "-0.3px", "fontWeight": "400"}],
+                      "body-md": ["16px", {"lineHeight": "1.55", "fontWeight": "400"}]
+              }
+            },
+          },
+        }
+    </script>
+</head>
+<body class="bg-canvas text-body font-body-md min-h-screen flex flex-col selection:bg-primary-fixed">
+<!-- TopNavBar -->
+<header class="w-full h-16 border-b border-hairline-soft flex justify-between items-center px-lg bg-canvas sticky top-0 z-50">
+<div class="flex items-center gap-xl">
+<span class="font-display-sm text-display-sm text-primary font-bold tracking-tight">SuperAgent</span>
+<nav class="hidden md:flex items-center gap-lg">
+<a class="text-muted hover:text-primary-active transition-colors font-body-md" href="#">Models</a>
+<a class="text-primary font-bold border-b-2 border-primary font-body-md py-1" href="#">Workflows</a>
+<a class="text-muted hover:text-primary-active transition-colors font-body-md" href="#">Plugins</a>
+</nav>
+</div>
+<div class="flex items-center gap-md">
+<button class="material-symbols-outlined text-muted hover:text-primary cursor-pointer p-xs" data-icon="settings">settings</button>
+<button class="material-symbols-outlined text-muted hover:text-primary cursor-pointer p-xs" data-icon="help">help</button>
+<button class="bg-primary text-on-primary px-lg py-sm rounded-lg font-body-md font-medium hover:bg-primary-active transition-colors cursor-pointer">Create Session</button>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden">
+<!-- SideNavBar -->
+<aside class="hidden md:flex flex-col h-[calc(100vh-64px)] w-80 bg-surface-soft border-r border-hairline-soft sticky top-16 overflow-y-auto">
+<div class="p-lg border-b border-hairline-soft">
+<div class="flex items-center gap-md mb-lg">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-primary-fixed">
+<img class="w-full h-full object-cover" data-alt="A portrait of a professional woman with a warm, friendly expression, set in a brightly lit studio with soft, cinematic lighting. The aesthetic is humanist and editorial, featuring a clean, minimalist background that complements the warm canvas color palette of the UI. She wears professional yet approachable attire." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6YZzEuFkvkO9OJqOpAQPY42ptHDAGQSXs2_OtUmkzqpDc2dhaHyxNu127hl7e9scteaNu_jv4ARPXskKu4pZtZocGwTf3dgOSeKQMI_vz0Muok_Q2kGfP4t-9djzRe94VW2ZN8_1mzqooAQ0Z1XIGjS3ViNtx055zV7144LUsZ1HOL66o84uwSLGzjFGDE9oKtnKY7oi9C63TFll-rOBfL5pWLSWnyDuDe9CXdLyPydUY9dWnStNhbOBL7ldSxA87bMjrDU3tNLI"/>
+</div>
+<div>
+<h3 class="font-display-sm text-display-sm text-primary leading-none">Session History</h3>
+<p class="text-body-sm text-muted mt-xs">Recent Conversations</p>
+</div>
+</div>
+<button class="w-full bg-surface-cream-strong text-primary border border-primary-fixed py-md rounded-lg font-body-md font-bold flex items-center justify-center gap-sm hover:bg-white transition-all">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+                    New Analysis
+                </button>
+</div>
+<nav class="flex-1 py-md overflow-y-auto">
+<div class="px-md flex flex-col gap-xs">
+<div class="flex items-center gap-md p-md rounded-lg cursor-pointer bg-white shadow-sm text-primary font-bold group">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+<span class="font-body-md">All Sessions</span>
+</div>
+<div class="flex items-center gap-md p-md rounded-lg cursor-pointer text-body hover:bg-surface-cream-strong transition-all group">
+<span class="material-symbols-outlined group-hover:text-primary" data-icon="edit_note">edit_note</span>
+<span class="font-body-md">Drafts</span>
+</div>
+<div class="flex items-center gap-md p-md rounded-lg cursor-pointer text-body hover:bg-surface-cream-strong transition-all group">
+<span class="material-symbols-outlined group-hover:text-primary" data-icon="inventory_2">inventory_2</span>
+<span class="font-body-md">Archived</span>
+</div>
+<div class="flex items-center gap-md p-md rounded-lg cursor-pointer text-body hover:bg-surface-cream-strong transition-all group">
+<span class="material-symbols-outlined group-hover:text-primary" data-icon="delete">delete</span>
+<span class="font-body-md">Trash</span>
+</div>
+</div>
+</nav>
+<div class="p-lg border-t border-hairline-soft bg-surface-soft/50 mt-auto">
+<div class="flex flex-col gap-sm">
+<button class="flex items-center gap-md text-body hover:text-primary transition-colors py-xs">
+<span class="material-symbols-outlined text-sm" data-icon="cloud_done">cloud_done</span>
+<span class="text-body-sm">System Status</span>
+</button>
+<button class="flex items-center gap-md text-body hover:text-primary transition-colors py-xs">
+<span class="material-symbols-outlined text-sm" data-icon="logout">logout</span>
+<span class="text-body-sm">Logout</span>
+</button>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 overflow-y-auto px-lg md:px-section py-lg md:py-section bg-canvas relative">
+<div class="max-w-[1000px] mx-auto flex flex-col gap-xl">
+<!-- Header -->
+<div class="mb-lg border-l-4 border-primary pl-lg">
+<h1 class="font-display-lg text-display-lg text-body-strong mb-sm">Refactoring Analysis</h1>
+<p class="font-body-md text-muted max-w-2xl">The model has completed its first pass of the codebase. Below is the detailed breakdown of the detected patterns and proposed structural changes.</p>
+</div>
+<!-- Bento Grid Layout for Cards -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-lg">
+<!-- Task Card (66% Complete) -->
+<div class="lg:col-span-5 bg-surface-card rounded-xl p-lg flex flex-col border border-hairline-soft shadow-sm hover:shadow-md transition-shadow">
+<div class="flex justify-between items-start mb-xl">
+<div>
+<h3 class="font-display-sm text-display-sm text-body-strong">Project Status</h3>
+<p class="text-body-sm text-muted">Analysis phase 2 of 3</p>
+</div>
+<div class="relative w-16 h-16">
+<svg class="w-full h-full transform -rotate-90">
+<circle class="text-hairline" cx="32" cy="32" fill="transparent" r="28" stroke="currentColor" stroke-width="8"></circle>
+<circle class="text-tertiary" cx="32" cy="32" fill="transparent" r="28" stroke="currentColor" stroke-dasharray="175.9" stroke-dashoffset="60" stroke-width="8"></circle>
+</svg>
+<span class="absolute inset-0 flex items-center justify-center font-bold text-tertiary text-xs">66%</span>
+</div>
+</div>
+<ul class="flex flex-col gap-md">
+<li class="flex items-center gap-md group">
+<div class="w-6 h-6 rounded border-2 border-tertiary bg-tertiary flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary text-sm font-bold" data-icon="check">check</span>
+</div>
+<span class="text-body-md text-body line-through opacity-60">Schema synchronization</span>
+</li>
+<li class="flex items-center gap-md group">
+<div class="w-6 h-6 rounded border-2 border-tertiary bg-tertiary flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary text-sm font-bold" data-icon="check">check</span>
+</div>
+<span class="text-body-md text-body line-through opacity-60">Dependency mapping</span>
+</li>
+<li class="flex items-center gap-md group">
+<div class="w-6 h-6 rounded border-2 border-tertiary bg-transparent flex items-center justify-center"></div>
+<span class="text-body-md text-body-strong font-medium">Refactor core auth module</span>
+</li>
+<li class="flex items-center gap-md group opacity-40">
+<div class="w-6 h-6 rounded border-2 border-muted bg-transparent flex items-center justify-center"></div>
+<span class="text-body-md text-muted">Performance benchmarking</span>
+</li>
+</ul>
+</div>
+<!-- Code Reader Card (Dark Navy) -->
+<div class="lg:col-span-7 bg-surface-dark-soft rounded-xl overflow-hidden flex flex-col border border-ink/20 shadow-xl">
+<div class="bg-surface-dark-elevated px-lg py-md flex items-center justify-between border-b border-white/5">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-muted-soft" data-icon="terminal">terminal</span>
+<span class="font-code text-on-dark-soft text-body-sm">auth_provider.py</span>
+</div>
+<span class="text-[10px] uppercase tracking-widest text-muted-soft font-bold">Python 3.11</span>
+</div>
+<div class="p-lg font-code text-code overflow-x-auto">
+<div class="flex">
+<span class="w-10 text-muted-soft select-none pr-4 text-right">01</span>
+<span class="text-on-dark"><span class="text-primary-fixed-dim">import</span> os</span>
+</div>
+<div class="flex">
+<span class="w-10 text-muted-soft select-none pr-4 text-right">02</span>
+<span class="text-on-dark"><span class="text-primary-fixed-dim">from</span> typing <span class="text-primary-fixed-dim">import</span> Optional</span>
+</div>
+<div class="flex">
+<span class="w-10 text-muted-soft select-none pr-4 text-right">03</span>
+<span> </span>
+</div>
+<div class="flex">
+<span class="w-10 text-muted-soft select-none pr-4 text-right">04</span>
+<span class="text-tertiary-fixed-dim">class</span> <span class="text-tertiary-fixed">SessionManager</span>:
+                            </div>
+<div class="flex">
+<span class="w-10 text-muted-soft select-none pr-4 text-right">05</span>
+<span class="text-on-dark">    <span class="text-primary-fixed-dim">def</span> <span class="text-tertiary-fixed-dim">__init__</span>(self, token: str):</span>
+</div>
+<div class="flex">
+<span class="w-10 text-muted-soft select-none pr-4 text-right">06</span>
+<span class="text-on-dark">        self.token = token</span>
+</div>
+<div class="flex">
+<span class="w-10 text-muted-soft select-none pr-4 text-right">07</span>
+<span class="text-on-dark">        self.is_valid = <span class="text-primary-fixed-dim">False</span></span>
+</div>
+</div>
+</div>
+<!-- Diff Card (Dark Navy) -->
+<div class="lg:col-span-8 bg-surface-dark-soft rounded-xl overflow-hidden flex flex-col border border-ink/20 shadow-lg">
+<div class="bg-surface-dark-elevated px-lg py-md flex items-center gap-md border-b border-white/5">
+<span class="material-symbols-outlined text-muted-soft" data-icon="difference">difference</span>
+<span class="font-code text-on-dark-soft text-body-sm">changeset: d5f21a</span>
+</div>
+<div class="font-code text-code p-0">
+<div class="px-lg py-1 border-l-4 border-transparent text-muted-soft opacity-50">@@ -14,8 +14,9 @@</div>
+<div class="px-lg py-1 border-l-4 border-transparent text-on-dark-soft">   def validate(self):</div>
+<div class="px-lg py-1 border-l-4 border-error/40 diff-removed">
+<span>-</span>     return self.token.is_active()
+                            </div>
+<div class="px-lg py-1 border-l-4 border-tertiary/40 diff-added">
+<span>+</span>     if not self.token: return False
+                            </div>
+<div class="px-lg py-1 border-l-4 border-tertiary/40 diff-added">
+<span>+</span>     return self.token.is_active and not self.expired
+                            </div>
+<div class="px-lg py-1 border-l-4 border-transparent text-on-dark-soft">   def logout(self):</div>
+</div>
+</div>
+<!-- Terminal Card (ANSI Style) -->
+<div class="lg:col-span-4 bg-surface-dark-soft rounded-xl overflow-hidden flex flex-col border border-ink/20 shadow-inner">
+<div class="bg-surface-dark-elevated px-md py-xs flex gap-1.5 border-b border-white/5">
+<div class="w-2.5 h-2.5 rounded-full bg-error opacity-40"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-primary-fixed-dim opacity-40"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-tertiary-fixed opacity-40"></div>
+</div>
+<div class="p-lg font-code text-code h-full min-h-[200px] terminal-scroll overflow-y-auto">
+<div class="text-on-dark mb-1">$ pytest tests/auth_suite.py</div>
+<div class="text-muted-soft mb-1">================= test session starts =================</div>
+<div class="flex justify-between mb-1">
+<span class="text-on-dark">test_token_validation</span>
+<span class="text-tertiary-fixed-dim font-bold">PASSED [ 25%]</span>
+</div>
+<div class="flex justify-between mb-1">
+<span class="text-on-dark">test_session_timeout</span>
+<span class="text-tertiary-fixed-dim font-bold">PASSED [ 50%]</span>
+</div>
+<div class="flex justify-between mb-1">
+<span class="text-on-dark">test_expired_access</span>
+<span class="text-tertiary-fixed-dim font-bold">PASSED [ 75%]</span>
+</div>
+<div class="flex justify-between mb-1">
+<span class="text-on-dark">test_logout_cleanup</span>
+<span class="text-tertiary-fixed-dim font-bold">PASSED [100%]</span>
+</div>
+<div class="text-tertiary-fixed-dim font-bold mt-4">✓ 4 passed in 0.23s</div>
+<div class="text-on-dark mt-2 animate-pulse">█</div>
+</div>
+</div>
+</div>
+<!-- Content Area Spacer -->
+<div class="h-32"></div>
+</div>
+</main>
+</div>
+<!-- Footer -->
+<footer class="bg-surface-dark-soft border-t border-ink/30 px-section py-xl mt-auto">
+<div class="max-w-[1000px] mx-auto flex flex-col md:flex-row justify-between items-center gap-xl">
+<div class="flex flex-col gap-sm">
+<span class="font-display-sm text-on-dark font-bold">SuperAgent</span>
+<p class="text-on-dark-soft text-body-sm max-w-sm">Humanist AI for structural analysis and iterative development. Built with precision and care for the digital editorial space.</p>
+</div>
+<div class="flex gap-xl text-on-dark-soft text-body-sm">
+<div class="flex flex-col gap-xs">
+<span class="text-on-dark font-medium mb-xs">Product</span>
+<a class="hover:text-tertiary-fixed-dim transition-colors" href="#">Documentation</a>
+<a class="hover:text-tertiary-fixed-dim transition-colors" href="#">API Reference</a>
+<a class="hover:text-tertiary-fixed-dim transition-colors" href="#">Changelog</a>
+</div>
+<div class="flex flex-col gap-xs">
+<span class="text-on-dark font-medium mb-xs">Company</span>
+<a class="hover:text-tertiary-fixed-dim transition-colors" href="#">About</a>
+<a class="hover:text-tertiary-fixed-dim transition-colors" href="#">Journal</a>
+<a class="hover:text-tertiary-fixed-dim transition-colors" href="#">Support</a>
+</div>
+</div>
+</div>
+<div class="max-w-[1000px] mx-auto mt-xl pt-lg border-t border-white/5 flex flex-col md:flex-row justify-between text-[12px] text-muted-soft uppercase tracking-widest">
+<span>© 2024 SuperAgent Technologies</span>
+<div class="flex gap-lg mt-md md:mt-0">
+<a class="hover:text-on-dark transition-colors" href="#">Privacy Policy</a>
+<a class="hover:text-on-dark transition-colors" href="#">Terms of Service</a>
+</div>
+</div>
+</footer>
+<!-- FAB for Create New Analysis (Mobile only) -->
+<button class="md:hidden fixed bottom-md right-md w-14 h-14 bg-primary text-on-primary rounded-full shadow-xl flex items-center justify-center z-50 hover:bg-primary-active active:scale-95 transition-all">
+<span class="material-symbols-outlined text-3xl" data-icon="add">add</span>
+</button>
+<script>
+        // Micro-interaction for list items
+        document.querySelectorAll('li.group').forEach(item => {
+            item.addEventListener('click', () => {
+                const checkbox = item.querySelector('.material-symbols-outlined');
+                const text = item.querySelector('span:last-child');
+                const box = item.querySelector('div');
+                
+                if (checkbox.textContent === 'check') {
+                    checkbox.textContent = '';
+                    text.classList.remove('line-through', 'opacity-60');
+                    text.classList.add('body-strong', 'font-medium');
+                    box.classList.remove('bg-tertiary');
+                } else {
+                    checkbox.textContent = 'check';
+                    text.classList.add('line-through', 'opacity-60');
+                    text.classList.remove('body-strong', 'font-medium');
+                    box.classList.add('bg-tertiary');
+                }
+            });
+        });
+
+        // Simple smooth scroll behavior for main
+        const main = document.querySelector('main');
+        main.addEventListener('scroll', () => {
+            const header = document.querySelector('header');
+            if (main.scrollTop > 10) {
+                header.classList.add('shadow-sm');
+            } else {
+                header.classList.remove('shadow-sm');
+            }
+        });
+    </script>
+</body></html>

@@ -2,6 +2,7 @@ import http, { type IncomingMessage, type Server, type ServerResponse } from "no
 import type { AddressInfo, Socket } from "node:net";
 import { handleHealth, writeError } from "./health";
 import { serveStatic } from "./static";
+import { SocketHub } from "./socket-hub";
 
 export interface ServerOptions {
   port?: number;
@@ -37,6 +38,7 @@ export class WebServer {
   private readonly routes: Route[] = [];
   private readonly sockets = new Set<Socket>();
   private readonly server: Server;
+  private io?: SocketHub;
   private activePort?: number;
 
   constructor(options: ServerOptions = {}) {
@@ -59,6 +61,14 @@ export class WebServer {
     return this.server;
   }
 
+  attachSocketIO(): SocketHub {
+    this.io ??= new SocketHub(this.server, () => this.activePort ?? this.initialPort);
+    return this.io;
+  }
+
+  getIO(): SocketHub {
+    return this.attachSocketIO();
+  }
   use(path: string, handler: RouteHandler): void {
     this.routes.push({ path, handler });
   }
@@ -70,6 +80,7 @@ export class WebServer {
         await this.listen(port);
         const activePort = this.resolveActivePort();
         this.activePort = activePort;
+        this.attachSocketIO();
         return {
           host: this.host,
           port: activePort,
