@@ -80,7 +80,7 @@ async function main(): Promise<void> {
     }
 
     if (cliMode.mode === "web") {
-      const exitCode = await startWebCommand(cliMode.options);
+      const exitCode = await startWebCommand({ ...cliMode.options, waitForSignal: true });
       process.exit(exitCode);
     }
 

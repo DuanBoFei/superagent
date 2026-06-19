@@ -1,5 +1,5 @@
 import { createReadStream, statSync } from "node:fs";
-import { extname, join, normalize, resolve } from "node:path";
+import { extname, join, normalize, relative, resolve } from "node:path";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { writeError } from "./health";
 
@@ -21,12 +21,18 @@ export function serveStatic(root: string, req: IncomingMessage, res: ServerRespo
   }
 
   const url = new URL(req.url, "http://localhost");
-  const pathname = normalize(decodeURIComponent(url.pathname));
+  const decodedPathname = decodeURIComponent(url.pathname);
+  if (decodedPathname.split(/[\\/]+/).includes("..")) {
+    writeError(res, 403, "FORBIDDEN", "Forbidden");
+    return true;
+  }
+  const pathname = normalize(decodedPathname);
   const relativePath = pathname === "/" ? "index.html" : pathname.slice(1);
   const rootPath = resolve(root);
   const filePath = resolve(join(rootPath, relativePath));
 
-  if (!filePath.startsWith(rootPath)) {
+  const rootRelativePath = relative(rootPath, filePath);
+  if (rootRelativePath.startsWith("..") || rootRelativePath === "..") {
     writeError(res, 403, "FORBIDDEN", "Forbidden");
     return true;
   }

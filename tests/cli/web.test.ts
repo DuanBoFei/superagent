@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { startWebCommand, type WebCommandServer } from "../../src/cli/web";
 import { WebLogger } from "../../src/server/logger";
 
@@ -7,6 +7,11 @@ function createLogger(output: string[]) {
 }
 
 describe("startWebCommand", () => {
+  afterEach(() => {
+    process.removeAllListeners("SIGINT");
+    process.removeAllListeners("SIGTERM");
+  });
+
   it("starts the server with web options and skips browser opening", async () => {
     const output: string[] = [];
     let receivedPort = 0;
@@ -69,5 +74,27 @@ describe("startWebCommand", () => {
 
     expect(result).toBe(1);
     expect(output.join("\n")).toContain("Failed to start web server: port unavailable");
+  });
+
+  it("waits for SIGINT and shuts down the server", async () => {
+    const output: string[] = [];
+    const shutdown = vi.fn(async () => undefined);
+
+    const command = startWebCommand({
+      noOpen: true,
+      waitForSignal: true,
+      logger: createLogger(output),
+      createServer: () => ({
+        start: async () => ({ host: "127.0.0.1", port: 3456, url: "http://localhost:3456", pid: 123 }),
+        shutdown,
+      }),
+    });
+
+    await vi.waitFor(() => expect(process.listenerCount("SIGINT")).toBeGreaterThan(0));
+    process.emit("SIGINT");
+
+    await expect(command).resolves.toBe(0);
+    expect(shutdown).toHaveBeenCalledWith(1000);
+    expect(output.join("\n")).toContain("Web server stopped");
   });
 });

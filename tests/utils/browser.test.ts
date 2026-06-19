@@ -24,4 +24,27 @@ describe("openBrowser", () => {
     expect(result.skipped).toBe(false);
     expect(result.error).toBe("missing opener");
   });
+
+  it.each([
+    ["darwin", "open", ["http://localhost:3456"], undefined],
+    ["win32", "start", ["", "http://localhost:3456"], true],
+    ["linux", "xdg-open", ["http://localhost:3456"], undefined],
+  ] as const)("uses the %s platform opener", async (platform, command, args, shell) => {
+    const calls: unknown[] = [];
+    const result = await openBrowser("http://localhost:3456", {
+      env: {},
+      platform,
+      spawn: ((receivedCommand: string, receivedArgs: string[], options: unknown) => {
+        calls.push([receivedCommand, receivedArgs, options]);
+        const child = new EventEmitter() as any;
+        child.unref = () => undefined;
+        queueMicrotask(() => child.emit("spawn"));
+        return child;
+      }) as any,
+    });
+
+    expect(result).toEqual({ opened: true, skipped: false });
+    expect(calls).toHaveLength(1);
+    expect(calls[0]).toMatchObject([command, args, { shell }]);
+  });
 });
