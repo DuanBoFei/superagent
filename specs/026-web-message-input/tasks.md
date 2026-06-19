@@ -169,7 +169,7 @@
 - **验证方式**: 组件测试：Enter/Shift+Enter/Esc 行为正确；粘贴换行保留；超过 50k 字符被拦截
 - **预计时间**: 5 min
 
-#### T011 [FE]: 实现 useInputHistory 输入历史 hook
+#### T011 [FE]: 实现 useInputHistory 输入历史 hook ✅
 
 - **FR 来源**: FR-MI-12
 - **依赖**: 无
