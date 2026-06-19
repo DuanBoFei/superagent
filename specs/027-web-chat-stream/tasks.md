@@ -43,7 +43,7 @@
 - **验证方式**: 单元测试：CommonMark 测试用例解析正确
 - **预计时间**: 2 hr
 
-#### T003 [BE]: 配置 DOMPurify Markdown 白名单 (B+ 策略)
+#### [x] T003 [BE]: 配置 DOMPurify Markdown 白名单 (B+ 策略)
 
 - **FR 来源**: FR-XSS-01 ~ FR-XSS-05
 - **依赖**: T001
