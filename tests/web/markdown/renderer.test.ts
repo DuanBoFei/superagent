@@ -48,4 +48,22 @@ describe("renderMarkdown", () => {
     expect(html).toContain('<a class="markdown-link" target="_blank" rel="noopener noreferrer">bad</a>');
     expect(html).not.toContain("javascript:");
   });
+
+  it("renders images with lazy loading and bounded layout", () => {
+    const ast = parseMarkdown('![Alt](https://example.com/image.png "Preview")');
+    const html = renderMarkdown(ast);
+
+    expect(html).toContain(
+      '<img class="markdown-image" src="https://example.com/image.png" alt="Alt" title="Preview" loading="lazy">',
+    );
+    expect(html).toContain('<span class="markdown-image-skeleton" aria-hidden="true"></span>');
+  });
+
+  it("renders broken image fallback text and drops unsafe image urls", () => {
+    const ast = parseMarkdown("![Bad](javascript:alert(1))");
+    const html = renderMarkdown(ast);
+
+    expect(html).toContain('<span class="markdown-image-fallback" role="img" aria-label="Bad">Bad</span>');
+    expect(html).not.toContain("javascript:");
+  });
 });

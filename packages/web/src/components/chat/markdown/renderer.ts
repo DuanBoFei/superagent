@@ -28,6 +28,8 @@ function renderNode(node: MarkdownNode): string {
       return renderListItem(node);
     case "link":
       return renderLink(node);
+    case "image":
+      return renderImage(node);
     case "inlineCode":
       return `<code class="markdown-inline-code">${escapeHtml(node.value)}</code>`;
     case "thematicBreak":
@@ -57,6 +59,16 @@ function renderLink(node: MarkdownNode & { type: "link" }): string {
   const href = isSafeUrl(node.url) ? ` href="${escapeAttribute(node.url)}"` : "";
   const title = node.title ? ` title="${escapeAttribute(node.title)}"` : "";
   return `<a class="markdown-link"${href}${title} target="_blank" rel="noopener noreferrer">${renderMarkdown(node.children)}</a>`;
+}
+
+function renderImage(node: MarkdownNode & { type: "image" }): string {
+  const alt = escapeAttribute(node.alt);
+  if (!isSafeUrl(node.url)) {
+    return `<span class="markdown-image-fallback" role="img" aria-label="${alt}">${escapeHtml(node.alt)}</span>`;
+  }
+
+  const title = node.title ? ` title="${escapeAttribute(node.title)}"` : "";
+  return `<span class="markdown-image-frame"><span class="markdown-image-skeleton" aria-hidden="true"></span><img class="markdown-image" src="${escapeAttribute(node.url)}" alt="${alt}"${title} loading="lazy"></span>`;
 }
 
 function renderTaskCheckbox(checked: boolean | undefined): string {
