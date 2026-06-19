@@ -97,9 +97,14 @@ function renderTableCell(node: MarkdownNode & { type: "tableCell" }): string {
 
 function renderCodeBlock(node: MarkdownNode & { type: "codeBlock" }): string {
   const language = node.lang?.trim() || "text";
-  const lines = highlightCode(node.value, language).split("\n");
-  const code = lines.map((line, index) => `<span class="markdown-code-line"><span class="markdown-code-line-number" aria-hidden="true">${index + 1}</span><span class="markdown-code-line-content">${line}</span></span>`).join("\n");
-  return `<figure class="markdown-code-block" data-language="${escapeAttribute(language)}"><figcaption class="markdown-code-header"><span>${getLanguageName(language)}</span></figcaption><pre class="markdown-code-pre"><code>${code}</code></pre></figure>`;
+  const highlightedLines = highlightCode(node.value, language).split("\n");
+  const collapsed = highlightedLines.length > 30;
+  const visibleLines = collapsed ? highlightedLines.slice(0, 10) : highlightedLines;
+  const code = visibleLines.map((line, index) => `<span class="markdown-code-line"><span class="markdown-code-line-number" aria-hidden="true">${index + 1}</span><span class="markdown-code-line-content">${line}</span></span>`).join("\n");
+  const copy = `<button class="markdown-code-copy" type="button" data-copy="${escapeAttribute(node.value)}" aria-label="Copy code">Copy</button>`;
+  const toggle = collapsed ? `<button class="markdown-code-toggle" type="button" data-expanded="false">Expand ${highlightedLines.length} lines</button>` : "";
+  const collapsedAttr = collapsed ? ' data-collapsed="true"' : "";
+  return `<figure class="markdown-code-block" data-language="${escapeAttribute(language)}"${collapsedAttr}><figcaption class="markdown-code-header"><span>${getLanguageName(language)}</span>${copy}</figcaption><pre class="markdown-code-pre"><code>${code}</code></pre>${toggle}</figure>`;
 }
 
 function renderTaskCheckbox(checked: boolean | undefined): string {

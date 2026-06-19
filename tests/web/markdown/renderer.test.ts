@@ -83,9 +83,25 @@ describe("renderMarkdown", () => {
     const html = renderMarkdown(ast);
 
     expect(html).toContain('<figure class="markdown-code-block" data-language="ts">');
-    expect(html).toContain('<figcaption class="markdown-code-header"><span>TypeScript</span></figcaption>');
+    expect(html).toContain('<figcaption class="markdown-code-header"><span>TypeScript</span>');
     expect(html).toContain('<span class="markdown-code-line-number" aria-hidden="true">1</span>');
     expect(html).toContain('<span class="markdown-code-line-number" aria-hidden="true">2</span>');
     expect(html).toContain('<span class="token keyword">const</span> answer = <span class="token number">42</span>;');
+  });
+
+  it("adds copy button metadata without line numbers", () => {
+    const ast = parseMarkdown("```ts\nconst answer = 42;\n```");
+    const html = renderMarkdown(ast);
+
+    expect(html).toContain('<button class="markdown-code-copy" type="button" data-copy="const answer = 42;" aria-label="Copy code">Copy</button>');
+  });
+
+  it("marks code blocks longer than 30 lines as collapsed", () => {
+    const source = Array.from({ length: 31 }, (_, index) => `line ${index + 1}`).join("\n");
+    const ast = parseMarkdown(`\`\`\`txt\n${source}\n\`\`\``);
+    const html = renderMarkdown(ast);
+
+    expect(html).toContain(' data-collapsed="true"');
+    expect(html).toContain('<button class="markdown-code-toggle" type="button" data-expanded="false">Expand 31 lines</button>');
   });
 });
