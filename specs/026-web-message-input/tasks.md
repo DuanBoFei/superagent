@@ -60,7 +60,7 @@
 
 ### 并行组 B：状态管理与 Socket 层（可并行）
 
-#### T004 [BE]: 创建 Zustand Chat Store 基础
+#### T004 [BE]: 创建 Zustand Chat Store 基础 ✅
 
 - **FR 来源**: FR-MI-09, FR-MI-10, FR-MI-11
 - **依赖**: T001
