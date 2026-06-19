@@ -29,7 +29,7 @@
 - **验证方式**: TypeScript 编译无错误，类型覆盖完整
 - **预计时间**: 2 min
 
-#### T002 [BE]: 创建 DOMPurify 封装与 UUID 工具
+#### T002 [BE]: 创建 DOMPurify 封装与 UUID 工具 ✅
 
 - **FR 来源**: FR-MI-07 (XSS 防护隐含)
 - **依赖**: 无
