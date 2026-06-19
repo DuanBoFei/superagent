@@ -153,7 +153,7 @@
 - **验证方式**: 组件测试：渲染各种 role/status 组合，视觉正确
 - **预计时间**: 4 min
 
-#### T010 [FE]: 创建 InputBox 底部输入框组件
+#### T010 [FE]: 创建 InputBox 底部输入框组件 ✅
 
 - **FR 来源**: FR-MI-01 ~ FR-MI-05, FR-MI-12, FR-MI-13, FR-MI-14, FR-MI-20
 - **依赖**: T002 (UUID)

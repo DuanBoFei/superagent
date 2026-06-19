@@ -1,7 +1,7 @@
 # 实施进度 · web-message-input
 
 ## 当前任务
-[>] T010 · 创建 InputBox 底部输入框组件
+[>] T011 · 实现 useInputHistory 输入历史 hook
 
 ## 已完成
 - [x] T001 · 创建 Message 类型与 Socket 协议定义
@@ -13,9 +13,10 @@
 - [x] T007 · 实现 Socket 服务端事件处理器
 - [x] T008 · 完善 RuntimeBridge 完整实现
 - [x] T009 · 创建 MessageBubble 消息气泡组件
+- [x] T010 · 创建 InputBox 底部输入框组件
 
 ## 阻塞项
 （无）
 
 ## 最后更新
-2026-06-19 21:49
+2026-06-19 21:50
