@@ -66,4 +66,15 @@ describe("renderMarkdown", () => {
     expect(html).toContain('<span class="markdown-image-fallback" role="img" aria-label="Bad">Bad</span>');
     expect(html).not.toContain("javascript:");
   });
+
+  it("renders tables with headers, body rows, alignment, and overflow wrapper", () => {
+    const ast = parseMarkdown("| Name | Value |\n| :--- | ---: |\n| foo | 1 |");
+    const html = renderMarkdown(ast);
+
+    expect(html).toContain('<div class="markdown-table-wrapper" role="region" aria-label="Markdown table">');
+    expect(html).toContain('<table class="markdown-table">');
+    expect(html).toContain('<thead><tr class="markdown-table-row"><th class="markdown-table-cell markdown-table-header" align="left">Name</th>');
+    expect(html).toContain('<tbody><tr class="markdown-table-row"><td class="markdown-table-cell" align="left">foo</td>');
+    expect(html).toContain('<td class="markdown-table-cell" align="right">1</td>');
+  });
 });

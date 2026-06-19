@@ -30,6 +30,8 @@ function renderNode(node: MarkdownNode): string {
       return renderLink(node);
     case "image":
       return renderImage(node);
+    case "table":
+      return renderTable(node);
     case "inlineCode":
       return `<code class="markdown-inline-code">${escapeHtml(node.value)}</code>`;
     case "thematicBreak":
@@ -69,6 +71,25 @@ function renderImage(node: MarkdownNode & { type: "image" }): string {
 
   const title = node.title ? ` title="${escapeAttribute(node.title)}"` : "";
   return `<span class="markdown-image-frame"><span class="markdown-image-skeleton" aria-hidden="true"></span><img class="markdown-image" src="${escapeAttribute(node.url)}" alt="${alt}"${title} loading="lazy"></span>`;
+}
+
+function renderTable(node: MarkdownNode & { type: "table" }): string {
+  const headerRows = node.children.filter((row) => row.children.some((cell) => cell.header));
+  const bodyRows = node.children.filter((row) => row.children.every((cell) => !cell.header));
+  const head = headerRows.length > 0 ? `<thead>${headerRows.map(renderTableRow).join("")}</thead>` : "";
+  const body = bodyRows.length > 0 ? `<tbody>${bodyRows.map(renderTableRow).join("")}</tbody>` : "";
+  return `<div class="markdown-table-wrapper" role="region" aria-label="Markdown table"><table class="markdown-table">${head}${body}</table></div>`;
+}
+
+function renderTableRow(node: MarkdownNode & { type: "tableRow" }): string {
+  return `<tr class="markdown-table-row">${node.children.map(renderTableCell).join("")}</tr>`;
+}
+
+function renderTableCell(node: MarkdownNode & { type: "tableCell" }): string {
+  const tag = node.header ? "th" : "td";
+  const headerClass = node.header ? " markdown-table-header" : "";
+  const align = node.align ? ` align="${node.align}"` : "";
+  return `<${tag} class="markdown-table-cell${headerClass}"${align}>${renderMarkdown(node.children)}</${tag}>`;
 }
 
 function renderTaskCheckbox(checked: boolean | undefined): string {
