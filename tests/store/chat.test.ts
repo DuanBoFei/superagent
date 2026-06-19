@@ -1,5 +1,5 @@
-import { beforeEach, describe, expect, it } from "vitest";
-import { createChatStore } from "../../packages/web/src/store/chat";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { createChatStore, createQueueProcessor } from "../../packages/web/src/store/chat";
 import type { Message } from "../../packages/web/src/types/message";
 
 describe("chat store", () => {
@@ -53,5 +53,23 @@ describe("chat store", () => {
     expect(store.processNextMessage()).toBe("msg_0");
     store.dequeueMessage("msg_0");
     expect(store.getState().pendingQueue).toEqual(["msg_1", "msg_2", "msg_3", "msg_4"]);
+  });
+
+  it("sends queued messages in order and advances after completion", () => {
+    const send = vi.fn();
+    const processor = createQueueProcessor(store, send);
+
+    store.addMessage({ id: "msg_1", role: "user", content: "one", timestamp: 1, status: "pending" });
+    store.addMessage({ id: "msg_2", role: "user", content: "two", timestamp: 2, status: "pending" });
+    store.enqueueMessage("msg_1");
+    store.enqueueMessage("msg_2");
+
+    expect(processor.process()).toBe("msg_1");
+    expect(send).toHaveBeenLastCalledWith(expect.objectContaining({ id: "msg_1", status: "sending" }));
+    expect(store.getState().messages[0]?.status).toBe("sending");
+
+    expect(processor.complete("msg_1")).toBe("msg_2");
+    expect(store.getState().pendingQueue).toEqual(["msg_2"]);
+    expect(send).toHaveBeenLastCalledWith(expect.objectContaining({ id: "msg_2", status: "sending" }));
   });
 });

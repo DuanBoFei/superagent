@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { RuntimeBridge } from "../../src/server/runtime-bridge";
 import { registerClientMessageHandler } from "../../src/server/socket-handlers";
 import { createChatStore } from "../../packages/web/src/store/chat";
-import type { ClientMessageEvent, MessageCompleteEvent, StreamTokenEvent } from "../../packages/web/src/types/message";
+import type { ClientMessageEvent, MessageCompleteEvent, MessageErrorEvent, StreamTokenEvent } from "../../packages/web/src/types/message";
 import type { TurnEvent } from "../../src/runtime/types";
 
 describe("web message flow", () => {
@@ -35,5 +35,27 @@ describe("web message flow", () => {
     expect(emitted.map((item) => item.event)).toEqual(["stream_token", "stream_token", "message_complete"]);
     expect(store.getState().messages[0].content).toBe("hello");
     expect(store.getState().messages[0].status).toBe("sent");
+  });
+
+  it("maps runtime failures into chat error state", async () => {
+    async function* startTurn(): AsyncGenerator<TurnEvent> {
+      yield { type: "error", message: "runtime failed" };
+    }
+
+    const store = createChatStore("session_1");
+    const bridge = new RuntimeBridge({ startTurn: vi.fn(startTurn) });
+    const handler = registerClientMessageHandler({ startTurn: (message) => bridge.routeToRuntime(message) });
+    const emitted: Array<{ event: string; payload: unknown }> = [];
+    const socket = { emit: (event: string, payload: unknown) => emitted.push({ event, payload }) };
+    const message: ClientMessageEvent = { messageId: "msg_1", sessionId: "session_1", content: "go", timestamp: 1 };
+
+    store.addMessage({ id: "assistant_1", role: "assistant", content: "", timestamp: 2, status: "streaming" });
+    await handler(socket, message);
+
+    const error = emitted.find((item) => item.event === "message_error")?.payload as MessageErrorEvent;
+    store.markError("assistant_1", error.message);
+
+    expect(error).toMatchObject({ message: "runtime failed", retryable: true });
+    expect(store.getState().messages[0]).toMatchObject({ status: "error", error: "runtime failed" });
   });
 });

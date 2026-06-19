@@ -12,6 +12,7 @@ export interface ChatStore {
   getState(): ChatState;
   setConnected(isConnected: boolean): void;
   setSession(sessionId: string): void;
+  replaceMessages(messages: Message[]): void;
   addMessage(message: Message): void;
   updateMessage(id: string, updates: Partial<Message>): void;
   appendToken(id: string, token: string): void;
@@ -30,6 +31,15 @@ export interface SessionStorageLike {
 
 export interface SessionStore {
   createNewSession(): string;
+}
+
+export interface SessionHistorySource {
+  loadMessages(sessionId: string): Promise<Message[]>;
+}
+
+export interface QueueProcessor {
+  process(): string | undefined;
+  complete(id: string): string | undefined;
 }
 
 export function createChatStore(sessionId: string): ChatStore {
@@ -59,6 +69,9 @@ export function createChatStore(sessionId: string): ChatStore {
         isConnected: state.isConnected,
         pendingQueue: [],
       };
+    },
+    replaceMessages: (messages) => {
+      state = { ...state, messages: [...messages], streamingMessageId: messages.find((message) => message.status === "streaming")?.id };
     },
     addMessage: (message) => {
       state = {
@@ -127,6 +140,32 @@ export function createSessionStore(
       storage.setItem("superagent_session_id", sessionId);
       store.setSession(sessionId);
       return sessionId;
+    },
+  };
+}
+
+export async function loadSessionHistory(store: ChatStore, source: SessionHistorySource): Promise<void> {
+  const messages = await source.loadMessages(store.getState().currentSessionId);
+  store.replaceMessages(messages);
+}
+
+export function createQueueProcessor(store: ChatStore, send: (message: Message) => void): QueueProcessor {
+  const process = () => {
+    const id = store.processNextMessage();
+    const message = store.getState().messages.find((item) => item.id === id);
+    if (!message) {
+      return undefined;
+    }
+    store.updateMessage(message.id, { status: "sending" });
+    send({ ...message, status: "sending" });
+    return message.id;
+  };
+
+  return {
+    process,
+    complete: (id) => {
+      store.dequeueMessage(id);
+      return process();
     },
   };
 }

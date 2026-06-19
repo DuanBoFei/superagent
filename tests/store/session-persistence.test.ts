@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
-import { createChatStore, createSessionStore, initializeSessionId } from "../../packages/web/src/store/chat";
+import { describe, expect, it, vi } from "vitest";
+import { createChatStore, createSessionStore, initializeSessionId, loadSessionHistory } from "../../packages/web/src/store/chat";
 
 function memoryStorage(initial: Record<string, string> = {}) {
   const data = new Map(Object.entries(initial));
@@ -36,5 +36,17 @@ describe("session persistence", () => {
     expect(store.getState().currentSessionId).toBe("session_next");
     expect(store.getState().messages).toEqual([]);
     expect(storage.getItem("superagent_session_id")).toBe("session_next");
+  });
+
+  it("loads persisted messages for the current session", async () => {
+    const store = createChatStore("session_1");
+    const source = {
+      loadMessages: vi.fn(async () => [{ id: "m1", role: "assistant" as const, content: "restored", timestamp: 1, status: "sent" as const }]),
+    };
+
+    await loadSessionHistory(store, source);
+
+    expect(source.loadMessages).toHaveBeenCalledWith("session_1");
+    expect(store.getState().messages).toEqual([{ id: "m1", role: "assistant", content: "restored", timestamp: 1, status: "sent" }]);
   });
 });
