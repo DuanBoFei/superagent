@@ -42,4 +42,16 @@ describe("chat store", () => {
 
     expect(store.getState().messages[0]).toMatchObject({ status: "error", error: "failed" });
   });
+
+  it("limits pending messages to five and processes FIFO", () => {
+    for (let index = 0; index < 5; index++) {
+      expect(store.enqueueMessage(`msg_${index}`)).toBe(true);
+    }
+
+    expect(store.enqueueMessage("msg_5")).toBe(false);
+    expect(store.getState().pendingQueue).toEqual(["msg_0", "msg_1", "msg_2", "msg_3", "msg_4"]);
+    expect(store.processNextMessage()).toBe("msg_0");
+    store.dequeueMessage("msg_0");
+    expect(store.getState().pendingQueue).toEqual(["msg_1", "msg_2", "msg_3", "msg_4"]);
+  });
 });

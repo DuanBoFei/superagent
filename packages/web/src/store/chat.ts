@@ -4,6 +4,7 @@ export interface ChatState {
   messages: Message[];
   currentSessionId: string;
   isConnected: boolean;
+  pendingQueue: string[];
   streamingMessageId?: string;
 }
 
@@ -15,6 +16,9 @@ export interface ChatStore {
   appendToken(id: string, token: string): void;
   markComplete(id: string, stats?: TokenUsageStats): void;
   markError(id: string, error: string): void;
+  enqueueMessage(id: string): boolean;
+  processNextMessage(): string | undefined;
+  dequeueMessage(id: string): void;
 }
 
 export function createChatStore(sessionId: string): ChatStore {
@@ -22,6 +26,7 @@ export function createChatStore(sessionId: string): ChatStore {
     messages: [],
     currentSessionId: sessionId,
     isConnected: false,
+    pendingQueue: [],
   };
 
   const updateMessage = (id: string, updates: Partial<Message>) => {
@@ -63,6 +68,17 @@ export function createChatStore(sessionId: string): ChatStore {
       if (state.streamingMessageId === id) {
         state = { ...state, streamingMessageId: undefined };
       }
+    },
+    enqueueMessage: (id) => {
+      if (state.pendingQueue.length >= 5) {
+        return false;
+      }
+      state = { ...state, pendingQueue: [...state.pendingQueue, id] };
+      return true;
+    },
+    processNextMessage: () => state.pendingQueue[0],
+    dequeueMessage: (id) => {
+      state = { ...state, pendingQueue: state.pendingQueue.filter((queuedId) => queuedId !== id) };
     },
   };
 }
