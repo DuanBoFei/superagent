@@ -120,7 +120,7 @@
 - **验证方式**: 集成测试：发消息 → 收到 stream_token → 收到 message_complete
 - **预计时间**: 5 min
 
-#### T008 [INT]: 完善 RuntimeBridge 完整实现
+#### T008 [INT]: 完善 RuntimeBridge 完整实现 ✅
 
 - **FR 来源**: 所有
 - **依赖**: T007
