@@ -77,4 +77,15 @@ describe("renderMarkdown", () => {
     expect(html).toContain('<tbody><tr class="markdown-table-row"><td class="markdown-table-cell" align="left">foo</td>');
     expect(html).toContain('<td class="markdown-table-cell" align="right">1</td>');
   });
+
+  it("renders code blocks with language label, highlighted code, and visual line numbers", () => {
+    const ast = parseMarkdown("```ts\nconst answer = 42;\nconsole.log(answer);\n```");
+    const html = renderMarkdown(ast);
+
+    expect(html).toContain('<figure class="markdown-code-block" data-language="ts">');
+    expect(html).toContain('<figcaption class="markdown-code-header"><span>TypeScript</span></figcaption>');
+    expect(html).toContain('<span class="markdown-code-line-number" aria-hidden="true">1</span>');
+    expect(html).toContain('<span class="markdown-code-line-number" aria-hidden="true">2</span>');
+    expect(html).toContain('<span class="token keyword">const</span> answer = <span class="token number">42</span>;');
+  });
 });

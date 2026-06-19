@@ -1,3 +1,4 @@
+import { getLanguageName, highlightCode } from "../../../lib/markdown/syntax-highlight";
 import type { MarkdownNode } from "../../../types/markdown";
 
 export function renderMarkdown(nodes: MarkdownNode[]): string {
@@ -34,6 +35,8 @@ function renderNode(node: MarkdownNode): string {
       return renderTable(node);
     case "inlineCode":
       return `<code class="markdown-inline-code">${escapeHtml(node.value)}</code>`;
+    case "codeBlock":
+      return renderCodeBlock(node);
     case "thematicBreak":
       return '<hr class="markdown-rule">';
     case "lineBreak":
@@ -90,6 +93,13 @@ function renderTableCell(node: MarkdownNode & { type: "tableCell" }): string {
   const headerClass = node.header ? " markdown-table-header" : "";
   const align = node.align ? ` align="${node.align}"` : "";
   return `<${tag} class="markdown-table-cell${headerClass}"${align}>${renderMarkdown(node.children)}</${tag}>`;
+}
+
+function renderCodeBlock(node: MarkdownNode & { type: "codeBlock" }): string {
+  const language = node.lang?.trim() || "text";
+  const lines = highlightCode(node.value, language).split("\n");
+  const code = lines.map((line, index) => `<span class="markdown-code-line"><span class="markdown-code-line-number" aria-hidden="true">${index + 1}</span><span class="markdown-code-line-content">${line}</span></span>`).join("\n");
+  return `<figure class="markdown-code-block" data-language="${escapeAttribute(language)}"><figcaption class="markdown-code-header"><span>${getLanguageName(language)}</span></figcaption><pre class="markdown-code-pre"><code>${code}</code></pre></figure>`;
 }
 
 function renderTaskCheckbox(checked: boolean | undefined): string {
