@@ -183,7 +183,7 @@
 - **验证方式**: 单元测试：hook API 正确；在三种浏览器中手动验证
 - **预计时间**: 45 min
 
-#### T012 [FE]: 实现 useMarkdownStream hook (流式解析核心)
+#### [x] T012 [FE]: 实现 useMarkdownStream hook (流式解析核心)
 
 - **FR 来源**: FR-ST-01, FR-ST-02, FR-ST-03, FR-ST-04, NFR-MD-01, NFR-MD-04
 - **依赖**: T002 (parser), T001
