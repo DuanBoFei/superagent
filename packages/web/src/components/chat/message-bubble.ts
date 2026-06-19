@@ -1,5 +1,6 @@
 import type { Message } from "../../types/message";
 import { sanitizeHtml } from "../../utils/dompurify";
+import { renderMarkdown } from "./markdown/renderer";
 
 const STATUS_LABELS: Record<Message["status"], string> = {
   pending: "Pending",
@@ -13,7 +14,7 @@ const STATUS_LABELS: Record<Message["status"], string> = {
 export function renderMessageBubble(message: Message): string {
   const alignment = message.role === "user" ? "justify-end" : "justify-start";
   const surface = message.role === "user" ? "bg-neutral-800 border-neutral-700" : "bg-neutral-950 border-neutral-800";
-  const content = sanitizeHtml(message.content);
+  const content = message.role === "assistant" && message.ast ? renderMarkdown(message.ast) : sanitizeHtml(message.content);
   const error = message.status === "error" && message.error ? renderError(message.error) : "";
 
   return `<article class="message-row flex ${alignment} py-1" data-message-id="${escapeAttribute(message.id)}" data-role="${message.role}" data-status="${message.status}">

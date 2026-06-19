@@ -1,3 +1,4 @@
+import { parseMarkdown, parsePartial } from "../lib/markdown/parser";
 import type { Message, TokenUsageStats } from "../types/message";
 
 export interface ChatState {
@@ -86,11 +87,15 @@ export function createChatStore(sessionId: string): ChatStore {
       if (!message) {
         return;
       }
-      updateMessage(id, { content: `${message.content}${token}`, status: "streaming" });
+      const content = `${message.content}${token}`;
+      const parsed = message.role === "assistant" ? parsePartial(content) : undefined;
+      updateMessage(id, { content, status: "streaming", ast: parsed?.ast, partialStructure: parsed?.partialStructure });
       state = { ...state, streamingMessageId: id };
     },
     markComplete: (id, _stats) => {
-      updateMessage(id, { status: "sent" });
+      const message = state.messages.find((item) => item.id === id);
+      const markdown = message?.role === "assistant" ? { ast: parseMarkdown(message.content), partialStructure: "none" as const } : undefined;
+      updateMessage(id, { status: "sent", ...markdown });
       if (state.streamingMessageId === id) {
         state = { ...state, streamingMessageId: undefined };
       }

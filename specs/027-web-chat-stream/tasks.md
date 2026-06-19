@@ -198,7 +198,7 @@
 - **验证方式**: 单元测试：快速追加 tokens，AST 正确增长；流式过程无闪烁
 - **预计时间**: 3 hr
 
-#### T013 [INT]: 扩展 Zustand store 并集成到 MessageBubble
+#### [x] T013 [INT]: 扩展 Zustand store 并集成到 MessageBubble
 
 - **FR 来源**: FR-ST-05
 - **依赖**: T012, T001, 026 Feature

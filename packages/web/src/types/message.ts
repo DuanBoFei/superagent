@@ -1,3 +1,5 @@
+import type { MarkdownNode, MarkdownPartialStructure } from "./markdown";
+
 export type MessageRole = "user" | "assistant";
 
 export type MessageStatus = "pending" | "sending" | "streaming" | "sent" | "error" | "cancelled";
@@ -9,6 +11,8 @@ export interface Message {
   timestamp: number;
   status: MessageStatus;
   error?: string;
+  ast?: MarkdownNode[];
+  partialStructure?: MarkdownPartialStructure;
 }
 
 export interface TokenUsageStats {
