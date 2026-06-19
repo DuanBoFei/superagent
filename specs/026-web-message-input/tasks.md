@@ -183,7 +183,7 @@
 - **验证方式**: 单元测试：加入 3 条，navigateUp 3 次验证返回正确文本
 - **预计时间**: 3 min
 
-#### T012 [FE]: 实现 useVirtualScroll 虚拟滚动 hook
+#### T012 [FE]: 实现 useVirtualScroll 虚拟滚动 hook ✅
 
 - **FR 来源**: FR-MI-18, NFR-MI-08
 - **依赖**: 无

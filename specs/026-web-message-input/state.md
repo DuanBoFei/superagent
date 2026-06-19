@@ -1,7 +1,7 @@
 # 实施进度 · web-message-input
 
 ## 当前任务
-[>] T012 · 实现 useVirtualScroll 虚拟滚动 hook
+[>] T013 · 创建 MessageList 消息列表组件
 
 ## 已完成
 - [x] T001 · 创建 Message 类型与 Socket 协议定义
@@ -15,9 +15,10 @@
 - [x] T009 · 创建 MessageBubble 消息气泡组件
 - [x] T010 · 创建 InputBox 底部输入框组件
 - [x] T011 · 实现 useInputHistory 输入历史 hook
+- [x] T012 · 实现 useVirtualScroll 虚拟滚动 hook
 
 ## 阻塞项
 （无）
 
 ## 最后更新
-2026-06-19 21:51
+2026-06-19 21:52
