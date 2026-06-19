@@ -1,0 +1,40 @@
+import { describe, expect, it } from "vitest";
+import { createChatStore, createSessionStore, initializeSessionId } from "../../packages/web/src/store/chat";
+
+function memoryStorage(initial: Record<string, string> = {}) {
+  const data = new Map(Object.entries(initial));
+  return {
+    getItem: (key: string) => data.get(key) ?? null,
+    setItem: (key: string, value: string) => data.set(key, value),
+    removeItem: (key: string) => data.delete(key),
+  };
+}
+
+describe("session persistence", () => {
+  it("loads an existing session id from storage", () => {
+    const storage = memoryStorage({ superagent_session_id: "session_existing" });
+
+    expect(initializeSessionId(storage)).toBe("session_existing");
+  });
+
+  it("creates and persists a new session id", () => {
+    const storage = memoryStorage();
+    const sessionId = initializeSessionId(storage, () => "session_new");
+
+    expect(sessionId).toBe("session_new");
+    expect(storage.getItem("superagent_session_id")).toBe("session_new");
+  });
+
+  it("creates a new session and clears messages", () => {
+    const storage = memoryStorage({ superagent_session_id: "session_old" });
+    const store = createChatStore("session_old");
+    const sessions = createSessionStore(store, storage, () => "session_next");
+
+    store.addMessage({ id: "m1", role: "user", content: "hello", timestamp: 1, status: "sent" });
+    sessions.createNewSession();
+
+    expect(store.getState().currentSessionId).toBe("session_next");
+    expect(store.getState().messages).toEqual([]);
+    expect(storage.getItem("superagent_session_id")).toBe("session_next");
+  });
+});

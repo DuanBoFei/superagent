@@ -11,6 +11,7 @@ export interface ChatState {
 export interface ChatStore {
   getState(): ChatState;
   setConnected(isConnected: boolean): void;
+  setSession(sessionId: string): void;
   addMessage(message: Message): void;
   updateMessage(id: string, updates: Partial<Message>): void;
   appendToken(id: string, token: string): void;
@@ -19,6 +20,16 @@ export interface ChatStore {
   enqueueMessage(id: string): boolean;
   processNextMessage(): string | undefined;
   dequeueMessage(id: string): void;
+}
+
+export interface SessionStorageLike {
+  getItem(key: string): string | null;
+  setItem(key: string, value: string): unknown;
+  removeItem(key: string): unknown;
+}
+
+export interface SessionStore {
+  createNewSession(): string;
 }
 
 export function createChatStore(sessionId: string): ChatStore {
@@ -40,6 +51,14 @@ export function createChatStore(sessionId: string): ChatStore {
     getState: () => state,
     setConnected: (isConnected) => {
       state = { ...state, isConnected };
+    },
+    setSession: (sessionId) => {
+      state = {
+        messages: [],
+        currentSessionId: sessionId,
+        isConnected: state.isConnected,
+        pendingQueue: [],
+      };
     },
     addMessage: (message) => {
       state = {
@@ -79,6 +98,35 @@ export function createChatStore(sessionId: string): ChatStore {
     processNextMessage: () => state.pendingQueue[0],
     dequeueMessage: (id) => {
       state = { ...state, pendingQueue: state.pendingQueue.filter((queuedId) => queuedId !== id) };
+    },
+  };
+}
+
+export function initializeSessionId(
+  storage: SessionStorageLike,
+  createId: () => string = () => `session_${crypto.randomUUID()}`,
+): string {
+  const existing = storage.getItem("superagent_session_id");
+  if (existing) {
+    return existing;
+  }
+
+  const sessionId = createId();
+  storage.setItem("superagent_session_id", sessionId);
+  return sessionId;
+}
+
+export function createSessionStore(
+  store: ChatStore,
+  storage: SessionStorageLike,
+  createId: () => string = () => `session_${crypto.randomUUID()}`,
+): SessionStore {
+  return {
+    createNewSession: () => {
+      const sessionId = createId();
+      storage.setItem("superagent_session_id", sessionId);
+      store.setSession(sessionId);
+      return sessionId;
     },
   };
 }

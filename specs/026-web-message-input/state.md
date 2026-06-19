@@ -1,7 +1,7 @@
 # 实施进度 · web-message-input
 
 ## 当前任务
-[>] T014 · 集成会话 ID localStorage 持久化
+[>] T015 · 组装完整 Chat 页面 + 端到端联调
 
 ## 已完成
 - [x] T001 · 创建 Message 类型与 Socket 协议定义
@@ -17,9 +17,10 @@
 - [x] T011 · 实现 useInputHistory 输入历史 hook
 - [x] T012 · 实现 useVirtualScroll 虚拟滚动 hook
 - [x] T013 · 创建 MessageList 消息列表组件
+- [x] T014 · 集成会话 ID localStorage 持久化
 
 ## 阻塞项
 （无）
 
 ## 最后更新
-2026-06-19 21:53
+2026-06-19 21:55
