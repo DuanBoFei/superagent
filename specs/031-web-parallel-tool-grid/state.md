@@ -1,10 +1,16 @@
 # 实施进度 · web-parallel-tool-grid
 
 ## 当前任务
-[>] T003 · 实现 Derived State Selectors
+[ ] T004 · Tool Orchestrator 事件订阅集成
 
 ## 已完成
 - [x] T001 · ToolGrid TypeScript 类型定义（2026-06-20）
+- [x] T002 · ToolGrid Store Slice（2026-06-20）
+- [x] T003 · Derived State Selectors（2026-06-20）
+  - 文件: `packages/web/src/store/slices/tool-grid.selectors.ts` (135 行)
+  - 测试: `tests/web/tool-grid-selectors.test.ts` (30 tests, all passed)
+  - selectFilteredTools / selectSortedTools / selectFailedTools / selectResourceMetrics / selectGridStats
+  - 全部为纯函数，零 store 依赖
   - 文件: `packages/web/src/types/tool-grid.ts` (90 行)
   - ToolStatus, ToolCardData, ToolGridState, ResourceMetrics, BulkAction, GridColumns
   - calculateColumns() 响应式列数计算函数
@@ -24,4 +30,4 @@
 （无）
 
 ## 最后更新
-2026-06-20 12:00
+2026-06-20 12:05
