@@ -1,7 +1,7 @@
 # 实施进度 · web-parallel-tool-grid
 
 ## 当前任务
-[ ] T011 · ViewToggle
+[ ] T012 · ResourceBarChart
 
 ## 已完成
 - [x] T001 · ToolGrid TypeScript 类型定义（2026-06-20）
@@ -104,6 +104,15 @@
   - Status/Duration/Name 三字段 + All/Running/Failed/Completed 四筛选
   - 全组合测试 (3×2×4=24 combos) 均通过
   - escapeHtml/escapeAttr XSS 防护
+
+- [x] T011 · ViewToggle（2026-06-20）
+  - 文件: `packages/web/src/components/chat/tool-grid/ViewToggle.ts` (12 行)
+  - 测试: `tests/web/view-toggle.test.ts` (15 tests, all passed)
+  - renderViewToggle() 纯函数 — 返回 Grid/List 视图切换按钮组 HTML
+  - 两个按钮: data-action="set-view-grid" / data-action="set-view-list"
+  - 当前视图: view-active-grid / view-active-list CSS class + aria-pressed true/false
+  - role="group" + aria-label="View mode"
+  - 每个按钮独立 aria-label + aria-pressed 无障碍标注
 
 ## 最后更新
 2026-06-20 12:22
