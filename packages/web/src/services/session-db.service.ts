@@ -47,7 +47,7 @@ FROM sessions_fts fts
 JOIN sessions s ON s.id = fts.session_id
 WHERE sessions_fts MATCH ?
 ORDER BY rank
-LIMIT ?
+LIMIT ? OFFSET ?
 `;
 
 const UPDATE_SQL = `
@@ -165,22 +165,30 @@ export class SessionDbService {
     deleteMany();
   }
 
-  async searchSessions(query: SearchQuery): Promise<SessionSummary[]> {
+  async searchSessions(
+    query: SearchQuery,
+    pagination?: { limit?: number; offset?: number },
+  ): Promise<SessionSummary[]> {
     const { text, dateRange, statusFilter, tagsFilter } = query;
+    const limit = pagination?.limit ?? 50;
+    const offset = pagination?.offset ?? 0;
 
-    // FTS5 search
+    // FTS5 search with prefix matching on the last token
     let rows: SessionDbQueryResult[];
     if (text && text.trim()) {
-      const ftsQuery = `"${text.replace(/"/g, '""')}"`;
+      const trimmed = text.trim();
+      const escaped = trimmed.replace(/"/g, '""');
+      // Use prefix search: append * to make it a prefix query
+      const ftsQuery = `"${escaped}"*`;
       rows = this.db
         .prepare(SEARCH_SQL)
-        .all(ftsQuery, 50) as SessionDbQueryResult[];
+        .all(ftsQuery, limit, offset) as SessionDbQueryResult[];
     } else {
       rows = this.db
         .prepare(
-          `SELECT ${SUMMARY_COLS} FROM sessions s ORDER BY s.updated_at DESC LIMIT 50`,
+          `SELECT ${SUMMARY_COLS} FROM sessions s ORDER BY s.updated_at DESC LIMIT ? OFFSET ?`,
         )
-        .all() as SessionDbQueryResult[];
+        .all(limit, offset) as SessionDbQueryResult[];
     }
 
     // Filters

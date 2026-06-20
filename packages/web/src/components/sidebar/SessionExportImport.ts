@@ -38,6 +38,14 @@ export function validateImportPayload(data: unknown): data is ExportFormatV1 {
   return true;
 }
 
+export function createExportBlob(
+  payload: ExportFormatV1,
+  _prefix?: string,
+): Blob {
+  const json = JSON.stringify(payload);
+  return new Blob([json], { type: "application/json" });
+}
+
 function generateUUID(): string {
   // RFC 4122 v4 UUID
   const hex = Array.from({ length: 32 }, () =>

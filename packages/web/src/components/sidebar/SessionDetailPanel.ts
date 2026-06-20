@@ -6,9 +6,11 @@ import { renderTerminal } from "../chat/terminal/TerminalRenderer";
 
 export interface SessionDetailPanelOptions {
   session: Session;
+  maxEntries?: number;
   onFork?: (messageIndex: number) => void;
   onClose?: () => void;
   onTagClick?: (tag: string) => void;
+  onLoadMore?: () => void;
 }
 
 export interface SessionDetailPanelController {
@@ -188,11 +190,15 @@ function buildTimeline(session: Session): TimelineEntry[] {
 // ── Render ─────────────────────────────────────────────
 
 export function renderSessionDetailPanel(options: SessionDetailPanelOptions): string {
-  const { session } = options;
+  const { session, maxEntries } = options;
 
   const hasForkedFrom = session.forkedFrom !== null;
   const timeline = buildTimeline(session);
   const isEmpty = timeline.length === 0;
+  const limit = maxEntries ?? 50;
+  const hasMore = timeline.length > limit;
+  const visible = hasMore ? timeline.slice(0, limit) : timeline;
+  const remaining = timeline.length - limit;
 
   // Header
   const headerHtml = `<div class="session-detail-header border-b border-neutral-800 px-4 py-3">
@@ -227,7 +233,7 @@ export function renderSessionDetailPanel(options: SessionDetailPanelOptions): st
     timelineHtml = `<div class="session-detail-empty flex items-center justify-center py-12 text-neutral-600 text-sm">No messages in this session</div>`;
   } else {
     timelineHtml = `<div class="session-detail-timeline px-4 py-3 space-y-3">`;
-    for (const entry of timeline) {
+    for (const entry of visible) {
       if (entry.type === "message" && entry.message) {
         const forkBtn = `<button class="session-detail-fork-btn text-[11px] text-neutral-600 hover:text-emerald-400 transition-colors ml-2" data-action="fork-from-here" data-message-index="${entry.messageIndex}" type="button" title="Fork from this message">Fork</button>`;
         timelineHtml += `<div class="timeline-row flex items-start gap-2">
@@ -241,9 +247,19 @@ export function renderSessionDetailPanel(options: SessionDetailPanelOptions): st
     timelineHtml += `</div>`;
   }
 
+  // Load more
+  const loadMoreHtml = hasMore
+    ? `<div class="session-detail-load-more px-4 py-3 border-t border-neutral-800">
+        <button class="w-full text-xs text-neutral-400 hover:text-neutral-200 py-1.5 rounded border border-neutral-800 hover:bg-neutral-800/50 transition-colors" data-action="load-more" type="button">
+          Load more &middot; <span class="text-neutral-500">${remaining} remaining</span> &middot; <span class="text-neutral-600">${timeline.length} entries</span>
+        </button>
+      </div>`
+    : "";
+
   return `<div class="session-detail-panel flex flex-col h-full bg-neutral-950 border-l border-neutral-800 overflow-y-auto">
     ${headerHtml}
     ${timelineHtml}
+    ${loadMoreHtml}
   </div>`;
 }
 
@@ -253,7 +269,7 @@ export function createSessionDetailPanelController(
   el: HTMLElement,
   options: SessionDetailPanelOptions,
 ): SessionDetailPanelController {
-  const { onClose, onFork, onTagClick } = options;
+  const { onClose, onFork, onTagClick, onLoadMore } = options;
 
   function onClick(e: MouseEvent): void {
     const target = e.target as HTMLElement;
@@ -261,6 +277,12 @@ export function createSessionDetailPanelController(
     const closeBtn = target.closest<HTMLElement>('[data-action="close-detail"]');
     if (closeBtn) {
       onClose?.();
+      return;
+    }
+
+    const loadMoreBtn = target.closest<HTMLElement>('[data-action="load-more"]');
+    if (loadMoreBtn) {
+      onLoadMore?.();
       return;
     }
 
