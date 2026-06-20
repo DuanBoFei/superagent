@@ -1,9 +1,17 @@
 # 实施进度 · web-parallel-tool-grid
 
 ## 当前任务
-[ ] T017 · TerminalRenderer 懒加载集成
+[ ] T018 · 输出预览节流优化
 
 ## 已完成
+- [x] T017 · TerminalRenderer 懒加载集成（2026-06-20）
+  - 文件: `packages/web/src/components/chat/tool-grid/ToolCard.ts` (修改，+7 行)
+  - 测试: `tests/web/tool-card-terminal-renderer.test.ts` (12 tests, all passed)
+  - renderOutput() 新增 toolName 参数，展开 + bash 工具走 renderTerminal() ANSI 着色
+  - 折叠态保持纯文本输出（不加载 TerminalRenderer）
+  - 非 bash 工具（read/grep）展开时用 escapeHtml 纯文本，不走终端渲染
+  - renderBashOutputAsync() 动态 import TerminalRenderer，支持异步懒加载
+  - 回归通过: tool-card.test.ts 27 tests 全绿
 - [x] T001 · ToolGrid TypeScript 类型定义（2026-06-20）
 - [x] T016 · 028 ToolCard 集成替换（2026-06-20）
   - 文件: `packages/web/src/components/chat/cards/CardRenderer.ts` (修改，+48 行)
@@ -169,4 +177,4 @@
   - undoClear 恢复时保留 cancelledAt
 
 ## 最后更新
-2026-06-20 12:35
+2026-06-20 12:40

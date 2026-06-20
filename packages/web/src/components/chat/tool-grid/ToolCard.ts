@@ -2,6 +2,7 @@ import type { ToolCardData } from "../../../types/tool-grid";
 import type { ToolTimerState } from "../../../hooks/use-tool-timer";
 import { renderToolProgressBar } from "./ToolProgressBar";
 import { renderToolTimer } from "./ToolTimer";
+import { renderTerminal } from "../terminal/TerminalRenderer";
 
 // ── Tool Label ──────────────────────────────────────────
 
@@ -54,8 +55,14 @@ function renderParams(params: Record<string, unknown>): string {
 
 // ── Output Rendering ────────────────────────────────────
 
-function renderOutput(preview: string[], full: string, expanded: boolean): string {
+function renderOutput(preview: string[], full: string, expanded: boolean, toolName?: string): string {
   if (!full && preview.length === 0) return "";
+
+  if (expanded && toolName === "bash") {
+    // Use TerminalRenderer for ANSI color rendering
+    const terminalHtml = renderTerminal(full, { maxLines: 500 });
+    return `<div class="tool-output-full">${terminalHtml}</div>`;
+  }
 
   if (expanded) {
     const lines = full.split("\n").map((line) => `<span class="tool-output-line">${escapeHtml(line)}</span>`).join("\n");
@@ -64,6 +71,13 @@ function renderOutput(preview: string[], full: string, expanded: boolean): strin
 
   const previewLines = preview.map((line) => `<span class="tool-output-line">${escapeHtml(line)}</span>`).join("\n");
   return `<div class="tool-output-preview"><pre class="tool-output-pre">${previewLines}</pre></div>`;
+}
+
+// ── Async Lazy Loading ──────────────────────────────────
+
+export async function renderBashOutputAsync(content: string): Promise<string> {
+  const { renderTerminal } = await import("../terminal/TerminalRenderer");
+  return renderTerminal(content, { maxLines: 500 });
 }
 
 // ── Error Rendering ─────────────────────────────────────
@@ -95,7 +109,7 @@ export function renderToolCard(data: ToolCardData): string {
 
   const progressBar = renderToolProgressBar({ progress, status });
   const paramsSection = renderParams(parameters);
-  const outputSection = renderOutput(outputPreview, fullOutput, isExpanded);
+  const outputSection = renderOutput(outputPreview, fullOutput, isExpanded, toolName);
   const errorSection = error ? renderError(error) : "";
 
   return `<div class="tool-card card-status-${escapeAttr(status)}" data-tool-id="${escapeAttr(toolId)}" data-status="${escapeAttr(status)}">
