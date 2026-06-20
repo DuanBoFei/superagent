@@ -147,6 +147,9 @@ export function createToolGridSlice(): ToolGridSlice {
     failTool(id: string, error: ToolError): void {
       const tool = tools.get(id);
       if (!tool) return;
+      if (tool.status === "success" || tool.status === "failed" || tool.status === "cancelled") {
+        return; // Idempotent
+      }
       const { endTime, durationMs } = recordEndTime(id);
       tools.set(id, { ...tool, status: "failed", endTime, durationMs, error });
       cleanupAbortController(id);

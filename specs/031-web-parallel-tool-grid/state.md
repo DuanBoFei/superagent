@@ -1,16 +1,20 @@
 # 实施进度 · web-parallel-tool-grid
 
 ## 当前任务
-[ ] T004 · Tool Orchestrator 事件订阅集成
+[ ] T005 · ToolProgressBar 组件
 
 ## 已完成
 - [x] T001 · ToolGrid TypeScript 类型定义（2026-06-20）
 - [x] T002 · ToolGrid Store Slice（2026-06-20）
 - [x] T003 · Derived State Selectors（2026-06-20）
-  - 文件: `packages/web/src/store/slices/tool-grid.selectors.ts` (135 行)
-  - 测试: `tests/web/tool-grid-selectors.test.ts` (30 tests, all passed)
-  - selectFilteredTools / selectSortedTools / selectFailedTools / selectResourceMetrics / selectGridStats
-  - 全部为纯函数，零 store 依赖
+- [x] T004 · Tool Orchestrator 事件订阅集成（2026-06-20）
+  - 文件: `packages/web/src/hooks/use-tool-grid.ts` (105 行)
+  - 测试: `tests/web/use-tool-grid.test.ts` (23 tests, all passed)
+  - createToolGridSubscriber() factory — ToolGridEventSubscriber 接口
+  - onToolStart → addTool() 映射，onToolOutput → appendOutput() 映射
+  - onToolComplete → completeTool()/failTool() 分流，onToolError → failTool()
+  - safeParse() 助手 — Zod schema 校验 + console.warn 降级
+  - Slice 增强: failTool() 添加幂等性检查（与 completeTool 一致）
   - 文件: `packages/web/src/types/tool-grid.ts` (90 行)
   - ToolStatus, ToolCardData, ToolGridState, ResourceMetrics, BulkAction, GridColumns
   - calculateColumns() 响应式列数计算函数
@@ -25,9 +29,14 @@
   - Undo 机制: getUndoStack/undoClear (保留原插入顺序)
   - 错误聚合: getFailedTools
   - 网格状态: setSort/setFilter/setViewMode/toggleErrorExpanded/toggleExpanded
+- [x] T003 · Derived State Selectors（2026-06-20）
+  - 文件: `packages/web/src/store/slices/tool-grid.selectors.ts` (135 行)
+  - 测试: `tests/web/tool-grid-selectors.test.ts` (30 tests, all passed)
+  - selectFilteredTools / selectSortedTools / selectFailedTools / selectResourceMetrics / selectGridStats
+  - 全部为纯函数，零 store 依赖
 
 ## 阻塞项
 （无）
 
 ## 最后更新
-2026-06-20 12:05
+2026-06-20 12:10
