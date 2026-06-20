@@ -33,7 +33,7 @@ describe("renderBashCard", () => {
   it("renders ANSI-colored output via the parser", () => {
     const html = renderBashCard(card({ content: { command: "echo", args: [], output: "\x1b[31merror\x1b[0m", exitCode: 0, durationMs: 50 } }));
     // Red ANSI code should be converted to color style
-    expect(html).toContain("color:#cc0000");
+    expect(html).toContain("color:#ff5555");
     expect(html).toContain("error");
   });
 
