@@ -46,17 +46,18 @@ export function renderResourceBarChart(props: ResourceBarChartProps): string {
 
   const tabs = METRIC_TABS.map((tab) => {
     const activeClass = selectedMetric === tab.metric ? ` metric-active-${tab.metric}` : "";
-    return `<button class="metric-tab${activeClass}" data-action="select-metric-${tab.metric}">${escapeHtml(tab.label)}</button>`;
+    const selected = selectedMetric === tab.metric ? "true" : "false";
+    return `<button class="metric-tab${activeClass}" data-action="select-metric-${tab.metric}" role="tab" aria-selected="${selected}" tabindex="0">${escapeHtml(tab.label)}</button>`;
   }).join("");
 
   let chartBody: string;
   if (completed.length === 0) {
-    chartBody = `<div class="chart-no-data no-data">No completed tools</div>`;
+    chartBody = `<div class="chart-no-data no-data" role="listitem" aria-label="No completed tools">No completed tools</div>`;
   } else {
     const rows = completed.map(({ tool, value }) => {
       const pct = maxValue > 0 ? Math.round((value / maxValue) * 100) : 100;
       const label = selectedMetric === "duration" ? formatDuration(value) : formatBytes(value);
-      return `<div class="tool-chart-row" data-tool-id="${escapeAttr(tool.toolId)}">
+      return `<div class="tool-chart-row" data-tool-id="${escapeAttr(tool.toolId)}" role="listitem" aria-label="${escapeAttr(tool.toolName)}: ${escapeAttr(label)}">
         <span class="tool-chart-name">${escapeHtml(tool.toolName)}</span>
         <span class="tool-chart-bar-wrap">
           <span class="tool-chart-bar ${statusColorClass(tool.status)}" style="width:${pct}%"></span>
@@ -67,9 +68,9 @@ export function renderResourceBarChart(props: ResourceBarChartProps): string {
     chartBody = rows;
   }
 
-  return `<div class="resource-bar-chart">
-  <div class="chart-metric-tabs">${tabs}</div>
-  <div class="chart-bars">${chartBody}</div>
+  return `<div class="resource-bar-chart" role="figure" aria-label="Resource usage chart">
+  <div class="chart-metric-tabs" role="tablist" aria-label="Metric selection">${tabs}</div>
+  <div class="chart-bars" role="list" aria-label="Tool resource comparison">${chartBody}</div>
 </div>`;
 }
 

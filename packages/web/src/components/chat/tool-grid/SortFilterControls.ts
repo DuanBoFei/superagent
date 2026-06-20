@@ -38,13 +38,13 @@ export function renderSortFilterControls(props: SortFilterControlsProps): string
   }).join("");
 
   return `<div class="sort-filter-controls">
-  <div class="sort-controls-section">
+  <div class="sort-controls-section" role="group" aria-label="Sort controls">
     <select class="sort-select" data-action="sort-by" aria-label="Sort by">
       ${sortOptions}
     </select>
     <button class="sort-direction-toggle ${directionClass}" data-action="toggle-sort-order" aria-label="Sort ${directionLabel}">${directionLabel}</button>
   </div>
-  <div class="filter-controls-section">
+  <div class="filter-controls-section" role="group" aria-label="Filter controls">
     ${filterButtons}
   </div>
 </div>`;

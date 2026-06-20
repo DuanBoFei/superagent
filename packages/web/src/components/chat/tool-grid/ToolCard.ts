@@ -102,7 +102,7 @@ export function renderToolCard(data: ToolCardData): string {
     <span class="tool-card-label">${escapeHtml(label)}</span>
     <span class="tool-card-name font-mono text-xs text-neutral-400">${escapeHtml(toolName)}</span>
     ${renderToolTimer(timerState)}
-    <button class="tool-card-toggle" data-action="toggle-card" aria-expanded="${expandedAttr}" aria-label="${isExpanded ? "Collapse" : "Expand"} tool card">
+    <button class="tool-card-toggle" data-action="toggle-card" data-keyboard="enter space" aria-expanded="${expandedAttr}" aria-label="${isExpanded ? "Collapse" : "Expand"} tool card">
       <span class="tool-card-toggle-icon">${isExpanded ? "▼" : "▶"}</span>
     </button>
   </div>`;
@@ -112,7 +112,7 @@ export function renderToolCard(data: ToolCardData): string {
   const outputSection = renderOutput(outputPreview, fullOutput, isExpanded, toolName);
   const errorSection = error ? renderError(error) : "";
 
-  return `<div class="tool-card card-status-${escapeAttr(status)}" data-tool-id="${escapeAttr(toolId)}" data-status="${escapeAttr(status)}">
+  return `<div class="tool-card card-status-${escapeAttr(status)}" data-tool-id="${escapeAttr(toolId)}" data-status="${escapeAttr(status)}" role="article" aria-label="${escapeAttr(label)} tool: ${escapeAttr(toolName)}" tabindex="0">
   ${header}
   <div class="tool-card-body">
     ${paramsSection}

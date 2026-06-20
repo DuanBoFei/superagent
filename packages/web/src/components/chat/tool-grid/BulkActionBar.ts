@@ -25,7 +25,7 @@ export function renderBulkActionBar(props: BulkActionBarProps): string {
     clearButton = `<button class="bulk-action-btn bulk-action-clear${clearClass}" data-action="clear-completed"${clearDisabledAttr} aria-label="Clear ${completedCount} completed tools">Clear Completed</button>`;
   }
 
-  return `<div class="bulk-action-bar" role="toolbar" aria-label="Tool grid bulk actions">
+  return `<div class="bulk-action-bar" role="toolbar" aria-label="Tool grid bulk actions" aria-controls="tool-grid-region">
   <button class="bulk-action-btn bulk-action-cancel${cancelClass}" data-action="cancel-all"${cancelDisabledAttr} aria-label="Cancel ${runningCount} running tools">${escapeHtml(cancelLabel)}</button>
   <button class="bulk-action-btn bulk-action-expand" data-action="expand-all" aria-label="Expand all tool cards">Expand All</button>
   <button class="bulk-action-btn bulk-action-collapse" data-action="collapse-all" aria-label="Collapse all tool cards">Collapse All</button>

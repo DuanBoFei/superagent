@@ -21,8 +21,9 @@ export function renderToolProgressBar(props: ToolProgressBarProps): string {
   const ariaValuenow = isIndeterminate ? "" : String(clamp(progress!, 0, 100));
   const fillWidth = isIndeterminate ? "" : `width: ${clamp(progress!, 0, 100)}%`;
   const indeterminateClass = isIndeterminate ? " tool-progress-indeterminate" : "";
+  const ariaValuetext = isIndeterminate ? "indeterminate" : `${clamp(progress!, 0, 100)}% complete`;
 
-  return `<div class="tool-progress-track ${statusClass}" role="progressbar" aria-valuenow="${escapeAttr(ariaValuenow)}" aria-valuemin="0" aria-valuemax="100" aria-label="Tool progress: ${isIndeterminate ? "indeterminate" : ariaValuenow + "%"}">
+  return `<div class="tool-progress-track ${statusClass}" role="progressbar" aria-valuenow="${escapeAttr(ariaValuenow)}" aria-valuemin="0" aria-valuemax="100" aria-valuetext="${escapeAttr(ariaValuetext)}" aria-label="Tool progress: ${isIndeterminate ? "indeterminate" : ariaValuenow + "%"}">
   <div class="tool-progress-fill ${statusClass}${indeterminateClass}" style="${fillWidth}"></div>
 </div>`;
 }

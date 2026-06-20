@@ -16,7 +16,8 @@
     "test:visual": "playwright test",
     "test:visual:update": "playwright test --update-snapshots",
     "typecheck": "tsc --noEmit",
-    "lint": "biome check src/ tests/"
+    "lint": "biome check src/ tests/",
+    "lint:css": "stylelint \"packages/web/src/**/*.css\" \"tests/web/*.css\" --allow-empty-input"
   },
   "keywords": [
     "ai-agent",
@@ -49,6 +50,8 @@
     "axe-core": "^4.12.1",
     "biome": "^0.3.3",
     "jsdom": "^29.1.1",
+    "stylelint": "^17.13.0",
+    "stylelint-config-standard": "^40.0.0",
     "tsx": "^4.22.4",
     "typescript": "^5.5",
     "vitest": "^2"

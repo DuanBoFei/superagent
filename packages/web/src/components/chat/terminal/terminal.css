@@ -2,13 +2,16 @@
 
 /* ── Base terminal container ── */
 .terminal-renderer {
-  font-family: Consolas, Monaco, 'Source Code Pro', monospace;
+  font-family:
+    Consolas, Monaco, 'Source Code Pro',
+    'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji',
+    monospace;
   background: #1e1e1e;
   color: #d4d4d4;
   tab-size: 8;
-  -moz-tab-size: 8;
   user-select: text;
-  -webkit-user-select: text;
+  scrollbar-width: thin;
+  scrollbar-color: #444 #1a1a1a;
 }
 
 /* ── Lines ── */
@@ -23,14 +26,6 @@
   /* CJK characters approximate 2-char width */
   display: inline-block;
   text-align: center;
-}
-
-/* ── Emoji font stack ── */
-.terminal-renderer {
-  font-family:
-    Consolas, Monaco, 'Source Code Pro',
-    'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji',
-    monospace;
 }
 
 /* ── Blink animation ── */
@@ -76,7 +71,7 @@
 .terminal-bell-flash {
   position: absolute;
   inset: 0;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgb(255 255 255 / 0.08);
   pointer-events: none;
   animation: bell-flash 100ms ease-out;
 }
@@ -130,17 +125,17 @@
 
 /* ── Focus / keyboard navigation ── */
 .terminal-renderer:focus {
-  outline: 2px solid rgba(96, 165, 250, 0.5);
+  outline: 2px solid rgb(96 165 250 / 0.5);
+  outline-offset: 2px;
+}
+
+.terminal-renderer:focus-visible {
+  outline: 2px solid rgb(96 165 250);
   outline-offset: 2px;
 }
 
 .terminal-renderer:focus:not(:focus-visible) {
   outline: none;
-}
-
-.terminal-renderer:focus-visible {
-  outline: 2px solid rgb(96, 165, 250);
-  outline-offset: 2px;
 }
 
 /* ── Scrollbar styling (dark theme) ── */
@@ -162,26 +157,19 @@
   background: #555;
 }
 
-/* Firefox scrollbar */
-.terminal-renderer {
-  scrollbar-width: thin;
-  scrollbar-color: #444 #1a1a1a;
-}
-
 /* ── Viewport specific ── */
 .terminal-viewport {
   position: relative;
-  overflow-y: auto;
-  overflow-x: auto;
+  overflow: auto;
   background: #1e1e1e;
 }
 
 .terminal-viewport:focus {
-  outline: 2px solid rgba(96, 165, 250, 0.5);
+  outline: 2px solid rgb(96 165 250 / 0.5);
   outline-offset: 0;
 }
 
 /* ── Truncated notice ── */
 .terminal-truncated-notice {
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgb(255 255 255 / 0.1);
 }

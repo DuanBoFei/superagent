@@ -19,9 +19,11 @@ export function renderErrorAggregationPanel(failedTools: ToolCardData[], isExpan
   if (isExpanded) {
     const items = failedTools.map((tool) => {
       const errorMsg = tool.error?.message ?? "Unknown error";
-      return `<li class="error-item" data-tool-id="${escapeAttr(tool.toolId)}" data-action="scroll-to-tool" role="button" tabindex="0" aria-label="Jump to ${escapeAttr(tool.toolName)} error">
-        <span class="error-item-tool font-mono">${escapeHtml(tool.toolName)}</span>
-        <span class="error-item-message">${escapeHtml(errorMsg)}</span>
+      return `<li class="error-item" role="listitem">
+        <button class="error-item-btn" data-tool-id="${escapeAttr(tool.toolId)}" data-action="scroll-to-tool" data-keyboard="enter space" aria-label="Jump to ${escapeAttr(tool.toolName)} error">
+          <span class="error-item-tool font-mono">${escapeHtml(tool.toolName)}</span>
+          <span class="error-item-message">${escapeHtml(errorMsg)}</span>
+        </button>
       </li>`;
     }).join("\n");
 

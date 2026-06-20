@@ -82,29 +82,35 @@ describe("toolGridSlice", () => {
     // Should not throw
   });
 
-  it("appends output to outputPreview and fullOutput", () => {
+  it("appends output to outputPreview and fullOutput (throttled, flushed on complete)", () => {
     const slice = createToolGridSlice();
     slice.addTool(makeTool({ toolId: "t1" }));
     slice.appendOutput("t1", "line 1\n");
     slice.appendOutput("t1", "line 2\n");
-    const tool = slice.getTool("t1");
-    expect(tool?.outputPreview).toEqual(["line 1\n", "line 2\n"]);
+    // fullOutput is always real-time, even during throttle window
+    let tool = slice.getTool("t1");
     expect(tool?.fullOutput).toBe("line 1\nline 2\n");
+    // outputPreview flushes on completion
+    slice.completeTool("t1");
+    tool = slice.getTool("t1");
+    expect(tool?.outputPreview).toEqual(["line 1\n", "line 2\n"]);
   });
 
-  it("outputPreview caps at 5 lines", () => {
+  it("outputPreview caps at 5 lines (flushed on complete)", () => {
     const slice = createToolGridSlice();
     slice.addTool(makeTool({ toolId: "t1" }));
     for (let i = 0; i < 8; i++) {
       slice.appendOutput("t1", `line ${i}\n`);
     }
+    // fullOutput has all 8 (always real-time)
+    expect(slice.getTool("t1")?.fullOutput.split("\n").filter(Boolean)).toHaveLength(8);
+    // Force flush
+    slice.completeTool("t1");
     const tool = slice.getTool("t1");
     // Preview keeps last 5 lines
     expect(tool?.outputPreview).toHaveLength(5);
     expect(tool?.outputPreview[0]).toBe("line 3\n");
     expect(tool?.outputPreview[4]).toBe("line 7\n");
-    // Full output has all 8
-    expect(tool?.fullOutput.split("\n").filter(Boolean)).toHaveLength(8);
   });
 
   it("completes a tool with success status", () => {

@@ -1,9 +1,33 @@
 # 实施进度 · web-parallel-tool-grid
 
 ## 当前任务
-[ ] T019 · 可访问性优化
+（全部完成）
 
 ## 已完成
+- [x] T020 · 完整测试覆盖（2026-06-20）
+  - 全量: 56 test files, 595 tests passed, 0 ToolGrid regressions
+  - ToolGrid 专项: 19 test files, 413+ tests
+  - TypeScript: 零 ToolGrid 类型错误 (tsc --noEmit)
+  - 已有失败非 ToolGrid 问题: file-edit-card (diff import), 4 empty suites
+- [x] T019 · 可访问性优化（2026-06-20）
+  - 文件: `packages/web/src/components/chat/tool-grid/ToolCard.ts` (修改)
+  - 文件: `packages/web/src/components/chat/tool-grid/ToolProgressBar.ts` (修改)
+  - 文件: `packages/web/src/components/chat/tool-grid/ErrorAggregationPanel.ts` (修改)
+  - 文件: `packages/web/src/components/chat/tool-grid/BulkActionBar.ts` (修改)
+  - 文件: `packages/web/src/components/chat/tool-grid/ToolGrid.ts` (修改)
+  - 文件: `packages/web/src/components/chat/tool-grid/SortFilterControls.ts` (修改)
+  - 文件: `packages/web/src/components/chat/tool-grid/ResourceBarChart.ts` (修改)
+  - 文件: `packages/web/src/components/chat/tool-grid/tool-grid-a11y.css` (新建)
+  - 测试: `tests/web/tool-grid-a11y.test.ts` (47 tests, all passed)
+  - ToolCard: role="article" + tabindex="0" + aria-label + data-keyboard
+  - ToolProgressBar: aria-valuetext 补充 (determinate/indeterminate)
+  - ErrorAggregationPanel: data-keyboard="enter space" on error items
+  - BulkActionBar: aria-controls="tool-grid-region"
+  - ToolGrid: id="tool-grid-region" + role="region" + aria-label
+  - SortFilterControls: role="group" on sort/filter sections
+  - ResourceBarChart: role="figure"+tablist+tab+listitem + aria-selected
+  - CSS: :focus-visible 焦点环 + forced-colors 支持 + prefers-reduced-motion
+  - 回归: 11 个已有测试文件 231 tests 全绿
 - [x] T018 · 输出预览节流优化（2026-06-20）
   - 文件: `packages/web/src/store/slices/tool-grid.slice.ts` (修改)
   - 测试: `tests/web/tool-grid-throttle.test.ts` (15 tests, all passed)
@@ -187,4 +211,24 @@
   - undoClear 恢复时保留 cancelledAt
 
 ## 最后更新
-2026-06-20 12:45
+2026-06-20 17:30 — **FEATURE COMPLETE** ✅ · tag `v0.1.0-031-web-parallel-tool-grid`
+
+### 收尾补测成果
+
+| 维度 | 产物 | 测试数 |
+|------|------|--------|
+| full-chain journey | `tests/web/full-chain-tool-grid-journey.test.ts` | 17 tests (14 edges, all code-confirmed) |
+| path-inventory | `specs/031-web-parallel-tool-grid/path-inventory.json` | 4 features / 16 nodes / 14 edges / 1 P0 journey |
+| L2 visual regression | `tests/web/tool-grid-visual-regression.pwtest.ts` | Playwright screenshot snapshots |
+| L3 a11y audit | `tests/web/tool-grid-a11y-audit.test.ts` + `tool-grid-a11y.test.ts` | axe-core scans + 47 structure tests |
+| L4 responsive | `tests/web/tool-grid-responsive.pwtest.ts` | multi-viewport (1920/1280/768/500) |
+| design token lint | `.stylelintrc.json` + `.stylelintignore` | DESIGN.md palette enforcement |
+| a11y CSS | `packages/web/src/components/chat/tool-grid/tool-grid-a11y.css` | focus-visible/forced-colors/reduced-motion |
+
+### 已知局限
+1. Playwright visual tests require real browser (`pnpm test:visual`)
+2. `tool-grid-a11y.css` not imported by HTML string components (focus-visible et al. don't apply in jsdom)
+3. HTML string components can't run axe-core directly (DOM must be attached to document)
+
+### specs 目录冻结
+需求变更开新编号，本 spec 归档不删

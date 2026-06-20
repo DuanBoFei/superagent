@@ -1,0 +1,111 @@
+/* ── T019 · WCAG AA Accessibility ──────────────────────── */
+
+/* Keyboard focus indicators */
+.tool-card:focus-visible {
+  outline: 2px solid var(--color-accent, #10b981);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.tool-card-toggle:focus-visible,
+.bulk-action-btn:focus-visible,
+.filter-btn:focus-visible,
+.view-toggle-btn:focus-visible,
+.metric-tab:focus-visible,
+.error-item:focus-visible,
+.error-panel-toggle:focus-visible,
+.sort-direction-toggle:focus-visible,
+.sort-select:focus-visible {
+  outline: 2px solid var(--color-accent, #10b981);
+  outline-offset: 2px;
+}
+
+/* Skip link for keyboard users (hidden until focused) */
+.tool-grid-skip-link {
+  position: absolute;
+  top: -100%;
+  left: 0;
+  z-index: 1000;
+  padding: 8px 16px;
+  background: var(--color-accent, #10b981);
+  color: #0a0a0a;
+  font-family: Inter, sans-serif;
+  font-size: 14px;
+  border-radius: 4px;
+  text-decoration: none;
+}
+
+.tool-grid-skip-link:focus {
+  top: 8px;
+  left: 8px;
+}
+
+/* High contrast mode support */
+@media (forced-colors: active) {
+  .tool-card {
+    border: 1px solid ButtonText;
+  }
+
+  .tool-card-toggle,
+  .bulk-action-btn,
+  .filter-btn,
+  .view-toggle-btn,
+  .metric-tab,
+  .error-item,
+  .sort-direction-toggle {
+    border: 1px solid ButtonText;
+  }
+
+  .tool-card-toggle:focus-visible,
+  .bulk-action-btn:focus-visible,
+  .filter-btn:focus-visible,
+  .view-toggle-btn:focus-visible,
+  .metric-tab:focus-visible,
+  .error-item:focus-visible {
+    outline: 3px solid Highlight;
+  }
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .tool-progress-fill {
+    transition: none;
+  }
+
+  .tool-progress-indeterminate {
+    animation: none;
+  }
+
+  .tool-card-toggle-icon {
+    transition: none;
+  }
+
+  .error-panel-toggle-icon {
+    transition: none;
+  }
+
+  .tool-chart-bar {
+    transition: none;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Screen reader only utility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}

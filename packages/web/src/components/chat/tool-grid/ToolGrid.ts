@@ -73,7 +73,7 @@ export function renderToolGrid(props: ToolGridProps): string {
     }
   }
 
-  return `<div class="tool-grid view-mode-${viewMode} grid-cols-${columns}">
+  return `<div class="tool-grid view-mode-${viewMode} grid-cols-${columns}" id="tool-grid-region" role="region" aria-label="Tool execution grid">
   ${errorPanel}
   <div class="tool-grid-controls">
     ${bulkBar}

@@ -1,0 +1,227 @@
+{
+  "features": [
+    { "id": "026", "name": "web-message-input", "kind": "FE" },
+    { "id": "028", "name": "web-diff-display", "kind": "FE" },
+    { "id": "030", "name": "web-bash-terminal", "kind": "FE" },
+    { "id": "031", "name": "web-parallel-tool-grid", "kind": "FE" }
+  ],
+  "nodes": [
+    { "id": "tool-orchestrator", "feature": "026", "kind": "component", "label": "Tool Orchestrator (event emitter)", "provenance": { "file": "packages/web/src/hooks/use-tool-cards.ts", "line": 28 } },
+    { "id": "tool-events-schema", "feature": "026", "kind": "component", "label": "Tool event Zod validators", "provenance": { "file": "packages/web/src/types/tool-events.ts", "line": 1 } },
+    { "id": "cards-slice", "feature": "028", "kind": "datastore", "label": "Cards Zustand slice (legacy)", "provenance": { "file": "packages/web/src/store/slices/cards.slice.ts", "line": 1 } },
+    { "id": "card-renderer", "feature": "028", "kind": "component", "label": "CardRenderer (028-031 bridge)", "provenance": { "file": "packages/web/src/components/chat/cards/CardRenderer.ts", "line": 26 } },
+    { "id": "terminal-renderer", "feature": "030", "kind": "component", "label": "TerminalRenderer (ANSI to HTML)", "provenance": { "file": "packages/web/src/components/chat/terminal/TerminalRenderer.ts", "line": 25 } },
+    { "id": "ansi-parser", "feature": "030", "kind": "handler", "label": "ANSI escape code parser", "provenance": { "file": "packages/web/src/lib/ansi-parser.ts", "line": 1 } },
+    { "id": "tool-grid-subscriber", "feature": "031", "kind": "handler", "label": "ToolGrid subscriber (026→031 bridge)", "provenance": { "file": "packages/web/src/hooks/use-tool-grid.ts", "line": 38 } },
+    { "id": "tool-grid-slice", "feature": "031", "kind": "datastore", "label": "ToolGrid Zustand slice", "provenance": { "file": "packages/web/src/store/slices/tool-grid.slice.ts", "line": 70 } },
+    { "id": "tool-grid-selectors", "feature": "031", "kind": "component", "label": "ToolGrid derived selectors", "provenance": { "file": "packages/web/src/store/slices/tool-grid.selectors.ts", "line": 1 } },
+    { "id": "tool-grid-types", "feature": "031", "kind": "component", "label": "ToolGrid type definitions", "provenance": { "file": "packages/web/src/types/tool-grid.ts", "line": 1 } },
+    { "id": "tool-card", "feature": "031", "kind": "component", "label": "ToolCard (with TerminalRenderer import)", "provenance": { "file": "packages/web/src/components/chat/tool-grid/ToolCard.ts", "line": 5 } },
+    { "id": "tool-grid", "feature": "031", "kind": "component", "label": "ToolGrid main component", "provenance": { "file": "packages/web/src/components/chat/tool-grid/ToolGrid.ts", "line": 1 } },
+    { "id": "tool-progress-bar", "feature": "031", "kind": "component", "label": "ToolProgressBar (determinate/indeterminate)", "provenance": { "file": "packages/web/src/components/chat/tool-grid/ToolProgressBar.ts", "line": 1 } },
+    { "id": "error-aggregation", "feature": "031", "kind": "component", "label": "ErrorAggregationPanel", "provenance": { "file": "packages/web/src/components/chat/tool-grid/ErrorAggregationPanel.ts", "line": 1 } },
+    { "id": "bulk-action-bar", "feature": "031", "kind": "component", "label": "BulkActionBar (cancel/clear/undo)", "provenance": { "file": "packages/web/src/components/chat/tool-grid/BulkActionBar.ts", "line": 1 } },
+    { "id": "resource-bar-chart", "feature": "031", "kind": "component", "label": "ResourceBarChart", "provenance": { "file": "packages/web/src/components/chat/tool-grid/ResourceBarChart.ts", "line": 1 } },
+    { "id": "sort-filter-controls", "feature": "031", "kind": "component", "label": "SortFilterControls", "provenance": { "file": "packages/web/src/components/chat/tool-grid/SortFilterControls.ts", "line": 1 } }
+  ],
+  "edges": [
+    {
+      "id": "tool-orchestrator--event-->tool-grid-subscriber",
+      "from": "tool-orchestrator",
+      "to": "tool-grid-subscriber",
+      "type": "call",
+      "source": "code",
+      "status": "code-confirmed",
+      "provenance": { "file": "packages/web/src/hooks/use-tool-grid.ts", "line": 42 },
+      "feature_from": "026",
+      "feature_to": "031",
+      "notes": "ToolStart/ToolOutput/ToolComplete/ToolError events parsed via Zod and dispatched to grid slice"
+    },
+    {
+      "id": "tool-events-schema--import-->tool-grid-subscriber",
+      "from": "tool-events-schema",
+      "to": "tool-grid-subscriber",
+      "type": "import",
+      "source": "code",
+      "status": "code-confirmed",
+      "provenance": { "file": "packages/web/src/hooks/use-tool-grid.ts", "line": 12 },
+      "feature_from": "026",
+      "feature_to": "031"
+    },
+    {
+      "id": "tool-grid-subscriber--call-->tool-grid-slice",
+      "from": "tool-grid-subscriber",
+      "to": "tool-grid-slice",
+      "type": "call",
+      "source": "code",
+      "status": "code-confirmed",
+      "provenance": { "file": "packages/web/src/hooks/use-tool-grid.ts", "line": 55 },
+      "feature_from": "031",
+      "feature_to": "031",
+      "notes": "grid.addTool() / grid.appendOutput() / grid.completeTool() / grid.failTool()"
+    },
+    {
+      "id": "tool-grid-slice--data-access-->tool-grid-selectors",
+      "from": "tool-grid-slice",
+      "to": "tool-grid-selectors",
+      "type": "data-access",
+      "source": "code",
+      "status": "code-confirmed",
+      "provenance": { "file": "packages/web/src/store/slices/tool-grid.selectors.ts", "line": 21 },
+      "feature_from": "031",
+      "feature_to": "031",
+      "notes": "Derived selectors read from ToolCardData Map + toolIdOrder array"
+    },
+    {
+      "id": "tool-grid-slice--call-->tool-grid",
+      "from": "tool-grid-slice",
+      "to": "tool-grid",
+      "type": "call",
+      "source": "code",
+      "status": "code-confirmed",
+      "provenance": { "file": "packages/web/src/components/chat/tool-grid/ToolGrid.ts", "line": 35 },
+      "feature_from": "031",
+      "feature_to": "031"
+    },
+    {
+      "id": "tool-grid--import-->tool-card",
+      "from": "tool-grid",
+      "to": "tool-card",
+      "type": "import",
+      "source": "code",
+      "status": "code-confirmed",
+      "provenance": { "file": "packages/web/src/components/chat/tool-grid/ToolGrid.ts", "line": 3 },
+      "feature_from": "031",
+      "feature_to": "031"
+    },
+    {
+      "id": "tool-card--import-->terminal-renderer",
+      "from": "tool-card",
+      "to": "terminal-renderer",
+      "type": "import",
+      "source": "code",
+      "status": "code-confirmed",
+      "provenance": { "file": "packages/web/src/components/chat/tool-grid/ToolCard.ts", "line": 5 },
+      "feature_from": "031",
+      "feature_to": "030",
+      "notes": "Synchronous import for renderTerminal(); also has lazy dynamic import for renderBashOutputAsync() at line 78"
+    },
+    {
+      "id": "terminal-renderer--call-->ansi-parser",
+      "from": "terminal-renderer",
+      "to": "ansi-parser",
+      "type": "call",
+      "source": "code",
+      "status": "code-confirmed",
+      "provenance": { "file": "packages/web/src/components/chat/terminal/TerminalRenderer.ts", "line": 41 },
+      "feature_from": "030",
+      "feature_to": "030"
+    },
+    {
+      "id": "tool-grid--import-->tool-progress-bar",
+      "from": "tool-grid",
+      "to": "tool-progress-bar",
+      "type": "import",
+      "source": "code",
+      "status": "code-confirmed",
+      "provenance": { "file": "packages/web/src/components/chat/tool-grid/ToolCard.ts", "line": 1 },
+      "feature_from": "031",
+      "feature_to": "031"
+    },
+    {
+      "id": "tool-grid-slice--data-access-->error-aggregation",
+      "from": "tool-grid-slice",
+      "to": "error-aggregation",
+      "type": "data-access",
+      "source": "code",
+      "status": "code-confirmed",
+      "provenance": { "file": "packages/web/src/components/chat/tool-grid/ErrorAggregationPanel.ts", "line": 1 },
+      "feature_from": "031",
+      "feature_to": "031",
+      "notes": "getFailedTools() supplies failed tool list to ErrorAggregationPanel"
+    },
+    {
+      "id": "tool-grid-slice--call-->bulk-action-bar",
+      "from": "tool-grid-slice",
+      "to": "bulk-action-bar",
+      "type": "call",
+      "source": "code",
+      "status": "code-confirmed",
+      "provenance": { "file": "packages/web/src/components/chat/tool-grid/BulkActionBar.ts", "line": 1 },
+      "feature_from": "031",
+      "feature_to": "031",
+      "notes": "cancelAllRunning() / clearCompleted() / undoClear() exposed as bulk actions"
+    },
+    {
+      "id": "tool-grid-slice--data-access-->resource-bar-chart",
+      "from": "tool-grid-slice",
+      "to": "resource-bar-chart",
+      "type": "data-access",
+      "source": "code",
+      "status": "code-confirmed",
+      "provenance": { "file": "packages/web/src/components/chat/tool-grid/ResourceBarChart.ts", "line": 1 },
+      "feature_from": "031",
+      "feature_to": "031",
+      "notes": "selectResourceMetrics() provides normalized metrics for bar chart"
+    },
+    {
+      "id": "card-renderer--import-->tool-grid-types",
+      "from": "card-renderer",
+      "to": "tool-grid-types",
+      "type": "import",
+      "source": "code",
+      "status": "code-confirmed",
+      "provenance": { "file": "packages/web/src/components/chat/cards/CardRenderer.ts", "line": 1 },
+      "feature_from": "028",
+      "feature_to": "031",
+      "notes": "renderCardsGrid() imports SortField, SortOrder, StatusFilter, ViewMode, calculateColumns from 031 types"
+    },
+    {
+      "id": "tool-orchestrator--event-->cards-slice",
+      "from": "tool-orchestrator",
+      "to": "cards-slice",
+      "type": "call",
+      "source": "code",
+      "status": "code-confirmed",
+      "provenance": { "file": "packages/web/src/hooks/use-tool-cards.ts", "line": 28 },
+      "feature_from": "026",
+      "feature_to": "028",
+      "notes": "Parallel legacy pipeline: createToolCardDispatcher() mirrors grid subscriber for 028 cards slice"
+    }
+  ],
+  "journeys": [
+    {
+      "id": "J-031-001",
+      "name": "并行工具网格可视化主旅程",
+      "p_level": "P0",
+      "crosses_features": ["026", "028", "030", "031"],
+      "hop_types": ["ui"],
+      "edge_ids": [
+        "tool-orchestrator--event-->tool-grid-subscriber",
+        "tool-events-schema--import-->tool-grid-subscriber",
+        "tool-grid-subscriber--call-->tool-grid-slice",
+        "tool-grid-slice--data-access-->tool-grid-selectors",
+        "tool-grid-slice--call-->tool-grid",
+        "tool-grid--import-->tool-card",
+        "tool-card--import-->terminal-renderer",
+        "terminal-renderer--call-->ansi-parser",
+        "tool-grid--import-->tool-progress-bar",
+        "tool-grid-slice--data-access-->error-aggregation",
+        "tool-grid-slice--call-->bulk-action-bar",
+        "tool-grid-slice--data-access-->resource-bar-chart",
+        "card-renderer--import-->tool-grid-types",
+        "tool-orchestrator--event-->cards-slice"
+      ],
+      "acs": [
+        "FR-GRID-01: 1/2/3 column responsive grid layout",
+        "FR-GRID-03: ToolCard five-state color (pending/running/success/failed/cancelled)",
+        "FR-GRID-07: Error aggregation panel for failed tools",
+        "FR-GRID-09: Bulk action bar (cancel all running, clear completed)",
+        "FR-GRID-12: Progress bar determinate/indeterminate",
+        "FR-GRID-15: Resource bar chart for metrics",
+        "FR-TC-06: TerminalRenderer integration for bash tool output"
+      ],
+      "p_reason": "核心主流程不可用 — 工具并行执行→网格可视化→进度监控→批量控制链路断裂会导致用户无法看到任何工具执行状态。P0 最高风险。需人确认：本旅程为纯同步 UI 流程，无需外部边界 stub。"
+    }
+  ]
+}
