@@ -1,5 +1,5 @@
 import type { BashCard } from "../../../types/cards";
-import { parseAnsiToHtml } from "../../../lib/ansi-parser";
+import { renderTerminal } from "../terminal/TerminalRenderer";
 
 const AUTO_COLLAPSE_LINES = 50;
 
@@ -7,16 +7,17 @@ export function renderBashCard(card: BashCard): string {
   const { command, args, output, exitCode, durationMs } = card.content;
   const fullCommand = [command, ...args].join(" ");
 
-  const coloredOutput = parseAnsiToHtml(output);
-  const lines = coloredOutput.split("\n");
-  const totalLines = lines.length;
+  const totalLines = output.split("\n").length;
   const isLong = totalLines > AUTO_COLLAPSE_LINES;
 
-  const displayLines = isLong ? lines.slice(0, 10) : lines;
-  const outputHtml = displayLines.map((line) => `<span class="bash-line">${line || " "}</span>`).join("\n");
+  // Render terminal output with ANSI support
+  const terminalHtml = renderTerminal(output, {
+    maxLines: isLong ? 10 : 10000,
+    enableBlink: false,
+  });
 
   const expandToggle = isLong
-    ? `<button type="button" class="bash-expand-btn" data-action="expand-bash" data-card-id="${escapeAttr(card.id)}">
+    ? `<button type="button" class="bash-expand-btn text-xs text-blue-400 hover:text-blue-300 mt-1" data-action="expand-bash" data-card-id="${escapeAttr(card.id)}">
         Show all ${totalLines} lines
       </button>`
     : "";
@@ -25,7 +26,7 @@ export function renderBashCard(card: BashCard): string {
     <div class="bash-command font-mono text-xs text-neutral-400 bg-neutral-900 rounded px-2 py-1">
       <span class="text-emerald-400">$</span> ${escapeHtml(fullCommand)}
     </div>
-    <pre class="bash-output font-mono text-xs text-neutral-200 bg-neutral-950 rounded border border-neutral-800 px-3 py-2 overflow-x-auto ${isLong ? "bash-collapsible" : ""}" ${isLong ? 'data-collapsed="true"' : ""}>${outputHtml}</pre>
+    <div class="bash-output-container ${isLong ? "bash-collapsible" : ""}" ${isLong ? 'data-collapsed="true"' : ""}>${terminalHtml}</div>
     ${expandToggle}
     <div class="bash-meta flex items-center gap-3 text-[11px] text-neutral-500 mt-1">
       ${renderExitCode(exitCode)}

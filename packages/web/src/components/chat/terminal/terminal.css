@@ -1,0 +1,187 @@
+/* Terminal output styles — dark theme, CJK/Emoji, accessibility */
+
+/* ── Base terminal container ── */
+.terminal-renderer {
+  font-family: Consolas, Monaco, 'Source Code Pro', monospace;
+  background: #1e1e1e;
+  color: #d4d4d4;
+  tab-size: 8;
+  -moz-tab-size: 8;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+/* ── Lines ── */
+.terminal-renderer .terminal-line {
+  display: block;
+  white-space: pre;
+}
+
+/* ── CJK / wide-char cells ── */
+.terminal-renderer .terminal-line .cjk-char,
+.terminal-renderer .terminal-line .emoji-char {
+  /* CJK characters approximate 2-char width */
+  display: inline-block;
+  text-align: center;
+}
+
+/* ── Emoji font stack ── */
+.terminal-renderer {
+  font-family:
+    Consolas, Monaco, 'Source Code Pro',
+    'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji',
+    monospace;
+}
+
+/* ── Blink animation ── */
+@keyframes terminal-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* ── Cursor styles ── */
+.terminal-cursor {
+  display: inline-block;
+  pointer-events: none;
+}
+
+.terminal-cursor--block {
+  background: currentColor;
+  color: #1e1e1e;
+  width: 0.6em;
+  height: 1.2em;
+  vertical-align: text-bottom;
+}
+
+.terminal-cursor--underline {
+  border-bottom: 2px solid currentColor;
+  width: 0.6em;
+  height: 1.2em;
+  vertical-align: text-bottom;
+}
+
+.terminal-cursor--bar {
+  border-left: 2px solid currentColor;
+  width: 0;
+  height: 1.2em;
+  vertical-align: text-bottom;
+}
+
+@keyframes cursor-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* ── Bell flash ── */
+.terminal-bell-flash {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.08);
+  pointer-events: none;
+  animation: bell-flash 100ms ease-out;
+}
+
+@keyframes bell-flash {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+/* ── Alternate screen banner ── */
+.alternate-screen-banner .alternate-screen-chevron {
+  transition: transform 0.15s ease;
+}
+
+.alternate-screen-banner[data-collapsed="false"] .alternate-screen-chevron {
+  transform: rotate(90deg);
+}
+
+.alternate-screen-banner[data-collapsed="false"] .alternate-screen-content {
+  display: block;
+}
+
+/* ── Copy button ── */
+.terminal-copy-btn {
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.terminal-renderer:hover .terminal-copy-btn,
+.terminal-renderer:focus-within .terminal-copy-btn {
+  opacity: 1;
+}
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  .terminal-bell-flash {
+    animation: none;
+    background: transparent;
+  }
+
+  .terminal-cursor--block,
+  .terminal-cursor--underline,
+  .terminal-cursor--bar {
+    animation: none !important;
+  }
+
+  .alternate-screen-banner .alternate-screen-chevron {
+    transition: none;
+  }
+}
+
+/* ── Focus / keyboard navigation ── */
+.terminal-renderer:focus {
+  outline: 2px solid rgba(96, 165, 250, 0.5);
+  outline-offset: 2px;
+}
+
+.terminal-renderer:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.terminal-renderer:focus-visible {
+  outline: 2px solid rgb(96, 165, 250);
+  outline-offset: 2px;
+}
+
+/* ── Scrollbar styling (dark theme) ── */
+.terminal-renderer::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.terminal-renderer::-webkit-scrollbar-track {
+  background: #1a1a1a;
+}
+
+.terminal-renderer::-webkit-scrollbar-thumb {
+  background: #444;
+  border-radius: 4px;
+}
+
+.terminal-renderer::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Firefox scrollbar */
+.terminal-renderer {
+  scrollbar-width: thin;
+  scrollbar-color: #444 #1a1a1a;
+}
+
+/* ── Viewport specific ── */
+.terminal-viewport {
+  position: relative;
+  overflow-y: auto;
+  overflow-x: auto;
+  background: #1e1e1e;
+}
+
+.terminal-viewport:focus {
+  outline: 2px solid rgba(96, 165, 250, 0.5);
+  outline-offset: 0;
+}
+
+/* ── Truncated notice ── */
+.terminal-truncated-notice {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
