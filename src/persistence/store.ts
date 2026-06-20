@@ -1,5 +1,6 @@
 import Database from "better-sqlite3";
 import type { SessionRecord, SessionSummary } from "./types";
+import { runMigrations } from "./migrations/runner";
 
 const SCHEMA_SQL = `
 CREATE TABLE IF NOT EXISTS sessions (
@@ -34,7 +35,9 @@ export function initDb(dbPath: string): Database.Database {
   const db = new Database(dbPath);
   db.pragma("journal_mode = WAL");
   db.pragma("busy_timeout = 5000");
+  db.pragma("foreign_keys = ON");
   db.exec(SCHEMA_SQL);
+  runMigrations(db);
   return db;
 }
 
