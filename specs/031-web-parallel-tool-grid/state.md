@@ -1,7 +1,7 @@
 # 实施进度 · web-parallel-tool-grid
 
 ## 当前任务
-[ ] T008 · ErrorAggregationPanel
+[ ] T009 · BulkActionBar
 
 ## 已完成
 - [x] T001 · ToolGrid TypeScript 类型定义（2026-06-20）
@@ -72,5 +72,17 @@
   - 数据属性: data-tool-id, data-status 挂载到卡片 wrapper
   - escapeHtml/escapeAttr XSS 防护
 
+- [x] T008 · ErrorAggregationPanel（2026-06-20）
+  - 文件: `packages/web/src/components/chat/tool-grid/ErrorAggregationPanel.ts` (48 行)
+  - 测试: `tests/web/error-aggregation-panel.test.ts` (19 tests, all passed)
+  - renderErrorAggregationPanel() 纯函数 — 返回错误聚合面板 HTML 字符串
+  - 零错误: 返回空字符串，不渲染面板
+  - 错误计数 badge: "1 error" / "N errors" + error-count-badge CSS class
+  - 展开/折叠: toggle 按钮 + aria-expanded + error-item-list 显隐
+  - 错误项: 工具名 + 错误消息 + data-tool-id + data-action="scroll-to-tool"
+  - WCAG: role="alert" + aria-live="polite" + role="list"/role="button"
+  - 输入: failedTools (ToolCardData[]) + isExpanded (boolean)
+  - escapeHtml/escapeAttr XSS 防护
+
 ## 最后更新
-2026-06-20 12:18
+2026-06-20 12:19
