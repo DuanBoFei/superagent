@@ -1,7 +1,7 @@
 # 实施进度 · web-parallel-tool-grid
 
 ## 当前任务
-[ ] T014 · ToolGrid 主组件 + 响应式布局
+[ ] T015 · AbortController 取消信号传播
 
 ## 已完成
 - [x] T001 · ToolGrid TypeScript 类型定义（2026-06-20）
@@ -135,5 +135,16 @@
   - 计算 startIndex/endIndex/items/totalHeight/padding
   - 负值 scrollTop 自动 clamp 到 0
 
+- [x] T014 · ToolGrid 主组件 + 响应式布局（2026-06-20）
+  - 文件: `packages/web/src/components/chat/tool-grid/ToolGrid.ts` (89 行)
+  - 测试: `tests/web/tool-grid.test.ts` (24 tests, all passed)
+  - renderToolGrid() 纯函数 — 聚合所有子组件的 orchestrator
+  - 计算响应式列数: calculateColumns(toolCount, viewMode, width) — 优先 toolCount
+  - 集成 7 个子组件: ErrorAggregationPanel + BulkActionBar + SortFilterControls + ViewToggle + ResourceBarChart + ToolCards + VirtualScroll
+  - 空状态: 无工具时显示 tool-grid-empty + message
+  - 虚拟滚动: toolCount > 20 时启用 useToolVirtualScroll
+  - view-mode-{grid|list} + grid-cols-{1|2|3} CSS class
+  - 仅在有已完成工具时渲染 ResourceBarChart
+
 ## 最后更新
-2026-06-20 12:24
+2026-06-20 12:28
