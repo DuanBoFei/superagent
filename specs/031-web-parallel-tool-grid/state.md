@@ -1,7 +1,7 @@
 # 实施进度 · web-parallel-tool-grid
 
 ## 当前任务
-[ ] T013 · useToolVirtualScroll hook
+[ ] T014 · ToolGrid 主组件 + 响应式布局
 
 ## 已完成
 - [x] T001 · ToolGrid TypeScript 类型定义（2026-06-20）
@@ -126,5 +126,14 @@
   - 格式化: durationMs→"2.3s", outputBytes→"1.5KB"/"0B"
   - escapeHtml/escapeAttr XSS 防护
 
+- [x] T013 · useToolVirtualScroll hook（2026-06-20）
+  - 文件: `packages/web/src/hooks/use-tool-virtual-scroll.ts` (34 行)
+  - 测试: `tests/web/use-tool-virtual-scroll.test.ts` (20 tests, all passed)
+  - useToolVirtualScroll() — 复用 createVirtualScroll，适配工具卡片固定高度
+  - TOOL_CARD_HEIGHT = 136px，启用阈值默认 >20 个工具
+  - 低于阈值返回 enabled=false + window=null
+  - 计算 startIndex/endIndex/items/totalHeight/padding
+  - 负值 scrollTop 自动 clamp 到 0
+
 ## 最后更新
-2026-06-20 12:23
+2026-06-20 12:24
