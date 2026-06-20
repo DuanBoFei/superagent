@@ -13,10 +13,10 @@ const TYPE_LABELS: Record<ToolCardType, string> = {
 };
 
 const STATUS_INDICATORS: Record<string, string> = {
-  pending: '<span class="card-status-dot card-status-pending" aria-label="Pending"></span>',
-  running: '<span class="card-status-dot card-status-running" aria-label="Running"></span>',
-  success: '<span class="card-status-dot card-status-success" aria-label="Success"></span>',
-  error: '<span class="card-status-dot card-status-error" aria-label="Error"></span>',
+  pending: '<span class="card-status-dot card-status-pending" role="img" aria-label="Pending"></span>',
+  running: '<span class="card-status-dot card-status-running" role="img" aria-label="Running"></span>',
+  success: '<span class="card-status-dot card-status-success" role="img" aria-label="Success"></span>',
+  error: '<span class="card-status-dot card-status-error" role="img" aria-label="Error"></span>',
 };
 
 export function renderCardHeader(card: BaseCardState): string {
