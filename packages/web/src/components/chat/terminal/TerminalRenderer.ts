@@ -1,6 +1,7 @@
 import { parseAnsiToHtml } from "../../../lib/ansi-parser";
 import { renderTerminalLine } from "./TerminalLine";
 import { renderTerminalCursor } from "./TerminalCursor";
+import { escapeForDataAttr } from "./TerminalCopy";
 import type { TerminalLine } from "../../../types/terminal";
 import { createDefaultAttributes } from "../../../lib/ansi-parser/sgr";
 
@@ -60,7 +61,9 @@ export function renderTerminal(
     ? "<style>@keyframes terminal-blink{0%,100%{opacity:1}50%{opacity:0}}</style>"
     : "";
 
-  return `${blinkStyles}<pre class="terminal-renderer" style="font-family:${MONO_FONT_STACK};font-size:${fontSize}px;line-height:${lineHeight};background:#1e1e1e;color:#d4d4d4;padding:8px;margin:0;overflow-x:auto;white-space:pre;border-radius:4px" data-terminal-lines="${lineCount}" role="log" aria-label="Terminal output">${lineEls.join("\n")}</pre>${truncatedNotice}`;
+  // Store raw content for clipboard copy
+  const rawContent = escapeForDataAttr(content);
+  return `${blinkStyles}<pre class="terminal-renderer" style="font-family:${MONO_FONT_STACK};font-size:${fontSize}px;line-height:${lineHeight};background:#1e1e1e;color:#d4d4d4;padding:8px;margin:0;overflow-x:auto;white-space:pre;border-radius:4px" data-terminal-lines="${lineCount}" data-terminal-content="${rawContent}" role="log" aria-label="Terminal output">${lineEls.join("\n")}</pre>${truncatedNotice}`;
 }
 
 // Render terminal content from a TerminalLine array (buffer-based rendering).

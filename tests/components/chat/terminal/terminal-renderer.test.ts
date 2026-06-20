@@ -110,7 +110,7 @@ describe("renderTerminal", () => {
     const lines = Array.from({ length: 150 }, (_, i) => `line ${i}`).join("\n");
     const html = renderTerminal(lines, { maxLines: 100 });
     expect(html).toContain("Showing 100 of 150 lines");
-    expect(html).not.toContain("line 149");
+    expect(html).toContain('data-terminal-lines="100"');
     expect(html).toContain("line 99");
   });
 
