@@ -15,7 +15,7 @@ Claude Code/OpenClaw/Codex 证明了 CLI Agent 可行，但都绑定高价国外
 北极星指标：首次成功修复率（First Fix Success Rate）MVP ≥ 50%。
 详细目标见：@specs/prd.md §2 / §11
 
-## 3 · 开发工作流
+## 3 · 工作流 HOW
 
 每个 feature 跑 4 步文档循环，再写代码：
 
@@ -27,45 +27,55 @@ Claude Code/OpenClaw/Codex 证明了 CLI Agent 可行，但都绑定高价国外
 ```
 
 - 启动 feature 前：读 `@specs/prd.md` 对应功能节 + `@specs/research/05-决策汇总.md`
+- 执行 task 前：读 `@.specify/memory/constitution.md`、对应 `spec.md` / `plan.md` / `tasks.md`
+- [FE] task 还必须读 `@DESIGN.md` 和匹配的 `@specs/design-reference/stitch-export/<page>/`
 - feature 跑完一轮完整 4 步 → 停下来确认 → 下一 feature
-- tasks 每条标注 `[FR-X 来源] [依赖任务] [验证方式]`，可独立测试
+- tasks 每条标注 `[BE]` / `[FE]` / `[INT]`，并包含 `[FR-X 来源] [依赖任务] [验证方式]`
 - 测试纪律：每个模块写完立即跑单元测试，不要攒到 feature 末尾
-- 节奏：先基础（config → runtime）→ 并行组同时铺 → 顺序组串联
+- 节奏铁律：每个 task 完成后更新 tasks.md checkbox；提交后停下来等 `next`
 
 ## 4 · 技术栈
 
-项目为 greenfield（无 package.json）。锁定决策见：@specs/research/05-决策汇总.md
+以 `@package.json` 为准；架构基线见：@specs/research/05-决策汇总.md
 
 | 层 | 决策 | 来源 |
 |----|------|------|
-| 语言/运行时 | TypeScript (strict) · Bun / Node.js 22+ | 05-决策汇总 §4.1 |
-| CLI/TUI | Ink 5.x (React for terminal) | 05-决策汇总 §4.2 |
-| AI SDK | @anthropic-ai/sdk + openai SDK | 05-决策汇总 §3.2 |
-| Schema 校验 | zod | 05-决策汇总 §3.2 |
-| 数据库 | better-sqlite3 (本地会话持久化) | 05-决策汇总 §3.2 |
-| MCP | @modelcontextprotocol/sdk | 05-决策汇总 §3.2 |
-| 日志 | pino (结构化 JSON) | 05-决策汇总 §3.2 |
-| 终端 | node-pty (Bash tool PTY) | 05-决策汇总 §3.2 |
-| 测试 | vitest | 05-决策汇总 §3.2 |
+| 语言/运行时 | TypeScript `^5.5` · Node/tsx | package.json |
+| CLI 入口 | `superagent` → `./bin/superagent.js` | package.json |
+| MCP | `@modelcontextprotocol/sdk` `^1.29.0` | package.json |
+| Schema 校验 | `zod` `^3.23` | package.json |
+| 数据库 | `better-sqlite3` `^12.10.0` | package.json |
+| 配置发现 | `cosmiconfig` `^9.0.2` | package.json |
+| 日志 | `pino` `^10.3.1` | package.json |
+| 测试 | `vitest` `^2` | package.json |
+| Lint/Format | `biome` `^0.3.3` | package.json |
 | 模型主力 | DeepSeek V4 Pro ($0.435/$0.87 per MTok) | 05-决策汇总 §2 |
 | 模型兜底 | DeepSeek V4 Flash ($0.14/$0.28 per MTok) | 05-决策汇总 §2 |
 
-M1 执行 `npm init` 后，由 /init 自动从 package.json 同步真实版本。
-
 ## 5 · 命令清单
 
-待 M1 启动后从 package.json scripts 自动补全。预期骨架：
-
 ```bash
-pnpm dev            # 开发模式（tsx watch）
-pnpm build          # tsc 构建
-pnpm test           # vitest 跑全部测试
-pnpm test -- <path> # 跑单个测试文件
-pnpm lint           # biome lint
-pnpm typecheck      # tsc --noEmit
+pnpm dev        # tsx watch src/index.ts
+pnpm start      # tsx src/index.ts
+pnpm build      # tsc
+pnpm test       # vitest run
+pnpm test:watch # vitest
+pnpm typecheck  # tsc --noEmit
+pnpm lint       # biome check src/ tests/
 ```
 
-## 6 · Anti-Patterns（禁止）
+## 6 · 项目宪法引用
+
+项目级约束以 `@.specify/memory/constitution.md` 为准；这里不复制宪法全文。
+执行任何 `tasks.md` 前，先读宪法的 Core Principles、Security、Quality、Implementation Discipline。
+
+## 7 · 视觉规范引用
+
+Web UI / 视觉相关任务以 `@DESIGN.md` 为视觉单一事实源。
+[FE] task 还必须读取匹配样本：`@specs/design-reference/stitch-export/<page>/`。
+不要把 DESIGN.md 的颜色、字体、间距常量复制进本文件。
+
+## 8 · Anti-Patterns（禁止）
 
 - ❌ 不要在 /speckit.specify 阶段写技术选型——留给 /plan *(来源: 硬约束)*
 - ❌ 不要让 Agent 静默大面积修改（>3 个文件）——必须先展示范围 + 等批准 *(来源: PRD AC2.4)*
@@ -75,8 +85,9 @@ pnpm typecheck      # tsc --noEmit
 - ❌ 不要让危险命令 auto-approve——deny > auto-approve，黑名单不可覆盖 *(来源: PRD §6-F5)*
 - ❌ 不要引入 PRD Out-of-Scope 能力（MCP/多Agent/浏览器/桌面控制） *(来源: PRD §5.2)*
 - ❌ 不要在上下文压缩中丢失"修改了哪些文件"和"当前目标" *(来源: PRD AC-CTX-04)*
+- ❌ 不要给 Web UI 发明独立视觉风格——必须回溯 `@DESIGN.md` 和匹配 Stitch 样本 *(来源: constitution Frontend Design System)*
 
-## 7 · Behavioral Guidelines (Karpathy-Inspired)
+## 9 · Behavioral Guidelines (Karpathy-Inspired)
 
 以下 4 条原则适用于全项目所有 task 实现期，目的是减少 AI 编码的常见失误。
 
@@ -141,11 +152,17 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 ---
 **These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.
 
-## 8 · 关键文件导航
+## 10 · 关键文件导航
 
 | 文件 | 作用 | 何时读 |
 |------|------|--------|
 | @specs/prd.md | 14 章产品需求文档 | 业务边界/优先级/验收标准不清时 |
+| @specs/web-prd.md | Web UI 产品需求文档 | Web UI feature 范围/验收不清时 |
+| @specs/design-reference/stitch-export/web_prd.md | Stitch 导出的 Web UI PRD | 对齐设计样本原始产品意图时 |
+| @.specify/memory/constitution.md | 项目宪法 + 实现纪律 | 执行任何 tasks.md 前 |
+| @DESIGN.md | Web UI 视觉系统事实源 | 任意 [FE] task 前 |
+| @specs/design-reference/stitch-export/ | Stitch 视觉样本仓库 | 匹配 Web UI feature 的 [FE] task 前 |
+| @package.json | 真实脚本、依赖、版本 | 命令/技术栈不确定时 |
 | @specs/research/05-决策汇总.md | 技术选型基线裁决 | 引入新依赖/质疑技术方向时 |
 | @specs/research/01-产品形态.md | 20 产品竞品分析 | 产品方向讨论时 |
 | @specs/research/03-开源项目.md | 17 个开源项目盘点 | 引入开源方案时 |

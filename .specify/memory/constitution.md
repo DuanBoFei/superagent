@@ -19,6 +19,16 @@
 - Tests must pass before marking a task complete.
 - TypeScript strict mode. No `any` without justification.
 
+## Frontend Design System
+
+- Root `DESIGN.md` is the single source of truth for visual direction. Plans and tasks must reference it for layout, component, interaction, accessibility, and density decisions; concrete values stay in `DESIGN.md`, not in this constitution.
+- Feature-specific UI work must read the matched sample under `specs/design-reference/stitch-export/<page>/` before implementation. Samples guide composition and interaction patterns; `DESIGN.md` remains authoritative when samples disagree.
+- Web UI must preserve a developer-tool, terminal-first experience: dense information, fast scanability, low visual noise, and clear workspace boundaries take priority over decorative presentation.
+- Layouts should use compact panel-based structures that maximize usable workspace, support keyboard-oriented workflows, and adapt by reorganizing panels rather than inventing separate experiences.
+- Components must be built from the project’s chosen UI baseline and mapped back to `DESIGN.md` component guidance. New visual patterns require an explicit plan/task note explaining why existing patterns are insufficient.
+- Language strategy follows the product PRD: MVP user-facing CLI/web chrome is English-first. Do not introduce broader i18n work unless a feature spec explicitly requires it.
+- Theme mode follows `DESIGN.md`. Do not add alternative themes or theme switching unless a feature spec explicitly requires it.
+
 ---
 
 ### Implementation Discipline (for Superpowers handoff)
