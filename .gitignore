@@ -4,3 +4,5 @@ dist/
 .credentials.yaml
 *.log
 .claude/cache/
+.fixtures/
+tests/web/__snapshots__/
