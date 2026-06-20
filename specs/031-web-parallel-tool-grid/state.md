@@ -1,7 +1,7 @@
 # 实施进度 · web-parallel-tool-grid
 
 ## 当前任务
-[ ] T007 · ToolCard 基础卡片组件
+[ ] T008 · ErrorAggregationPanel
 
 ## 已完成
 - [x] T001 · ToolGrid TypeScript 类型定义（2026-06-20）
@@ -58,5 +58,19 @@
 ## 阻塞项
 （无）
 
+- [x] T007 · ToolCard 基础卡片组件（2026-06-20）
+  - 文件: `packages/web/src/components/chat/tool-grid/ToolCard.ts` (117 行)
+  - 测试: `tests/web/tool-card.test.ts` (27 tests, all passed)
+  - renderToolCard() 纯函数 — 返回完整卡片 HTML 字符串
+  - 头部: 工具标签(toolLabel映射) + 工具名 + ToolTimer + 展开/折叠按钮(aria-expanded)
+  - 参数摘要: 最多显示 3 个参数键值对
+  - 进度条: 集成 renderToolProgressBar（含 indeterminate 模式）
+  - 计时器: computeTimerState() → renderToolTimer()（running 状态识别）
+  - 输出预览: 折叠时展示 outputPreview 末尾行，展开时展示 fullOutput 全文
+  - 错误显示: tool-card-error 区域 + 错误消息 + 可选 stack trace
+  - 状态标识: card-status-{pending|running|success|failed|cancelled} CSS class
+  - 数据属性: data-tool-id, data-status 挂载到卡片 wrapper
+  - escapeHtml/escapeAttr XSS 防护
+
 ## 最后更新
-2026-06-20 12:16
+2026-06-20 12:18
