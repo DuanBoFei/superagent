@@ -1,10 +1,21 @@
 # 实施进度 · web-parallel-tool-grid
 
 ## 当前任务
-[ ] T016 · 028 ToolCard 集成替换
+[ ] T017 · TerminalRenderer 懒加载集成
 
 ## 已完成
 - [x] T001 · ToolGrid TypeScript 类型定义（2026-06-20）
+- [x] T016 · 028 ToolCard 集成替换（2026-06-20）
+  - 文件: `packages/web/src/components/chat/cards/CardRenderer.ts` (修改，+48 行)
+  - 测试: `tests/web/card-renderer-grid.test.ts` (23 tests, all passed)
+  - 新增 `renderCardsGrid()` 导出 — 单工具退化为原 `renderCards()` card-stack 布局
+  - 多工具 → tool-grid wrapper + calculateColumns() 响应式 grid-cols-{1|2|3}
+  - 集成 4 个 ToolGrid 子组件: BulkActionBar + SortFilterControls + ViewToggle + ErrorBanner
+  - 统计派生: runningCount (pending+running), completedCount (success+error)
+  - 错误聚合: renderErrorBanner() — error-banner + role=alert + aria-live=polite
+  - 虚拟滚动: >20 工具时启用 virtual-scroll-container (136px 卡片高度)
+  - GridOptions 接口: containerWidth/viewMode/sortBy/sortOrder/filterStatus 全可选
+  - 保持 028 CardRegistry 类型特定渲染，未丢失任何 card 内容能力
 - [x] T002 · ToolGrid Store Slice（2026-06-20）
 - [x] T003 · Derived State Selectors（2026-06-20）
 - [x] T004 · Tool Orchestrator 事件订阅集成（2026-06-20）
@@ -158,4 +169,4 @@
   - undoClear 恢复时保留 cancelledAt
 
 ## 最后更新
-2026-06-20 12:30
+2026-06-20 12:35
