@@ -56,8 +56,8 @@ function renderEmpty(): string {
   return `<div class="session-list session-list--empty" role="listbox" aria-label="Session list" data-session-count="0">
     <div class="flex flex-col items-center justify-center h-full text-center px-4 py-12">
       <div class="text-zinc-600 text-4xl mb-3" aria-hidden="true">[ ]</div>
-      <p class="text-zinc-500 text-sm font-medium">No sessions yet</p>
-      <p class="text-zinc-600 text-xs mt-1">Start a conversation to see it here</p>
+      <p class="text-zinc-400 text-sm font-medium">No sessions yet</p>
+      <p class="text-zinc-400 text-xs mt-1">Start a conversation to see it here</p>
     </div>
   </div>`;
 }
@@ -89,7 +89,11 @@ export function renderSessionList(options: SessionListOptions): string {
       .map((opts) => renderSessionListItem(opts))
       .join("");
 
-    return `<div class="session-list${virtualClass}" role="listbox" aria-multiselectable="true" aria-label="Session list" data-session-count="${sessions.length}"${virtualAttr}>
+    const activeDescendantAttr = activeSessionId
+      ? ` aria-activedescendant="${escapeAttr(activeSessionId)}"`
+      : "";
+
+    return `<div class="session-list${virtualClass}" role="listbox" aria-multiselectable="true" aria-label="Session list" data-session-count="${sessions.length}"${activeDescendantAttr}${virtualAttr}>
       <div class="session-list-inner" style="overflow-y:auto;height:100%">
         ${itemsHtml}
       </div>
@@ -104,7 +108,11 @@ export function renderSessionList(options: SessionListOptions): string {
     .map((opts) => renderSessionListItem(opts))
     .join("");
 
-  return `<div class="session-list${virtualClass}" role="listbox" aria-multiselectable="true" aria-label="Session list" data-session-count="${sessions.length}"${virtualAttr}>
+  const activeDescendantAttr2 = activeSessionId
+    ? ` aria-activedescendant="${escapeAttr(activeSessionId)}"`
+    : "";
+
+  return `<div class="session-list${virtualClass}" role="listbox" aria-multiselectable="true" aria-label="Session list" data-session-count="${sessions.length}"${activeDescendantAttr2}${virtualAttr}>
     <div class="session-list-inner" style="overflow-y:auto;height:100%">
       <div class="session-list-spacer" style="height:${totalHeight}px;position:relative">
         <div class="session-list-viewport" style="position:absolute;top:0;left:0;right:0">

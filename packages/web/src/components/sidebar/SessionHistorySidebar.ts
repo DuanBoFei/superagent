@@ -27,11 +27,12 @@ export function renderSessionHistorySidebar(options: SidebarRenderOptions): stri
   const zClass = mode === "overlay" ? "z-50 shadow-2xl" : "z-30";
   const widthStyle = `width:${width}px`;
 
-  return `<aside class="session-sidebar fixed left-0 top-0 h-full flex flex-col bg-neutral-950 border-r border-zinc-800 transition-transform duration-150 ease-out ${visibilityClass} ${zClass}" style="${escapeAttribute(widthStyle)}" data-sidebar-open="${open ? "1" : "0"}" data-sidebar-mode="${escapeAttribute(mode)}" data-sidebar-width="${width}" role="complementary" aria-label="Session history">
+  return `<style>@media(prefers-reduced-motion:reduce){.motion-reduce,.motion-reduce *,.motion-reduce::before,.motion-reduce::after{transition-duration:0s!important;animation-duration:0s!important}}</style>
+  <aside class="session-sidebar motion-reduce fixed left-0 top-0 h-full flex flex-col bg-neutral-950 border-r border-zinc-800 transition-transform duration-150 ease-out ${visibilityClass} ${zClass}" style="${escapeAttribute(widthStyle)}" data-sidebar-open="${open ? "1" : "0"}" data-sidebar-mode="${escapeAttribute(mode)}" data-sidebar-width="${width}" role="complementary" aria-label="Session history" aria-expanded="${open ? "true" : "false"}">
   <div class="sidebar-drag-handle absolute right-0 top-0 w-1 h-full cursor-col-resize hover:bg-emerald-500/50 transition-colors z-10" data-action="drag-handle" aria-hidden="true"></div>
   <div class="sidebar-header flex items-center justify-between px-4 py-3 border-b border-zinc-800 shrink-0">
     <span class="text-sm font-semibold text-emerald-400 tracking-tight">SuperAgent</span>
-    <button type="button" class="sidebar-close-btn text-zinc-500 hover:text-zinc-300 transition-colors p-1 rounded" data-action="close-sidebar" aria-label="Close sidebar">
+    <button type="button" class="sidebar-close-btn text-zinc-400 hover:text-zinc-300 transition-colors p-1 rounded" data-action="close-sidebar" aria-label="Close sidebar">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4l8 8M12 4l-8 8"/></svg>
     </button>
   </div>

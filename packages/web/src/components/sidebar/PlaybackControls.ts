@@ -45,12 +45,12 @@ export function renderPlaybackControls(options: PlaybackControlsOptions): string
         `<button class="playback-speed-btn text-[11px] px-1.5 py-0.5 rounded border transition-colors ${
           s === speed
             ? "playback-speed-active border-emerald-500/40 bg-emerald-500/10 text-emerald-400"
-            : "border-neutral-700 text-neutral-500 hover:border-neutral-600 hover:text-neutral-300"
+            : "border-neutral-700 text-neutral-400 hover:border-neutral-600 hover:text-neutral-300"
         }" data-action="set-speed" data-speed="${s}" type="button">${s}x</button>`,
     )
     .join("");
 
-  return `<div class="playback-controls flex items-center gap-2 px-3 py-2 bg-neutral-950 border-t border-neutral-800 select-none">
+  return `<div class="playback-controls motion-reduce flex items-center gap-2 px-3 py-2 bg-neutral-950 border-t border-neutral-800 select-none" role="region" aria-label="Playback controls" aria-live="polite">
     <div class="flex items-center gap-1">
       <button class="${stepBtnClass(atStart)}" data-action="step-back" type="button" aria-label="Step back"${atStart ? " disabled" : ""}>
         <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4l-4 4 4 4M6 5v6"/></svg>
@@ -72,7 +72,7 @@ export function renderPlaybackControls(options: PlaybackControlsOptions): string
     <div class="flex items-center gap-1 ml-auto">
       <span class="playback-progress text-[11px] text-neutral-400 tabular-nums min-w-[64px] text-right">
         <span class="text-neutral-200">${currentIndex}</span>
-        <span class="text-neutral-600"> / ${maxIndex}</span>
+        <span class="text-neutral-500"> / ${maxIndex}</span>
       </span>
 
       <button class="playback-show-all-btn text-[11px] px-2 py-1 rounded border border-neutral-700 text-neutral-400 hover:text-neutral-200 hover:border-neutral-600 transition-colors" data-action="show-all" type="button" aria-label="Show all messages">
@@ -141,6 +141,8 @@ export function createPlaybackControlsController(
   function onKeydown(e: KeyboardEvent): void {
     const target = e.target as HTMLElement;
     if (target.tagName === "INPUT" || target.tagName === "TEXTAREA") return;
+    const ae = document.activeElement;
+    if (ae && (ae.tagName === "INPUT" || ae.tagName === "TEXTAREA")) return;
 
     switch (e.key) {
       case " ":

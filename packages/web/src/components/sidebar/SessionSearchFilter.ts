@@ -136,7 +136,7 @@ export function renderSessionSearchFilter(
       ? `<button class="search-clear" data-action="clear-search" type="button" aria-label="Clear search">&times;</button>`
       : "";
 
-  return `<div class="session-search-filter">
+  return `<div class="session-search-filter" role="search">
     <div class="search-input-wrapper">
       <input type="text" class="search-input" placeholder="Search sessions" value="${escapeAttr(query.text)}" aria-label="Search sessions" />
       ${clearHtml}

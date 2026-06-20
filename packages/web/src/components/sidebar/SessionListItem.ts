@@ -48,7 +48,7 @@ function renderTags(tags: string[]): string {
 
   const overflowHtml =
     overflow > 0
-      ? `<span class="session-tag inline-block px-1.5 py-0.5 text-[10px] font-mono text-zinc-500">+${overflow}</span>`
+      ? `<span class="session-tag inline-block px-1.5 py-0.5 text-[10px] font-mono text-zinc-400">+${overflow}</span>`
       : "";
 
   return `<div class="session-tags flex flex-wrap gap-1 mt-1">${chips}${overflowHtml}</div>`;
@@ -69,10 +69,10 @@ export function renderSessionListItem(options: SessionListItemOptions): string {
   const statusDot = statusClass(session.status);
   const tags = renderTags(session.tags);
   const forkHtml = session.forkedFrom
-    ? `<span class="fork-indicator ml-1 text-zinc-600" title="Forked from another session" aria-label="Forked session">&#x2387;</span>`
+    ? `<span class="fork-indicator ml-1 text-zinc-400" title="Forked from another session" aria-label="Forked session">&#x2387;</span>`
     : "";
 
-  return `<li class="session-item group relative flex flex-col px-3 py-2.5 cursor-pointer border-l-2 border-l-transparent hover:bg-zinc-900/70 transition-colors duration-100 ${activeClass}" data-session-id="${escapeAttr(session.id)}" data-action="select-session" role="option" aria-selected="${isActive ? "true" : "false"}" aria-label="Session: ${escapeAttr(session.title)}">
+  return `<li class="session-item group relative flex flex-col px-3 py-2.5 cursor-pointer border-l-2 border-l-transparent hover:bg-zinc-900/70 transition-colors duration-100 motion-reduce:transition-none ${activeClass}" data-session-id="${escapeAttr(session.id)}" data-action="select-session" role="option" aria-selected="${isActive ? "true" : "false"}" aria-label="Session: ${escapeAttr(session.title)}" tabindex="0">
   <div class="flex items-start justify-between gap-2">
     <div class="flex-1 min-w-0">
       <div class="flex items-center gap-1.5">
@@ -80,19 +80,19 @@ export function renderSessionListItem(options: SessionListItemOptions): string {
         <span class="text-sm font-semibold text-zinc-200 truncate">${escapeAttr(session.title)}</span>
         ${forkHtml}
       </div>
-      <p class="text-xs text-zinc-500 mt-0.5 line-clamp-2 overflow-hidden">${escapeAttr(session.firstMessagePreview)}</p>
+      <p class="text-xs text-zinc-400 mt-0.5 line-clamp-2 overflow-hidden">${escapeAttr(session.firstMessagePreview)}</p>
     </div>
     <div class="flex items-center gap-2 shrink-0">
       <input type="checkbox" class="multi-select checkbox opacity-0 group-hover:opacity-100 transition-opacity ${isSelected ? "opacity-100" : ""}" data-action="toggle-select" ${isSelected ? "checked" : ""} aria-label="Select session" tabindex="-1">
-      <button type="button" class="session-delete-btn opacity-0 group-hover:opacity-100 transition-opacity text-zinc-600 hover:text-red-400 p-0.5" data-action="delete-session" aria-label="Delete session" tabindex="-1">
+      <button type="button" class="session-delete-btn opacity-0 group-hover:opacity-100 transition-opacity text-zinc-400 hover:text-red-400 p-0.5" data-action="delete-session" aria-label="Delete session" tabindex="-1">
         <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4l8 8M12 4l-8 8"/></svg>
       </button>
     </div>
   </div>
   <div class="flex items-center gap-3 mt-1.5">
-    <span class="text-[11px] font-mono text-zinc-600">${duration}</span>
-    <span class="tool-count text-[11px] font-mono text-zinc-600">${session.toolCallCount} tool${session.toolCallCount !== 1 ? "s" : ""}</span>
-    <span class="text-[11px] font-mono text-zinc-600">${session.messageCount} msg</span>
+    <span class="text-[11px] font-mono text-zinc-400">${duration}</span>
+    <span class="tool-count text-[11px] font-mono text-zinc-400">${session.toolCallCount} tool${session.toolCallCount !== 1 ? "s" : ""}</span>
+    <span class="text-[11px] font-mono text-zinc-400">${session.messageCount} msg</span>
   </div>
   ${tags}
 </li>`;
