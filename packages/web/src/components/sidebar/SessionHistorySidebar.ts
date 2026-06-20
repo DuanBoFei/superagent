@@ -1,4 +1,5 @@
 import type { SessionHistorySlice } from "../../store/slices/session-history.slice";
+import { escapeAttr } from "./escape";
 
 export interface SidebarRenderOptions {
   slice: SessionHistorySlice;
@@ -28,7 +29,7 @@ export function renderSessionHistorySidebar(options: SidebarRenderOptions): stri
   const widthStyle = `width:${width}px`;
 
   return `<style>@media(prefers-reduced-motion:reduce){.motion-reduce,.motion-reduce *,.motion-reduce::before,.motion-reduce::after{transition-duration:0s!important;animation-duration:0s!important}}</style>
-  <aside class="session-sidebar motion-reduce fixed left-0 top-0 h-full flex flex-col bg-neutral-950 border-r border-zinc-800 transition-transform duration-150 ease-out ${visibilityClass} ${zClass}" style="${escapeAttribute(widthStyle)}" data-sidebar-open="${open ? "1" : "0"}" data-sidebar-mode="${escapeAttribute(mode)}" data-sidebar-width="${width}" role="complementary" aria-label="Session history" aria-expanded="${open ? "true" : "false"}">
+  <aside class="session-sidebar motion-reduce fixed left-0 top-0 h-full flex flex-col bg-neutral-950 border-r border-zinc-800 transition-transform duration-150 ease-out ${visibilityClass} ${zClass}" style="${escapeAttr(widthStyle)}" data-sidebar-open="${open ? "1" : "0"}" data-sidebar-mode="${escapeAttr(mode)}" data-sidebar-width="${width}" role="complementary" aria-label="Session history" aria-expanded="${open ? "true" : "false"}">
   <div class="sidebar-drag-handle absolute right-0 top-0 w-1 h-full cursor-col-resize hover:bg-emerald-500/50 transition-colors z-10" data-action="drag-handle" aria-hidden="true"></div>
   <div class="sidebar-header flex items-center justify-between px-4 py-3 border-b border-zinc-800 shrink-0">
     <span class="text-sm font-semibold text-emerald-400 tracking-tight">SuperAgent</span>
@@ -100,6 +101,11 @@ export function createSessionHistorySidebarController(
     document.body.style.userSelect = "";
   }
 
+  function onCloseClick(): void {
+    slice.toggleSidebar();
+    updateVisibility();
+  }
+
   function onKeyDown(e: KeyboardEvent): void {
     if (e.key === "Escape" && slice.getSidebarOpen()) {
       slice.toggleSidebar();
@@ -136,10 +142,7 @@ export function createSessionHistorySidebarController(
       if (!findElements()) return;
 
       dragHandle?.addEventListener("mousedown", onDragStart);
-      closeBtn?.addEventListener("click", () => {
-        slice.toggleSidebar();
-        updateVisibility();
-      });
+      closeBtn?.addEventListener("click", onCloseClick);
       document.addEventListener("keydown", onKeyDown);
 
       mediaQuery = window.matchMedia(`(max-width: ${OVERLAY_BREAKPOINT - 1}px)`);
@@ -149,7 +152,7 @@ export function createSessionHistorySidebarController(
 
     detach(): void {
       dragHandle?.removeEventListener("mousedown", onDragStart);
-      closeBtn?.removeEventListener("click", () => {});
+      closeBtn?.removeEventListener("click", onCloseClick);
       document.removeEventListener("keydown", onKeyDown);
       document.removeEventListener("mousemove", onDragMove);
       document.removeEventListener("mouseup", onDragEnd);
@@ -174,12 +177,4 @@ export function createSessionHistorySidebarController(
 function sidebarMode(slice: SessionHistorySlice): "dock" | "overlay" {
   if (typeof window !== "undefined" && window.innerWidth < OVERLAY_BREAKPOINT) return "overlay";
   return slice.getSidebarMode();
-}
-
-function escapeAttribute(value: string): string {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/"/g, "&quot;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
 }

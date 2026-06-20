@@ -1,4 +1,5 @@
 import type { SessionSummary } from "../../types/session-history";
+import { escapeHtml } from "./escape";
 
 // ── Types ───────────────────────────────────────────────
 
@@ -112,14 +113,6 @@ export function renderDeleteConfirm(options: DeleteConfirmOptions): string {
       </div>
     </div>
   </div>`;
-}
-
-function escapeHtml(s: string): string {
-  return s
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
 }
 
 // ── Delete confirm controller ──────────────────────────

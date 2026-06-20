@@ -1,3 +1,5 @@
+import { escapeHtml } from "./escape";
+
 // ── Types ───────────────────────────────────────────────
 
 export interface TitleEditOptions {
@@ -30,14 +32,6 @@ export function renderTitleEdit(title: string): string {
   </span>`;
 }
 
-function escapeHtml(s: string): string {
-  return s
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}
-
 // ── Controller ──────────────────────────────────────────
 
 export function createTitleEditController(
@@ -49,8 +43,11 @@ export function createTitleEditController(
   let currentTitle = initialTitle;
   let isEditing = false;
 
-  const display = el.querySelector<HTMLElement>(".title-edit-display")!;
-  const input = el.querySelector<HTMLInputElement>(".title-edit-input")!;
+  const display = el.querySelector<HTMLElement>(".title-edit-display");
+  const input = el.querySelector<HTMLInputElement>(".title-edit-input");
+  if (!display || !input) {
+    return { attach() {}, detach() {} };
+  }
 
   function enterEditMode(): void {
     if (isEditing) return;

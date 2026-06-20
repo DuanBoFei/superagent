@@ -1,4 +1,5 @@
 import type { Session } from "../../types/session-history";
+import { escapeHtml } from "./escape";
 
 // ── Types ───────────────────────────────────────────────
 
@@ -94,14 +95,6 @@ export function renderForkDialog(options: ForkDialogOptions): string {
       </div>
     </div>
   </div>`;
-}
-
-function escapeHtml(s: string): string {
-  return s
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
 }
 
 // ── Controller ──────────────────────────────────────────

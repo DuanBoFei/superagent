@@ -3,6 +3,7 @@ import type { Message } from "../../types/message";
 import type { ToolCardState, BashCard } from "../../types/cards";
 import { renderMessageBubble } from "../chat/message-bubble";
 import { renderTerminal } from "../chat/terminal/TerminalRenderer";
+import { escapeAttr, escapeHtml } from "./escape";
 
 export interface SessionDetailPanelOptions {
   session: Session;
@@ -19,23 +20,6 @@ export interface SessionDetailPanelController {
 }
 
 // ── Helpers ────────────────────────────────────────────
-
-function escapeAttr(value: string): string {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/"/g, "&quot;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-}
-
-function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
 
 function formatDuration(ms: number): string {
   const totalSeconds = Math.floor(ms / 1000);

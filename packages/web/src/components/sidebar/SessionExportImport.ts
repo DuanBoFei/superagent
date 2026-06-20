@@ -112,7 +112,10 @@ export function createSessionExportImportController(
   el: HTMLElement,
   options: SessionExportImportOptions,
 ): SessionExportImportController {
-  const fileInput = el.querySelector<HTMLInputElement>('input[type="file"]')!;
+  const fileInput = el.querySelector<HTMLInputElement>('input[type="file"]');
+  if (!fileInput) {
+    return { attach() {}, detach() {} };
+  }
 
   function onClick(e: MouseEvent): void {
     const target = e.target as HTMLElement;

@@ -1,6 +1,7 @@
 import type { SessionSummary } from "../../types/session-history";
 import { renderSessionListItem } from "./SessionListItem";
 import type { SessionListItemOptions } from "./SessionListItem";
+import { escapeAttr } from "./escape";
 
 export interface SessionListOptions {
   sessions: SessionSummary[];
@@ -22,14 +23,6 @@ export interface SessionListController {
 const VIRTUAL_THRESHOLD = 20;
 const ESTIMATED_ITEM_HEIGHT = 96;
 const OVERSCAN_COUNT = 5;
-
-function escapeAttr(value: string): string {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/"/g, "&quot;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-}
 
 function renderSkeleton(): string {
   const items = Array.from(

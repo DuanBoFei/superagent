@@ -4,6 +4,7 @@ import type { SessionHistorySlice } from "../../store/slices/session-history.sli
 import type { SessionPlaybackSlice } from "../../hooks/useSessionPlayback";
 import type { SessionDbService } from "../../services/session-db.service";
 import { forkSession } from "./SessionForkDialog";
+import { escapeHtml } from "./escape";
 
 // ── Types ───────────────────────────────────────────────
 
@@ -52,14 +53,6 @@ export function renderPlaybackBanner(options: PlaybackBannerOptions): string {
     </span>
     <button class="playback-banner-resume ml-auto text-[12px] px-3 py-1 rounded bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 transition-colors border border-amber-500/20" data-action="resume-live" type="button">Resume live chat</button>
   </div>`;
-}
-
-function escapeHtml(s: string): string {
-  return s
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
 }
 
 // ── Banner Controller ───────────────────────────────────

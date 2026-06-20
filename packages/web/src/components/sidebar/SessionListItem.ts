@@ -1,4 +1,5 @@
 import type { SessionSummary } from "../../types/session-history";
+import { escapeAttr } from "./escape";
 
 export interface SessionListItemOptions {
   session: SessionSummary;
@@ -52,14 +53,6 @@ function renderTags(tags: string[]): string {
       : "";
 
   return `<div class="session-tags flex flex-wrap gap-1 mt-1">${chips}${overflowHtml}</div>`;
-}
-
-function escapeAttr(value: string): string {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/"/g, "&quot;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
 }
 
 export function renderSessionListItem(options: SessionListItemOptions): string {

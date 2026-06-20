@@ -44,24 +44,7 @@ function getActivePreset(dateRange: DateRange | null): string | null {
   return null;
 }
 
-// ── Escape helpers ──────────────────────────────────────
-
-function escapeAttr(value: string): string {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/"/g, "&quot;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-}
-
-function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
+import { escapeAttr, escapeHtml } from "./escape";
 
 // ── Constants ───────────────────────────────────────────
 

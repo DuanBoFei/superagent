@@ -93,6 +93,7 @@ export class SessionDbService {
     limit = 50,
     offset = 0,
   ): Promise<SessionSummary[]> {
+    try {
     const rows = this.db
       .prepare(SUMMARY_SQL)
       .all(limit, offset) as SessionDbQueryResult[];
@@ -113,9 +114,15 @@ export class SessionDbService {
     }
 
     return rows.map((r) => rowToSummary(r, tagsMap.get(r.id) ?? []));
+    } catch (err) {
+      throw new Error(
+        `Failed to get session summaries: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
   }
 
   async getSession(id: string): Promise<Session | null> {
+    try {
     const row = this.db
       .prepare(GET_SQL)
       .get(id) as SessionDbQueryResult | undefined;
@@ -140,35 +147,65 @@ export class SessionDbService {
       messages: [],
       toolCalls: [],
     };
+    } catch (err) {
+      throw new Error(
+        `Failed to get session ${id}: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
   }
 
   async updateSession(
     id: string,
     updates: { title?: string; status?: SessionStatus },
   ): Promise<void> {
+    try {
     this.db
       .prepare(UPDATE_SQL)
       .run(updates.title ?? null, updates.status ?? null, Date.now(), id);
+    } catch (err) {
+      throw new Error(
+        `Failed to update session ${id}: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
   }
 
   async deleteSession(id: string): Promise<void> {
-    this.db.prepare(DELETE_SQL).run(id);
+    try {
+    const deleteOne = this.db.transaction(() => {
+      this.db.prepare(DELETE_TAGS_SQL).run(id);
+      this.db.prepare(DELETE_SQL).run(id);
+    });
+    deleteOne();
+    } catch (err) {
+      throw new Error(
+        `Failed to delete session ${id}: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
   }
 
   async deleteSessions(ids: string[]): Promise<void> {
+    try {
+    const deleteTagsStmt = this.db.prepare(DELETE_TAGS_SQL);
     const deleteStmt = this.db.prepare(DELETE_SQL);
     const deleteMany = this.db.transaction(() => {
       for (const id of ids) {
+        deleteTagsStmt.run(id);
         deleteStmt.run(id);
       }
     });
     deleteMany();
+    } catch (err) {
+      throw new Error(
+        `Failed to delete sessions: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
   }
 
   async searchSessions(
     query: SearchQuery,
     pagination?: { limit?: number; offset?: number },
   ): Promise<SessionSummary[]> {
+    try {
     const { text, dateRange, statusFilter, tagsFilter } = query;
     const limit = pagination?.limit ?? 50;
     const offset = pagination?.offset ?? 0;
@@ -237,19 +274,42 @@ export class SessionDbService {
     }
 
     return rows.map((r) => rowToSummary(r, tagsMap.get(r.id) ?? []));
+    } catch (err) {
+      throw new Error(
+        `Failed to search sessions: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
   }
 
   async addTag(sessionId: string, tag: string): Promise<void> {
+    try {
     this.db.prepare(ADD_TAG_SQL).run(sessionId, tag);
+    } catch (err) {
+      throw new Error(
+        `Failed to add tag to session ${sessionId}: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
   }
 
   async removeTag(sessionId: string, tag: string): Promise<void> {
+    try {
     this.db.prepare(REMOVE_TAG_SQL).run(sessionId, tag);
+    } catch (err) {
+      throw new Error(
+        `Failed to remove tag from session ${sessionId}: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
   }
 
   async getAllTags(): Promise<string[]> {
+    try {
     const rows = this.db.prepare(ALL_TAGS_SQL).all() as Array<{ tag: string }>;
     return rows.map((r) => r.tag);
+    } catch (err) {
+      throw new Error(
+        `Failed to get all tags: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
   }
 
   close(): void {

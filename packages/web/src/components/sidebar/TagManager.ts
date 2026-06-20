@@ -32,25 +32,7 @@ function hashTagColor(tag: string): number {
   }
   return Math.abs(hash) % TAG_COLORS.length;
 }
-
-// ── Escape helpers ────────────────────────────────────
-
-function escapeAttr(value: string): string {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/"/g, "&quot;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-}
-
-function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
+import { escapeAttr, escapeHtml } from "./escape";
 
 // ── Render ────────────────────────────────────────────
 
