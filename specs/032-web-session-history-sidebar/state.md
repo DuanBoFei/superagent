@@ -1,7 +1,7 @@
 # 实施进度 · web-session-history-sidebar
 
 ## 当前任务
-[>] T022 · Full Test Coverage
+（无 — 全部完成）
 
 ## 已完成
 - [x] T001 · Session History TypeScript 类型定义 (2026-06-20)
@@ -25,6 +25,7 @@
 - [x] T019 · Main Chat Panel Integration (2026-06-20)
 - [x] T020 · Responsive + Accessibility (2026-06-20)
 - [x] T021 · Performance Optimization (2026-06-20)
+- [x] T022 · Full Test Coverage (2026-06-20) — 492 tests, 18 files, 92.62% coverage
 
 ## 阻塞项
 （无）
