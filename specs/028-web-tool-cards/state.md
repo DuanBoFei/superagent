@@ -3,7 +3,7 @@
 ## 状态：✅ 全部完成
 
 ## 当前任务
-（无 — 所有 20 个任务已完成）
+（无 — 所有 20 个任务 + 4 个测试收尾缺口已完成）
 
 ## 已完成
 - [x] T01 · 创建 ToolCard TypeScript 类型定义 (2026-06-20)
@@ -27,11 +27,21 @@
 - [x] T19 · 核心单元测试 + 组件测试 (2026-06-20)
 - [x] T20 · 端到端集成验收 + 视觉回归 (2026-06-20)
 
+## 收尾测试路由（test-routing-advisor → frontend-testing）
+
+- [x] ① 设计 token lint：34 种颜色类对照 DESIGN.md，5 tests (2026-06-20)
+- [x] ③ a11y 审计：axe-core 扫描，修复 1 个 severe violation (CardHeader role="img")，5 tests (2026-06-20)
+- [x] ⑤ 视觉回归：Playwright 截图测试 9 种卡片 + ErrorCard，84 tests (2026-06-20)
+- [x] ④ 跨浏览器+响应式：几何不变量 mobile/tablet/desktop，Chrome+Firefox，32 tests (2026-06-20)
+
 ## 统计
 - 总任务: 20
-- 通过测试: 185 (028 相关)
-- 新增文件: ~25
+- 收尾缺口: 4 (全部完成)
+- Vitest 通过: 232 (37 files)
+- Playwright 测试: 84 (4 projects × 21 tests)
+- 新增文件: ~30
+- 产品码修复: 1 (CardHeader a11y aria-prohibited-attr)
 - 预存失败: 7 (marked 依赖缺失，与 028 无关)
 
 ## 最后更新
-2026-06-20 01:05
+2026-06-20 10:30
