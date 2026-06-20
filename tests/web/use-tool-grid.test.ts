@@ -109,15 +109,17 @@ describe("onToolStart", () => {
 // ── Tool Output ──────────────────────────────────────
 
 describe("onToolOutput", () => {
-  it("appends output to an existing tool", () => {
+  it("appends output to an existing tool (fullOutput real-time, preview throttled)", () => {
     const { grid, sub } = setup();
     sub.onToolStart(makeStartEvent());
     sub.onToolOutput(makeOutputEvent({ content: "hello\n" }));
     sub.onToolOutput(makeOutputEvent({ content: "world\n" }));
 
     const tool = grid.getTool("call_1");
+    // fullOutput always accumulates in real-time
     expect(tool?.fullOutput).toBe("hello\nworld\n");
-    expect(tool?.outputPreview).toEqual(["hello\n", "world\n"]);
+    // outputPreview throttled: second call within 100ms window is buffered
+    expect(tool?.outputPreview).toEqual(["hello\n"]);
   });
 
   it("is a no-op when tool does not exist", () => {

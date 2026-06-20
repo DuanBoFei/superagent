@@ -1,9 +1,19 @@
 # 实施进度 · web-parallel-tool-grid
 
 ## 当前任务
-[ ] T018 · 输出预览节流优化
+[ ] T019 · 可访问性优化
 
 ## 已完成
+- [x] T018 · 输出预览节流优化（2026-06-20）
+  - 文件: `packages/web/src/store/slices/tool-grid.slice.ts` (修改)
+  - 测试: `tests/web/tool-grid-throttle.test.ts` (15 tests, all passed)
+  - 回归修复: `tests/web/use-tool-grid.test.ts` (onToolOutput 测试适配节流)
+  - appendOutput 节流: 同一工具 100ms 内最多一次 outputPreview 刷新
+  - pendingChunks Map 累积缓冲块，flushOutputPreview() 合并输出
+  - fullOutput 始终实时追加，不受节流影响
+  - completeTool/failTool/cancelTool 强制 flush 确保最后输出可见
+  - scheduleDeferred/cancelDeferred: rAF 浏览器 / setTimeout Node 双环境
+  - 每工具独立节流窗口，互不影响
 - [x] T017 · TerminalRenderer 懒加载集成（2026-06-20）
   - 文件: `packages/web/src/components/chat/tool-grid/ToolCard.ts` (修改，+7 行)
   - 测试: `tests/web/tool-card-terminal-renderer.test.ts` (12 tests, all passed)
@@ -177,4 +187,4 @@
   - undoClear 恢复时保留 cancelledAt
 
 ## 最后更新
-2026-06-20 12:40
+2026-06-20 12:45

@@ -48,6 +48,24 @@ export interface ToolGridSlice {
 
 const MAX_PREVIEW_LINES = 5;
 const CANCEL_GRACE_MS = 3000;
+const PREVIEW_THROTTLE_MS = 100;
+
+function scheduleDeferred(fn: () => void): number {
+  // requestAnimationFrame in browser (defers to next frame, low priority);
+  // setTimeout fallback for Node / test environments
+  if (typeof requestAnimationFrame !== "undefined") {
+    return requestAnimationFrame(() => fn()) as unknown as number;
+  }
+  return setTimeout(fn, 0) as unknown as number;
+}
+
+function cancelDeferred(id: number): void {
+  if (typeof cancelAnimationFrame !== "undefined") {
+    cancelAnimationFrame(id);
+  } else {
+    clearTimeout(id);
+  }
+}
 
 export function createToolGridSlice(): ToolGridSlice {
   const tools = new Map<string, ToolCardData>();
@@ -59,6 +77,11 @@ export function createToolGridSlice(): ToolGridSlice {
   let viewMode: ViewMode = "grid";
   let statusFilter: StatusFilter = "all";
   let errorExpanded = false;
+
+  // Per-tool throttle state for output preview
+  const lastPreviewUpdate = new Map<string, number>();
+  const pendingChunks = new Map<string, string[]>();
+  const scheduledFlush = new Map<string, number>();
 
   function buildGridState(): ToolGridState {
     const ids = toolIdOrder.filter((id) => tools.has(id));
@@ -83,6 +106,29 @@ export function createToolGridSlice(): ToolGridSlice {
 
   function cleanupAbortController(id: string): void {
     abortControllers.delete(id);
+  }
+
+  function flushOutputPreview(id: string): void {
+    const scheduled = scheduledFlush.get(id);
+    if (scheduled != null) {
+      cancelDeferred(scheduled);
+      scheduledFlush.delete(id);
+    }
+
+    const tool = tools.get(id);
+    const chunks = pendingChunks.get(id);
+    if (!tool || !chunks || chunks.length === 0) return;
+
+    const previewChunks = [...tool.outputPreview, ...chunks];
+    const outputPreview = previewChunks.slice(-MAX_PREVIEW_LINES);
+
+    tools.set(id, {
+      ...tool,
+      outputPreview,
+    });
+
+    pendingChunks.delete(id);
+    lastPreviewUpdate.set(id, Date.now());
   }
 
   return {
@@ -118,18 +164,36 @@ export function createToolGridSlice(): ToolGridSlice {
     appendOutput(id: string, content: string): void {
       const tool = tools.get(id);
       if (!tool) return;
+
+      // fullOutput always updates immediately (real-time accumulation)
       const fullOutput = tool.fullOutput + content;
-      // Collect all output chunks for preview (preserve newlines)
-      const previewChunks = [...tool.outputPreview, content];
-      // Keep only last MAX_PREVIEW_LINES
-      const outputPreview = previewChunks.slice(-MAX_PREVIEW_LINES);
+      const outputBytes = new TextEncoder().encode(fullOutput).length;
+
+      // Accumulate pending preview content
+      const existing = pendingChunks.get(id) ?? [];
+      pendingChunks.set(id, [...existing, content]);
+
+      // Throttle preview updates to PREVIEW_THROTTLE_MS per tool
+      const lastUpdate = lastPreviewUpdate.get(id) ?? 0;
+      const now = Date.now();
+      const elapsed = now - lastUpdate;
+
+      if (elapsed >= PREVIEW_THROTTLE_MS) {
+        flushOutputPreview(id);
+      } else if (!scheduledFlush.has(id)) {
+        const delay = PREVIEW_THROTTLE_MS - elapsed;
+        const deferredId = scheduleDeferred(() => flushOutputPreview(id));
+        scheduledFlush.set(id, deferredId);
+      }
+
+      // Always persist fullOutput; re-read tool after possible flush above
+      const updated = tools.get(id)!;
       tools.set(id, {
-        ...tool,
+        ...updated,
         fullOutput,
-        outputPreview,
         resourceUsage: {
-          ...tool.resourceUsage,
-          outputBytes: new TextEncoder().encode(fullOutput).length,
+          ...updated.resourceUsage,
+          outputBytes,
         },
       });
     },
@@ -140,8 +204,11 @@ export function createToolGridSlice(): ToolGridSlice {
       if (tool.status === "success" || tool.status === "failed" || tool.status === "cancelled") {
         return; // Idempotent
       }
+      // Force flush any pending preview before finalizing
+      flushOutputPreview(id);
+      const updated = tools.get(id)!;
       const { endTime, durationMs } = recordEndTime(id);
-      tools.set(id, { ...tool, status: "success", endTime, durationMs, progress: 100 });
+      tools.set(id, { ...updated, status: "success", endTime, durationMs, progress: 100 });
       cleanupAbortController(id);
     },
 
@@ -151,17 +218,23 @@ export function createToolGridSlice(): ToolGridSlice {
       if (tool.status === "success" || tool.status === "failed" || tool.status === "cancelled") {
         return; // Idempotent
       }
+      // Force flush any pending preview before finalizing
+      flushOutputPreview(id);
+      const updated = tools.get(id)!;
       const { endTime, durationMs } = recordEndTime(id);
-      tools.set(id, { ...tool, status: "failed", endTime, durationMs, error });
+      tools.set(id, { ...updated, status: "failed", endTime, durationMs, error });
       cleanupAbortController(id);
     },
 
     cancelTool(id: string): void {
       const tool = tools.get(id);
       if (!tool) return;
+      // Force flush any pending preview before finalizing
+      flushOutputPreview(id);
+      const updated = tools.get(id)!;
       const { endTime, durationMs } = recordEndTime(id);
       tools.set(id, {
-        ...tool,
+        ...updated,
         status: "cancelled",
         endTime,
         durationMs,
