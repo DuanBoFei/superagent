@@ -1,7 +1,7 @@
 # 实施进度 · web-parallel-tool-grid
 
 ## 当前任务
-[ ] T010 · SortFilterControls
+[ ] T011 · ViewToggle
 
 ## 已完成
 - [x] T001 · ToolGrid TypeScript 类型定义（2026-06-20）
@@ -94,5 +94,16 @@
   - Undo 机制: showUndo=true 时替换 Clear Completed 为 Undo (Xs) 倒计时按钮
   - role="toolbar" + aria-label 无障碍标注
 
+- [x] T010 · SortFilterControls（2026-06-20）
+  - 文件: `packages/web/src/components/chat/tool-grid/SortFilterControls.ts` (64 行)
+  - 测试: `tests/web/sort-filter-controls.test.ts` (15 tests, all passed)
+  - renderSortFilterControls() 纯函数 — 返回排序筛选控件 HTML 字符串
+  - Sort select: data-action="sort-by" + data-sort-selected 标记当前排序字段
+  - Sort direction toggle: data-action="toggle-sort-order" + sort-order-asc/desc CSS class
+  - Filter buttons: data-action="filter-by" + data-filter-value + filter-active-{status} active 状态
+  - Status/Duration/Name 三字段 + All/Running/Failed/Completed 四筛选
+  - 全组合测试 (3×2×4=24 combos) 均通过
+  - escapeHtml/escapeAttr XSS 防护
+
 ## 最后更新
-2026-06-20 12:20
+2026-06-20 12:22
