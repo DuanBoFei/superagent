@@ -1,7 +1,7 @@
 # 实施进度 · web-parallel-tool-grid
 
 ## 当前任务
-[ ] T009 · BulkActionBar
+[ ] T010 · SortFilterControls
 
 ## 已完成
 - [x] T001 · ToolGrid TypeScript 类型定义（2026-06-20）
@@ -84,5 +84,15 @@
   - 输入: failedTools (ToolCardData[]) + isExpanded (boolean)
   - escapeHtml/escapeAttr XSS 防护
 
+- [x] T009 · BulkActionBar（2026-06-20）
+  - 文件: `packages/web/src/components/chat/tool-grid/BulkActionBar.ts` (45 行)
+  - 测试: `tests/web/bulk-action-bar.test.ts` (18 tests, all passed)
+  - renderBulkActionBar() 纯函数 — 返回批量操作栏 HTML 字符串
+  - 四个按钮: Cancel All / Expand All / Collapse All / Clear Completed
+  - Cancel All: 无 running 时 disabled + cancel-all-disabled CSS class
+  - Clear Completed: 无 completed 时 disabled + clear-completed-disabled CSS class
+  - Undo 机制: showUndo=true 时替换 Clear Completed 为 Undo (Xs) 倒计时按钮
+  - role="toolbar" + aria-label 无障碍标注
+
 ## 最后更新
-2026-06-20 12:19
+2026-06-20 12:20
