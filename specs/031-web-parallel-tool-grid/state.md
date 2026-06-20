@@ -1,7 +1,7 @@
 # 实施进度 · web-parallel-tool-grid
 
 ## 当前任务
-[ ] T006 · ToolTimer 组件 + useToolTimer hook
+[ ] T007 · ToolCard 基础卡片组件
 
 ## 已完成
 - [x] T001 · ToolGrid TypeScript 类型定义（2026-06-20）
@@ -15,6 +15,19 @@
   - Indeterminate 模式: progress = null → pulse CSS class + aria-valuenow=""
   - 状态颜色: pending/running/success/failed/cancelled 各独立 CSS class
   - clamp() 边界保护 (-5→0%, 150→100%)
+- [x] T006 · ToolTimer 组件 + useToolTimer hook（2026-06-20）
+  - 文件: `packages/web/src/hooks/use-tool-timer.ts` (113 行)
+  - 文件: `packages/web/src/components/chat/tool-grid/ToolTimer.ts` (22 行)
+  - 测试: `tests/web/use-tool-timer.test.ts` (15 tests, all passed)
+  - 测试: `tests/web/tool-timer.test.ts` (14 tests, all passed)
+  - createToolTimer() factory — ToolTimerController 接口（start/stop/getState/onUpdate/destroy）
+  - requestAnimationFrame 驱动，每秒更新，非 setInterval
+  - 输入 startTime/endTime → 输出 formatted MM:SS + running boolean
+  - endTime 已设置时停止 RAF 循环，返回最终状态
+  - formatTime() 纯函数：65s→01:05, 3661s→61:01
+  - renderToolTimer() 纯函数：running 时 "tool-timer-running" CSS class + role=timer
+  - 非运行状态的视觉效果（无闪烁动画）
+  - escapeHtml/escapeAttr XSS 防护
   - 文件: `packages/web/src/hooks/use-tool-grid.ts` (105 行)
   - 测试: `tests/web/use-tool-grid.test.ts` (23 tests, all passed)
   - createToolGridSubscriber() factory — ToolGridEventSubscriber 接口
@@ -46,4 +59,4 @@
 （无）
 
 ## 最后更新
-2026-06-20 12:10
+2026-06-20 12:16
