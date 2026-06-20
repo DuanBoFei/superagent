@@ -29,9 +29,9 @@ const DEFAULT_FILTERS: SearchQuery = {
   tagsFilter: null,
 };
 
-const MIN_SIDEBAR_WIDTH = 200;
-const MAX_SIDEBAR_WIDTH = 480;
-const DEFAULT_SIDEBAR_WIDTH = 280;
+const MIN_SIDEBAR_WIDTH = 280;
+const MAX_SIDEBAR_WIDTH = 600;
+const DEFAULT_SIDEBAR_WIDTH = 360;
 
 export function createSessionHistorySlice(
   dbService: SessionDbService,

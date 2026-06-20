@@ -76,8 +76,8 @@ describe("SessionHistorySlice", () => {
       expect(slice.getSidebarOpen()).toBe(true);
     });
 
-    it("has default sidebar width of 280", () => {
-      expect(slice.getSidebarWidth()).toBe(280);
+    it("has default sidebar width of 360", () => {
+      expect(slice.getSidebarWidth()).toBe(360);
     });
 
     it("has sidebar mode dock by default", () => {
@@ -156,12 +156,12 @@ describe("SessionHistorySlice", () => {
 
     it("setSidebarWidth clamps to minimum", () => {
       slice.setSidebarWidth(50);
-      expect(slice.getSidebarWidth()).toBe(200);
+      expect(slice.getSidebarWidth()).toBe(280);
     });
 
     it("setSidebarWidth clamps to maximum", () => {
       slice.setSidebarWidth(9999);
-      expect(slice.getSidebarWidth()).toBe(480);
+      expect(slice.getSidebarWidth()).toBe(600);
     });
 
     it("setSidebarWidth accepts valid values", () => {
