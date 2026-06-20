@@ -1,7 +1,7 @@
 # 实施进度 · web-session-history-sidebar
 
 ## 当前任务
-[>] T009 · SessionSearchFilter 搜索筛选组件
+[>] T010 · TagManager 标签管理组件
 
 ## 已完成
 - [x] T001 · Session History TypeScript 类型定义 (2026-06-20)
@@ -12,6 +12,7 @@
 - [x] T006 · Sidebar Container + 拖拽宽度 (2026-06-20)
 - [x] T007 · SessionListItem 会话卡片组件 (2026-06-20)
 - [x] T008 · SessionList + 虚拟滚动 (2026-06-20)
+- [x] T009 · SessionSearchFilter 搜索筛选组件 (2026-06-20)
 
 ## 阻塞项
 （无）
