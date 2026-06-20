@@ -1,7 +1,7 @@
 # 实施进度 · web-parallel-tool-grid
 
 ## 当前任务
-[ ] T012 · ResourceBarChart
+[ ] T013 · useToolVirtualScroll hook
 
 ## 已完成
 - [x] T001 · ToolGrid TypeScript 类型定义（2026-06-20）
@@ -114,5 +114,17 @@
   - role="group" + aria-label="View mode"
   - 每个按钮独立 aria-label + aria-pressed 无障碍标注
 
+- [x] T012 · ResourceBarChart（2026-06-20）
+  - 文件: `packages/web/src/components/chat/tool-grid/ResourceBarChart.ts` (79 行)
+  - 测试: `tests/web/resource-bar-chart.test.ts` (26 tests, all passed)
+  - renderResourceBarChart() 纯函数 — 返回资源条形图 HTML
+  - Metric tabs: Duration / Output Size，data-action="select-metric-{metric}"
+  - 行: tool name + bar (width%) + value label，按值降序排列
+  - 归一化: max=100%，bar color 对应工具状态 (bar-color-{status})
+  - 仅显示已完成工具 (success/failed/cancelled)，排除 pending/running
+  - No-data 状态: no-data CSS class
+  - 格式化: durationMs→"2.3s", outputBytes→"1.5KB"/"0B"
+  - escapeHtml/escapeAttr XSS 防护
+
 ## 最后更新
-2026-06-20 12:22
+2026-06-20 12:23
