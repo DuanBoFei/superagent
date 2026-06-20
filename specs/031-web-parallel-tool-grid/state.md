@@ -1,13 +1,20 @@
 # 实施进度 · web-parallel-tool-grid
 
 ## 当前任务
-[ ] T005 · ToolProgressBar 组件
+[ ] T006 · ToolTimer 组件 + useToolTimer hook
 
 ## 已完成
 - [x] T001 · ToolGrid TypeScript 类型定义（2026-06-20）
 - [x] T002 · ToolGrid Store Slice（2026-06-20）
 - [x] T003 · Derived State Selectors（2026-06-20）
 - [x] T004 · Tool Orchestrator 事件订阅集成（2026-06-20）
+- [x] T005 · ToolProgressBar 组件（2026-06-20）
+  - 文件: `packages/web/src/components/chat/tool-grid/ToolProgressBar.ts` (37 行)
+  - 测试: `tests/web/tool-progress-bar.test.ts` (15 tests, all passed)
+  - Determinate 模式: progress 0-100 → width% + role=progressbar + aria-valuenow
+  - Indeterminate 模式: progress = null → pulse CSS class + aria-valuenow=""
+  - 状态颜色: pending/running/success/failed/cancelled 各独立 CSS class
+  - clamp() 边界保护 (-5→0%, 150→100%)
   - 文件: `packages/web/src/hooks/use-tool-grid.ts` (105 行)
   - 测试: `tests/web/use-tool-grid.test.ts` (23 tests, all passed)
   - createToolGridSubscriber() factory — ToolGridEventSubscriber 接口
