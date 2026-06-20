@@ -28,6 +28,7 @@ export interface ToolCardData {
   error: ToolError | null;
   isExpanded: boolean;
   resourceUsage: ResourceUsage;
+  cancelledAt?: number;
 }
 
 // ── Tool Grid State ─────────────────────────────────────

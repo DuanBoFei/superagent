@@ -1,7 +1,7 @@
 # 实施进度 · web-parallel-tool-grid
 
 ## 当前任务
-[ ] T015 · AbortController 取消信号传播
+[ ] T016 · 028 ToolCard 集成替换
 
 ## 已完成
 - [x] T001 · ToolGrid TypeScript 类型定义（2026-06-20）
@@ -146,5 +146,16 @@
   - view-mode-{grid|list} + grid-cols-{1|2|3} CSS class
   - 仅在有已完成工具时渲染 ResourceBarChart
 
+- [x] T015 · AbortController 取消信号传播（2026-06-20）
+  - 文件: `packages/web/src/store/slices/tool-grid.slice.ts` (修改，新增 CANCEL_GRACE_MS)
+  - 文件: `packages/web/src/types/tool-grid.ts` (修改，新增 cancelledAt 字段)
+  - 测试: `tests/web/tool-grid-abort.test.ts` (21 tests, all passed)
+  - cancelTool()/cancelAllRunning() 记录 cancelledAt 时间戳
+  - clearCompleted() 排除 3 秒内取消的工具（CANCEL_GRACE_MS = 3000）
+  - AbortController 注册/清理/abort() 传播完整链路
+  - cancelAllRunning() 对 pending+running 工具批量 abort
+  - clearCompleted 同时清理已清除工具的 AbortController
+  - undoClear 恢复时保留 cancelledAt
+
 ## 最后更新
-2026-06-20 12:28
+2026-06-20 12:30

@@ -47,6 +47,7 @@ export interface ToolGridSlice {
 }
 
 const MAX_PREVIEW_LINES = 5;
+const CANCEL_GRACE_MS = 3000;
 
 export function createToolGridSlice(): ToolGridSlice {
   const tools = new Map<string, ToolCardData>();
@@ -159,7 +160,13 @@ export function createToolGridSlice(): ToolGridSlice {
       const tool = tools.get(id);
       if (!tool) return;
       const { endTime, durationMs } = recordEndTime(id);
-      tools.set(id, { ...tool, status: "cancelled", endTime, durationMs });
+      tools.set(id, {
+        ...tool,
+        status: "cancelled",
+        endTime,
+        durationMs,
+        cancelledAt: Date.now(),
+      });
       const ctrl = abortControllers.get(id);
       if (ctrl) {
         ctrl.abort();
@@ -224,8 +231,15 @@ export function createToolGridSlice(): ToolGridSlice {
     clearCompleted(): void {
       const toRemove: string[] = [];
       undoStack = [];
+      const now = Date.now();
       for (const [id, tool] of tools) {
-        if (tool.status === "success" || tool.status === "failed" || tool.status === "cancelled") {
+        if (
+          tool.status === "success" ||
+          tool.status === "failed" ||
+          (tool.status === "cancelled" &&
+            tool.cancelledAt != null &&
+            now - tool.cancelledAt > CANCEL_GRACE_MS)
+        ) {
           const index = toolIdOrder.indexOf(id);
           undoStack.push({ tool: { ...tool }, index });
           toRemove.push(id);
@@ -239,10 +253,17 @@ export function createToolGridSlice(): ToolGridSlice {
     },
 
     cancelAllRunning(): void {
+      const now = Date.now();
       for (const [id, tool] of tools) {
         if (tool.status === "running" || tool.status === "pending") {
           const { endTime, durationMs } = recordEndTime(id);
-          tools.set(id, { ...tool, status: "cancelled", endTime, durationMs });
+          tools.set(id, {
+            ...tool,
+            status: "cancelled",
+            endTime,
+            durationMs,
+            cancelledAt: now,
+          });
           const ctrl = abortControllers.get(id);
           if (ctrl) {
             ctrl.abort();
