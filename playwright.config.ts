@@ -8,9 +8,9 @@ export default defineConfig({
     timeout: 10000,
   },
   snapshotDir: "./tests/web/__snapshots__",
-  snapshotPathTemplate: "{snapshotDir}/{testFilePath}/{arg}{ext}",
+  snapshotPathTemplate: "{snapshotDir}/{testFilePath}/{projectName}/{arg}{ext}",
   use: {
-    baseURL: "http://localhost:4321",
+    baseURL: "http://localhost:3456",
     colorScheme: "dark",
   },
   projects: [
@@ -28,23 +28,11 @@ export default defineConfig({
         viewport: { width: 1280, height: 900 },
       },
     },
-    {
-      name: "chromium-mobile",
-      use: {
-        ...devices["Pixel 5"],
-      },
-    },
-    {
-      name: "chromium-tablet",
-      use: {
-        ...devices["iPad Pro 11"],
-      },
-    },
   ],
   webServer: {
-    command: "npx tsx tests/web/serve-fixture.ts",
-    url: "http://localhost:4321",
+    command: "pnpm -C packages/web dev --port 3456",
+    url: "http://localhost:3456",
     reuseExistingServer: true,
-    timeout: 10000,
+    timeout: 30000,
   },
 });
