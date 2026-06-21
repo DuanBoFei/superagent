@@ -20,6 +20,16 @@ export class RuntimeBridge {
 
       if (event.type === "text") {
         yield { type: "token", token: event.content };
+      } else if (event.type === "tool_call") {
+        yield {
+          type: "token",
+          token: JSON.stringify({ type: "tool_call", name: event.name, input: event.args }),
+        };
+      } else if (event.type === "tool_result") {
+        yield {
+          type: "token",
+          token: JSON.stringify({ type: "tool_result", name: event.name, success: event.success, summary: event.summary }),
+        };
       } else if (event.type === "turn_end") {
         yield {
           type: "complete",

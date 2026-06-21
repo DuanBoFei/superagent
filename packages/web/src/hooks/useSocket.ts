@@ -6,7 +6,8 @@ import type { ClientToServerEvents, ServerToClientEvents } from "../types/messag
 
 type ConnectionStatus = "connecting" | "connected" | "disconnected";
 
-const BACKEND_URL = "http://localhost:3457";
+const BACKEND_PORT = process.env.NEXT_PUBLIC_BACKEND_PORT ?? "3456";
+const BACKEND_URL = `http://localhost:${BACKEND_PORT}`;
 
 export function useSocket() {
   const socketRef = useRef<Socket<ServerToClientEvents, ClientToServerEvents> | null>(null);
