@@ -25,10 +25,10 @@ async function main(): Promise<void> {
         process.stdout.write("No saved sessions.\n");
       } else {
         for (const s of sessions) {
-          process.stdout.write(`${s.id}\t${s.date}\t${s.turns} turns\t${s.firstMessage}\n`);
+          process.stdout.write(`${s.id}\t${s.date}\t${s.turns} turns\t${s.firstMessage || "(empty)"}\n`);
         }
       }
-      process.exit(0);
+      return;
     }
 
     const sessionId = process.argv.includes("--resume")
@@ -99,7 +99,7 @@ async function main(): Promise<void> {
       process.stdout.write("\n");
       obs.emit({ type: "session:end", exitCode: 0 });
       obs.close();
-      process.exit(0);
+      return;
     }
 
     await startRepl(runtime, config, detectTerminalProfile(process.platform, process.env));

@@ -96,8 +96,6 @@ export async function* fallbackRequest(
   options.onAttemptStart?.({ model: secondaryCfg.model, attempt: 1, category: "fallback" });
   try {
     yield* yieldChunks(requestWithRetry(prompt, secondaryCfg, options.requester));
-    primaryTimeouts = 0;
-    skipPrimary = false;
     options.onAttemptEnd?.({
       model: secondaryCfg.model,
       attempt: 1,

@@ -17,6 +17,9 @@ export function dispatchEvent(
         `${event.success ? "✓" : "✗"} [${event.name}] ${event.summary}\n`,
       );
       break;
+    case "agent_phase":
+      process.stdout.write(`[${event.role}] ${event.lifecycle}\n`);
+      break;
     case "turn_end":
       process.stdout.write(
         `\n✓ Turn ${event.summary.turnNumber} | ${event.summary.totalTokens} tokens | $${event.summary.totalCost.toFixed(3)}\n`,

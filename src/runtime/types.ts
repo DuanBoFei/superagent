@@ -43,6 +43,11 @@ export type TurnEvent =
       args: Record<string, unknown>;
     }
   | { type: "tool_result"; name: string; success: boolean; summary: string }
+  | {
+      type: "agent_phase";
+      role: "explore" | "implement" | "review";
+      lifecycle: "start" | "result" | "failure" | "skipped";
+    }
   | { type: "turn_end"; summary: TurnSummary }
   | { type: "error"; message: string };
 

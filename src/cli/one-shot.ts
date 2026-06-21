@@ -16,6 +16,9 @@ export async function runOneShot(
     if (event.type === "text") {
       process.stdout.write(event.content);
     }
+    if (event.type === "agent_phase") {
+      process.stdout.write(`[${event.role}] ${event.lifecycle}\n`);
+    }
     if (event.type === "error") {
       process.stderr.write(`✗ ${event.message}\n`);
     }
