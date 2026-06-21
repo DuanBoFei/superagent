@@ -4,6 +4,7 @@
 export interface SessionSummary {
   id: string;
   title: string;
+  firstMessagePreview: string;
   createdAt: string;
   updatedAt: string;
   messageCount: number;
