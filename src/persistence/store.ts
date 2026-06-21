@@ -83,6 +83,8 @@ export function listSessions(
   return rows.map((row) => ({
     id: row.id as string,
     date: new Date(row.created_at as number).toISOString(),
+    createdAt: row.created_at as number,
+    updatedAt: row.updated_at as number,
     turns: row.turn_count as number,
     firstMessage: (row.first_message as string) ?? "",
   }));

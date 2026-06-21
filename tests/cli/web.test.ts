@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { startWebCommand, type WebCommandServer } from "../../src/cli/web";
 import { WebLogger } from "../../src/server/logger";
+import type { MessageRuntime, SessionDataProvider } from "../../src/server/socket-handlers";
 
 function createLogger(output: string[]) {
   return new WebLogger({ color: false, verbose: true, write: (line) => output.push(line) });
@@ -98,5 +99,63 @@ describe("startWebCommand", () => {
     await expect(command).resolves.toBe(0);
     expect(shutdown).toHaveBeenCalledWith(1000);
     expect(output.join("\n")).toContain("Web server stopped");
+  });
+
+  it("wires the runtime and session provider to the socket hub after server start", async () => {
+    const output: string[] = [];
+    const registerHandlersSpy = vi.fn();
+    const runtimeBridge: MessageRuntime = {
+      startTurn: async function* () {
+        yield { type: "complete" };
+      },
+    };
+    const sessionProvider: SessionDataProvider = {
+      listSessions: () => [],
+      loadSessionMessages: () => null,
+    };
+
+    const server: WebCommandServer = {
+      start: async () => ({ host: "127.0.0.1", port: 4567, url: "http://localhost:4567", pid: 123 }),
+      shutdown: async () => undefined,
+      getIO: () => ({ registerHandlers: registerHandlersSpy }) as any,
+    };
+
+    const result = await startWebCommand({
+      port: 4567,
+      noOpen: true,
+      noFrontend: true,
+      logger: createLogger(output),
+      createServer: () => server,
+      createRuntimeBridge: () => runtimeBridge,
+      createSessionProvider: () => sessionProvider,
+    });
+
+    expect(result).toBe(0);
+    expect(registerHandlersSpy).toHaveBeenCalledWith(runtimeBridge, sessionProvider);
+  });
+
+  it("skips socket hub wiring when the server has no getIO method", async () => {
+    const output: string[] = [];
+    const runtimeBridge: MessageRuntime = {
+      startTurn: async function* () {
+        yield { type: "complete" };
+      },
+    };
+
+    const server: WebCommandServer = {
+      start: async () => ({ host: "127.0.0.1", port: 4567, url: "http://localhost:4567", pid: 123 }),
+      shutdown: async () => undefined,
+    };
+
+    const result = await startWebCommand({
+      port: 4567,
+      noOpen: true,
+      noFrontend: true,
+      logger: createLogger(output),
+      createServer: () => server,
+      createRuntimeBridge: () => runtimeBridge,
+    });
+
+    expect(result).toBe(0);
   });
 });

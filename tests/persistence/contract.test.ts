@@ -55,7 +55,7 @@ describe("Persistence contract", () => {
       expect(list).toHaveLength(1);
       const summary = list[0]!;
       const keys = Object.keys(summary).sort();
-      expect(keys).toEqual(["date", "firstMessage", "id", "turns"]);
+      expect(keys).toEqual(["createdAt", "date", "firstMessage", "id", "turns", "updatedAt"]);
       expect(typeof summary.id).toBe("string");
       expect(typeof summary.date).toBe("string");
       expect(typeof summary.turns).toBe("number");

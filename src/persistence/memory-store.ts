@@ -26,9 +26,12 @@ export function createMemoryStore(): SessionManager {
       const results: SessionSummary[] = [];
       for (const [id, state] of sessions) {
         const firstUserMsg = state.messages.find((m) => m.role === "user");
+        const now = Date.now();
         results.push({
           id,
           date: new Date(state.startedAt).toISOString(),
+          createdAt: state.startedAt,
+          updatedAt: now,
           turns: state.turnNumber,
           firstMessage: firstUserMsg?.content ?? "",
         });

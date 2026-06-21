@@ -10,6 +10,8 @@ export interface SessionRecord {
 export interface SessionSummary {
   id: string;
   date: string;
+  createdAt: number;
+  updatedAt: number;
   turns: number;
   firstMessage: string;
 }

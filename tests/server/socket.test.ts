@@ -174,4 +174,167 @@ describe("SocketHub handler registration", () => {
       server.close();
     }
   });
+
+  it("routes load_session to session_loaded with stored messages", async () => {
+    const { server, port } = await createTestServer();
+    const hub = new SocketHub(server, () => port);
+
+    const storedMessages = [
+      { role: "user" as const, content: "hello" },
+      { role: "assistant" as const, content: "hi there" },
+    ];
+
+    const sessionProvider: SessionDataProvider = {
+      listSessions: () => [],
+      loadSessionMessages: (id) => (id === "loaded-session" ? storedMessages : null),
+    };
+
+    const runtime = {
+      startTurn: vi.fn(async function* (): AsyncGenerator<RuntimeEvent> {
+        yield { type: "complete" };
+      }),
+    };
+
+    hub.registerHandlers(runtime, sessionProvider);
+
+    const client = ioc(`http://127.0.0.1:${port}`, { forceNew: true, transports: ["websocket"] });
+
+    try {
+      await new Promise<void>((resolve) => client.on("connect", resolve));
+
+      const response = waitForEvent<{ sessionId: string; messages: Array<{ role: string; content: string }> }>(client, "session_loaded");
+      client.emit("load_session", { sessionId: "loaded-session" });
+
+      const payload = await response;
+      expect(payload.sessionId).toBe("loaded-session");
+      expect(payload.messages).toHaveLength(2);
+      expect(payload.messages[0]).toMatchObject({ role: "user", content: "hello" });
+    } finally {
+      client.disconnect();
+      hub.io.close();
+      server.close();
+    }
+  });
+
+  it("does not emit session_loaded for unknown session ids", async () => {
+    const { server, port } = await createTestServer();
+    const hub = new SocketHub(server, () => port);
+
+    const sessionProvider: SessionDataProvider = {
+      listSessions: () => [],
+      loadSessionMessages: () => null,
+    };
+
+    const runtime = {
+      startTurn: vi.fn(async function* (): AsyncGenerator<RuntimeEvent> {
+        yield { type: "complete" };
+      }),
+    };
+
+    hub.registerHandlers(runtime, sessionProvider);
+
+    const client = ioc(`http://127.0.0.1:${port}`, { forceNew: true, transports: ["websocket"] });
+
+    try {
+      await new Promise<void>((resolve) => client.on("connect", resolve));
+
+      let received = false;
+      client.on("session_loaded", () => { received = true; });
+      client.emit("load_session", { sessionId: "nonexistent" });
+
+      // Wait briefly to ensure no event arrives
+      await new Promise((r) => setTimeout(r, 200));
+      expect(received).toBe(false);
+    } finally {
+      client.disconnect();
+      hub.io.close();
+      server.close();
+    }
+  });
+
+  it("emits message_error to client when runtime throws", async () => {
+    const { server, port } = await createTestServer();
+    const hub = new SocketHub(server, () => port);
+
+    const runtime = {
+      startTurn: vi.fn(async function* (): AsyncGenerator<RuntimeEvent> {
+        throw new Error("API key invalid");
+      }),
+    };
+
+    const sessionProvider: SessionDataProvider = {
+      listSessions: () => [],
+      loadSessionMessages: () => null,
+    };
+
+    hub.registerHandlers(runtime, sessionProvider);
+
+    const client = ioc(`http://127.0.0.1:${port}`, { forceNew: true, transports: ["websocket"] });
+
+    try {
+      await new Promise<void>((resolve) => client.on("connect", resolve));
+
+      const errorPromise = waitForEvent<{ code: string; message: string; retryable: boolean }>(client, "message_error");
+      client.emit("client_send", { messageId: "err-1", sessionId: "s-err", content: "bad", timestamp: 0 });
+
+      const error = await errorPromise;
+      expect(error.code).toBe("RUNTIME_ERROR");
+      expect(error.message).toBe("API key invalid");
+      expect(error.retryable).toBe(true);
+    } finally {
+      client.disconnect();
+      hub.io.close();
+      server.close();
+    }
+  });
+
+  it("supports multiple concurrent client connections", async () => {
+    const { server, port } = await createTestServer();
+    const hub = new SocketHub(server, () => port);
+
+    const sessionProvider: SessionDataProvider = {
+      listSessions: () => [],
+      loadSessionMessages: () => null,
+    };
+
+    const runtime = {
+      startTurn: vi.fn(async function* (): AsyncGenerator<RuntimeEvent> {
+        yield { type: "token", token: "ok" };
+        yield { type: "complete" };
+      }),
+    };
+
+    hub.registerHandlers(runtime, sessionProvider);
+
+    const client1 = ioc(`http://127.0.0.1:${port}`, { forceNew: true, transports: ["websocket"] });
+    const client2 = ioc(`http://127.0.0.1:${port}`, { forceNew: true, transports: ["websocket"] });
+
+    try {
+      await Promise.all([
+        new Promise<void>((r) => client1.on("connect", r)),
+        new Promise<void>((r) => client2.on("connect", r)),
+      ]);
+
+      // Both clients get session_list on get_sessions
+      const r1 = waitForEvent(client1, "session_list");
+      const r2 = waitForEvent(client2, "session_list");
+      client1.emit("get_sessions");
+      client2.emit("get_sessions");
+      await Promise.all([r1, r2]);
+
+      // Both clients can send messages and get tokens
+      const t1 = new Promise<void>((resolve) => client1.on("stream_token", () => resolve()));
+      const t2 = new Promise<void>((resolve) => client2.on("stream_token", () => resolve()));
+      client1.emit("client_send", { messageId: "c1", sessionId: "s1", content: "a", timestamp: 0 });
+      client2.emit("client_send", { messageId: "c2", sessionId: "s2", content: "b", timestamp: 0 });
+      await Promise.all([t1, t2]);
+
+      expect(runtime.startTurn).toHaveBeenCalledTimes(2);
+    } finally {
+      client1.disconnect();
+      client2.disconnect();
+      hub.io.close();
+      server.close();
+    }
+  });
 });
