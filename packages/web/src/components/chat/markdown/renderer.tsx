@@ -96,7 +96,7 @@ const ALLOWED_ATTR = [
 ];
 
 function sanitize(html: string): string {
-  return DOMPurify.sanitize(html, {
+  return DOMPurify(html, {
     ALLOWED_TAGS,
     ALLOWED_ATTR,
   });

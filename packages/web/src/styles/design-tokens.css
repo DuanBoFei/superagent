@@ -1,0 +1,61 @@
+/* ═══════════════════════════════════════════════════════════════════
+   SuperAgent · Design Tokens (CSS Custom Properties)
+   Single source of truth: DESIGN.md → §Colors / §Typography / §Layout
+   ═══════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ── Surface Elevation (tonal layering, no shadows) ── */
+  --surface-base:       #0a0a0a;  /* Level 0 · App shell */
+  --surface-panel:      #0d0d0d;  /* Level 1 · Nested panels / cards */
+  --surface-modal:      #18181b;  /* Level 2 · Modals / popovers */
+  --surface-input:      #050505;  /* Input background */
+  --surface-hover:      #18181b;  /* List item hover */
+
+  /* ── Borders ── */
+  --border-default:     #1f1f23;  /* 1px solid panel boundaries */
+  --border-input:       #1f1f23;
+
+  /* ── Typography Colors ── */
+  --text-primary:       #fafafa;  /* Headings · Code */
+  --text-secondary:     #a1a1aa;  /* Labels · Metadata */
+  --text-on-accent:     #fafafa;  /* Text on emerald backgrounds */
+
+  /* ── Accent ── */
+  --color-accent:       #10b981;  /* Emerald · Execution / Success */
+  --color-accent-dim:   rgb(16 185 129 / 0.10);  /* 10% opacity badge */
+
+  /* ── Status Colors ── */
+  --color-success:      #10b981;
+  --color-error:        #ef4444;
+  --color-warning:      #f59e0b;
+
+  /* ── Typography · Font Families ── */
+  --font-ui:            inter, sans-serif;
+  --font-code:          "JetBrains Mono", consolas, monaco, monospace;
+
+  /* ── Typography · Sizes (DESIGN.md scale) ── */
+  --text-xs:            11px;     /* Labels · breadcrumbs · status tags */
+  --text-sm:            13px;     /* Body small */
+  --text-base:          14px;     /* Body · UI workhorse */
+  --text-lg:            18px;     /* Headline small */
+  --text-code:          13px;     /* Code blocks */
+  --text-code-sm:       12px;     /* Code small */
+
+  /* ── Spacing (4px rule) ── */
+  --space-1:            4px;
+  --space-2:            8px;
+  --space-3:            12px;
+  --space-4:            16px;
+  --space-6:            24px;
+
+  /* ── Border Radius ── */
+  --radius-sm:          2px;
+  --radius-default:     4px;
+  --radius-md:          6px;
+  --radius-lg:          8px;
+
+  /* ── Elevation depths (no shadows — tonal layering only) ── */
+  --elevation-base:     0;
+  --elevation-panel:    1;
+  --elevation-modal:    2;
+}

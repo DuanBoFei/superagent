@@ -4,7 +4,7 @@
 
 ## 1 · 项目是什么 (WHAT)
 
-SuperAgent 是一个终端内的 AI 编码助手：读代码→理解→改 bug→跑测试→验证，全链路自主完成。入口是 CLI REPL（非 IDE 插件、非 Web），目标用户是独立开发者与开源维护者。核心理念：模型自由——默认走 DeepSeek V4 Pro（成本为 Claude Code 的 1/17），不绑定单一模型厂商。
+SuperAgent 是一个终端内的 AI 编码助手：读代码→理解→改 bug→跑测试→验证，全链路自主完成。入口为 CLI REPL + 浏览器 Web UI（非 IDE 插件），目标用户是独立开发者与开源维护者。核心理念：模型自由——默认走 DeepSeek V4 Pro（成本为 Claude Code 的 1/17），不绑定单一模型厂商。
 
 完整业务需求见：@specs/prd.md
 
@@ -49,8 +49,14 @@ Claude Code/OpenClaw/Codex 证明了 CLI Agent 可行，但都绑定高价国外
 | 日志 | `pino` `^10.3.1` | package.json |
 | 测试 | `vitest` `^2` | package.json |
 | Lint/Format | `biome` `^0.3.3` | package.json |
+| Lint/CSS | `stylelint` `^17` | package.json |
 | 模型主力 | DeepSeek V4 Pro ($0.435/$0.87 per MTok) | 05-决策汇总 §2 |
 | 模型兜底 | DeepSeek V4 Flash ($0.14/$0.28 per MTok) | 05-决策汇总 §2 |
+| Web 框架 | Next.js 15 (App Router) + React 19 | web-plan.md §2.2 |
+| Web UI 组件 | Shadcn UI + Tailwind CSS | web-plan.md §2.2 |
+| Web 状态管理 | Zustand | web-plan.md §2.2 |
+| Web 实时通信 | Socket.io (client + server) | web-plan.md §2.2 |
+| Web 测试 | Vitest + @testing-library/react + Playwright | web-plan.md §2.2 |
 
 ## 5 · 命令清单
 
@@ -62,6 +68,9 @@ pnpm test       # vitest run
 pnpm test:watch # vitest
 pnpm typecheck  # tsc --noEmit
 pnpm lint       # biome check src/ tests/
+pnpm lint:css   # stylelint (CSS files)
+pnpm dev:web    # next dev -p 3456 (packages/web/)
+pnpm build:web  # next build (packages/web/)
 ```
 
 ## 6 · 项目宪法引用
@@ -158,6 +167,7 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 |------|------|--------|
 | @specs/prd.md | 14 章产品需求文档 | 业务边界/优先级/验收标准不清时 |
 | @specs/web-prd.md | Web UI 产品需求文档 | Web UI feature 范围/验收不清时 |
+| @specs/web-plan.md | Web UI 技术方案基线 | Web 架构/技术选型不确定时 |
 | @specs/design-reference/stitch-export/web_prd.md | Stitch 导出的 Web UI PRD | 对齐设计样本原始产品意图时 |
 | @.specify/memory/constitution.md | 项目宪法 + 实现纪律 | 执行任何 tasks.md 前 |
 | @DESIGN.md | Web UI 视觉系统事实源 | 任意 [FE] task 前 |
@@ -180,3 +190,5 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 | src/cli/ | 008 CLI REPL | 终端交互 |
 | src/persistence/ | 009 会话持久化 | SQLite 存储 |
 | src/observability/ | 010 可观测性 | 日志+成本追踪 |
+| packages/web/ | Next.js Web UI | [FE] task 实现时 |
+| packages/core/ | 共享 runtime（future） | 跨包共享代码时 |

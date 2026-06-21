@@ -3,6 +3,7 @@
   "extends": ["stylelint-config-standard"],
   "rules": {
     "color-named": "never",
+    "color-no-hex": [true, {"severity": "warning"}],
     "color-function-notation": "modern",
     "alpha-value-notation": "number",
     "hue-degree-notation": "number",
@@ -12,7 +13,10 @@
     "number-max-precision": 3,
     "value-keyword-case": [
       "lower",
-      { "camelCaseSvgKeywords": true }
+      {
+        "camelCaseSvgKeywords": true,
+        "ignoreProperties": ["font-family", "font"]
+      }
     ],
     "selector-class-pattern": [
       "^[a-z]([a-z0-9-]+)?(__[a-z]([a-z0-9-]+)?)?(--[a-z]([a-z0-9-]+)?)?$",
@@ -20,6 +24,25 @@
         "message": "Expected class selector to be kebab-case or BEM format",
         "resolveNestedSelectors": true
       }
-    ]
-  }
+    ],
+    "declaration-property-value-disallowed-list": {
+      "/^border$/": ["/^#[0-9a-fA-F]{3,8}(?!.*var.*)/"],
+      "/^background$/": ["/^#[0-9a-fA-F]{3,8}(?!.*var.*)/"]
+    }
+  },
+  "overrides": [
+    {
+      "files": ["**/terminal*.css"],
+      "rules": {
+        "color-no-hex": null,
+        "declaration-property-value-disallowed-list": {}
+      }
+    },
+    {
+      "files": ["**/design-tokens.css"],
+      "rules": {
+        "color-no-hex": null
+      }
+    }
+  ]
 }
