@@ -20,7 +20,7 @@
 1. **不能继续对话** — 历史会话只是"查看"模式，发送消息会创建新 session，而非在已有上下文中继续
 2. **没有会话生命周期管理** — 没有新建会话、重命名、删除功能
 
-AgentRuntime 已有 `resumeSession(sessionId)` 方法（加载历史 SessionState + 恢复 messages 数组），但 RuntimeBridge 未暴露。
+AgentRuntime 已有 `resumeSession(sessionId)` 方法可以加载历史 SessionState 并恢复 messages 数组，但它会立即启动 query loop（"Continue where you left off"），不适合"加载→等用户输入→再启动"的交互流。另外，`stubs/session.ts` 已有 `loadSession(id): SessionState | null` 和 `saveSession(state): void`，提供完整的 SessionState SQLite 持久化层。
 
 ### 2.2 目标
 
@@ -46,16 +46,30 @@ client_send({ sessionId, content })  // 始终同一个事件
 RuntimeBridge.routeToRuntime(msg):
   handle = handles.get(msg.sessionId)
   if (!handle):
-    handle = createRuntime({ loadSession: db.loadSession })
+    handle = createRuntime({ loadSession, saveSession })  // 已有的持久化回调
+    if (loadSession(msg.sessionId)):
+      handle.loadHistory(msg.sessionId)  // 加载历史 → session 变量指向已恢复的 SessionState
     handles.set(msg.sessionId, handle)
-  handle.startTurn(msg.content)
+  handle.startTurn(msg.content)  // 追加 user message → 模型看到完整上下文
 ```
 
-### 3.2 RuntimeBridge 多句柄模型
+**关键**：需要给 `RuntimeHandle` 新增 `loadHistory(sessionId)` 方法——只加载 SessionState 到内存，不启动 query loop。`startTurn` 后自然追加 user message 到恢复的 `session.messages[]`。
 
-从单一 `runtime: RuntimeHandle` 变为 `Map<sessionId, HandleEntry>`：
+### 3.2 RuntimeBridge 多句柄模型 + RuntimeHandle.loadHistory
+
+从单一 `runtime: RuntimeHandle` 变为 `Map<sessionId, HandleEntry>`。新增 `RuntimeHandle.loadHistory(sessionId)` 方法：
 
 ```typescript
+// RuntimeHandle 新增方法 (runtime.ts, ~10 行)
+loadHistory(sessionId: string): void {
+  const loaded = deps.loadSession?.(sessionId);
+  if (loaded) {
+    session = loaded;
+    session.interruptFlag = false;
+    // 不 push "Continue where you left off"，不启动 query loop
+  }
+}
+
 interface HandleEntry {
   handle: RuntimeHandle;
   isStreaming: boolean;
@@ -68,7 +82,6 @@ class RuntimeBridge {
   async *routeToRuntime(msg: ClientMessageEvent): AsyncGenerator<RuntimeEvent>;
 
   closeSession(sessionId: string): void;
-  abortTurn(sessionId: string): void;
 }
 ```
 
@@ -93,7 +106,7 @@ streamingSessionIds: Set<string>;         // 有活跃 turn 的 session
 **When** 加载完成，用户在输入框输入新消息并发送
 **Then**
 - `client_send` 携带该 sessionId 发送到后端
-- RuntimeBridge 发现 handles 中无此 sessionId → createRuntime + loadSession → startTurn
+- RuntimeBridge 发现 handles 中无此 sessionId → createRuntime + loadHistory(sessionId) + startTurn(content)
 - Agent 在历史上下文基础上回复
 - 回复结束后，侧边栏的 message_count 更新
 - `get_sessions` 自动触发，侧边栏排序更新
@@ -112,6 +125,8 @@ streamingSessionIds: Set<string>;         // 有活跃 turn 的 session
 - 侧边栏 Session-A 项显示"进行中"指示器
 - 用户在 Session-B 可以正常发消息（InputBox 只看 B 是否有 active turn）
 - Session-A 流式结束后，侧边栏指示器消失，`sessionMessages["A"]` 保留完整内容
+
+**实现**：侧边栏组件直接 `useChatStore(s => s.streamingSessionIds)` 检查当前会话是否在 streaming，不需要跨 store 同步机制。
 
 ### FR-3: 新建会话 [P0]
 
@@ -156,6 +171,7 @@ streamingSessionIds: Set<string>;         // 有活跃 turn 的 session
 | 文件 | 改动 | 体积 |
 |------|------|:--:|
 | `src/server/runtime-bridge.ts` | Map<sessionId, HandleEntry> 多句柄 + routeToRuntime 按 sessionId 路由 + closeSession | 大 |
+| `src/runtime/runtime.ts` | 新增 `RuntimeHandle.loadHistory(sessionId)` 方法 (~10 行) | 小 |
 | `src/server/socket-handlers.ts` | 新增 rename_session / delete_session handler；registerSessionHandlers 注册 | 小 |
 | `src/server/socket-hub.ts` | registerHandlers 注册新事件 | 小 |
 | `src/server/socket-types.ts` | 新增 rename_session / delete_session 类型 | 小 |
