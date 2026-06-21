@@ -26,8 +26,8 @@ export function SessionListItem({
         isActive ? "bg-zinc-900 border-l-emerald-500" : ""
       }`}
       data-session-id={session.id}
-      role="option"
-      aria-selected={isActive}
+      role="listitem"
+      aria-current={isActive ? "true" : undefined}
       aria-label={`Session: ${session.title}`}
       tabIndex={0}
       onClick={onSelect}
