@@ -70,6 +70,7 @@ export interface RuntimeHandle {
   getSession(): SessionState;
   startTurn(userMessage: string): AsyncGenerator<TurnEvent>;
   resumeSession(sessionId: string): AsyncGenerator<TurnEvent>;
+  loadHistory(sessionId: string): void;
   setActiveSkill(name: string, args: Record<string, string>): SkillDiagnostic[];
   clearActiveSkill(): void;
   hasActiveSkillPlanSuggestion(): boolean;
@@ -203,6 +204,16 @@ export function createRuntime(options: RuntimeOptions = {}): RuntimeHandle {
   return {
     getSession() {
       return session;
+    },
+
+    loadHistory(sessionId: string) {
+      const loaded = resolvedDeps.loadSession?.(sessionId);
+      if (loaded) {
+        session = loaded;
+        session.interruptFlag = false;
+      } else {
+        session = createFreshSession({ sessionId });
+      }
     },
 
     setActiveSkill(name: string, args: Record<string, string>): SkillDiagnostic[] {

@@ -172,4 +172,96 @@ describe("Runtime public API", () => {
       expect(turnEnd.summary.reason).toBe("completed");
     }
   });
+
+  it("loadHistory loads session from persistence and sets sessionId", () => {
+    const runtime = createRuntime({
+      sendMessage: textModel,
+      loadSession: () => ({
+        sessionId: "loaded-session",
+        turnNumber: 5,
+        messages: [
+          { role: "user" as const, content: "previous message" },
+        ],
+        toolResults: [],
+        state: "IDLE" as const,
+        interruptFlag: false,
+        startedAt: Date.now(),
+      }),
+    });
+
+    runtime.loadHistory("loaded-session");
+
+    const session = runtime.getSession();
+    expect(session.sessionId).toBe("loaded-session");
+    expect(session.turnNumber).toBe(5);
+    expect(session.messages).toHaveLength(1);
+    expect(session.messages[0]!.content).toBe("previous message");
+    expect(session.interruptFlag).toBe(false);
+  });
+
+  it("loadHistory creates fresh session when loadSession returns null", () => {
+    const runtime = createRuntime({
+      sendMessage: textModel,
+      loadSession: () => null,
+    });
+
+    runtime.loadHistory("missing-session");
+
+    const session = runtime.getSession();
+    expect(session.sessionId).toBe("missing-session");
+    expect(session.messages).toHaveLength(0);
+    expect(session.state).toBe("IDLE");
+  });
+
+  it("loadHistory does not start query loop (is synchronous)", () => {
+    let loadCalled = false;
+    const runtime = createRuntime({
+      sendMessage: textModel,
+      loadSession: () => {
+        loadCalled = true;
+        return {
+          sessionId: "sync-test",
+          turnNumber: 0,
+          messages: [],
+          toolResults: [],
+          state: "IDLE" as const,
+          interruptFlag: false,
+          startedAt: Date.now(),
+        };
+      },
+    });
+
+    runtime.loadHistory("sync-test");
+
+    expect(loadCalled).toBe(true);
+    expect(runtime.getSession().sessionId).toBe("sync-test");
+    expect(runtime.getSession().state).toBe("IDLE");
+  });
+
+  it("startTurn after loadHistory appends to loaded messages", async () => {
+    const runtime = createRuntime({
+      sendMessage: textModel,
+      loadSession: () => ({
+        sessionId: "resume-test",
+        turnNumber: 3,
+        messages: [
+          { role: "user" as const, content: "old message" },
+          { role: "assistant" as const, content: "old reply" },
+        ],
+        toolResults: [],
+        state: "IDLE" as const,
+        interruptFlag: false,
+        startedAt: Date.now(),
+      }),
+    });
+
+    runtime.loadHistory("resume-test");
+    await collect(runtime.startTurn("new message"));
+
+    const messages = runtime.getSession().messages;
+    expect(messages.length).toBeGreaterThanOrEqual(3);
+    expect(messages[0]!.content).toBe("old message");
+    expect(messages[1]!.content).toBe("old reply");
+    expect(messages.some((m) => m.role === "user" && m.content === "new message")).toBe(true);
+  });
 });
