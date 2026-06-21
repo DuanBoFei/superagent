@@ -13,14 +13,20 @@ function makeMessage(overrides?: Partial<Message>): Message {
   };
 }
 
+function msgs(sid?: string): Message[] {
+  const state = useChatStore.getState();
+  const key = sid ?? state.activeSessionId ?? "__default__";
+  return state.sessionMessages[key] ?? [];
+}
+
 describe("ChatStore", () => {
   beforeEach(() => {
     useChatStore.getState().reset();
   });
 
   describe("initial state", () => {
-    it("has empty messages", () => {
-      expect(useChatStore.getState().messages).toEqual([]);
+    it("has empty sessionMessages", () => {
+      expect(useChatStore.getState().sessionMessages).toEqual({});
     });
 
     it("has empty input", () => {
@@ -35,56 +41,65 @@ describe("ChatStore", () => {
       expect(useChatStore.getState().isStreaming).toBe(false);
     });
 
-    it("has null sessionId", () => {
-      expect(useChatStore.getState().sessionId).toBeNull();
+    it("has null activeSessionId", () => {
+      expect(useChatStore.getState().activeSessionId).toBeNull();
     });
   });
 
   describe("addMessage", () => {
-    it("appends a message", () => {
+    it("appends a message to default session", () => {
       const msg = makeMessage();
       useChatStore.getState().addMessage(msg);
-      expect(useChatStore.getState().messages).toHaveLength(1);
-      expect(useChatStore.getState().messages[0]).toEqual(msg);
+      expect(msgs()).toHaveLength(1);
+      expect(msgs()[0]).toEqual(msg);
+    });
+
+    it("appends a message to specific session", () => {
+      const msg = makeMessage();
+      useChatStore.getState().addMessage(msg, "session-A");
+      expect(msgs("session-A")).toHaveLength(1);
+      expect(msgs("session-A")[0]).toEqual(msg);
+      expect(msgs("session-B")).toHaveLength(0);
     });
 
     it("sets isStreaming when message status is streaming", () => {
+      useChatStore.getState().setActiveSession("s1");
       const msg = makeMessage({ status: "streaming" });
-      useChatStore.getState().addMessage(msg);
+      useChatStore.getState().addMessage(msg, "s1");
       expect(useChatStore.getState().isStreaming).toBe(true);
     });
 
     it("preserves message order", () => {
+      useChatStore.getState().setActiveSession("s1");
       const first = makeMessage({ id: "1", content: "first" });
       const second = makeMessage({ id: "2", content: "second" });
-      useChatStore.getState().addMessage(first);
-      useChatStore.getState().addMessage(second);
-      expect(useChatStore.getState().messages.map((m) => m.id)).toEqual([
-        "1",
-        "2",
-      ]);
+      useChatStore.getState().addMessage(first, "s1");
+      useChatStore.getState().addMessage(second, "s1");
+      expect(msgs("s1").map((m) => m.id)).toEqual(["1", "2"]);
     });
   });
 
   describe("appendToken", () => {
     it("appends token to existing message content", () => {
+      useChatStore.getState().setActiveSession("s1");
       const msg = makeMessage({ id: "a1", content: "He", status: "streaming" });
-      useChatStore.getState().addMessage(msg);
-      useChatStore.getState().appendToken("a1", "llo");
-      const updated = useChatStore.getState().messages[0];
-      expect(updated?.content).toBe("Hello");
+      useChatStore.getState().addMessage(msg, "s1");
+      useChatStore.getState().appendToken("a1", "llo", "s1");
+      expect(msgs("s1")[0]?.content).toBe("Hello");
     });
 
     it("keeps status as streaming", () => {
+      useChatStore.getState().setActiveSession("s1");
       const msg = makeMessage({ id: "a1", content: "", status: "streaming" });
-      useChatStore.getState().addMessage(msg);
-      useChatStore.getState().appendToken("a1", "x");
-      expect(useChatStore.getState().messages[0]?.status).toBe("streaming");
+      useChatStore.getState().addMessage(msg, "s1");
+      useChatStore.getState().appendToken("a1", "x", "s1");
+      expect(msgs("s1")[0]?.status).toBe("streaming");
     });
 
     it("creates placeholder for unknown message id", () => {
-      useChatStore.getState().appendToken("new-id", "hello");
-      const messages = useChatStore.getState().messages;
+      useChatStore.getState().setActiveSession("s1");
+      useChatStore.getState().appendToken("new-id", "hello", "s1");
+      const messages = msgs("s1");
       expect(messages).toHaveLength(1);
       expect(messages[0]?.id).toBe("new-id");
       expect(messages[0]?.content).toBe("hello");
@@ -92,57 +107,65 @@ describe("ChatStore", () => {
     });
 
     it("sets isStreaming to true", () => {
-      useChatStore.getState().appendToken("x", "t");
+      useChatStore.getState().setActiveSession("s1");
+      useChatStore.getState().appendToken("x", "t", "s1");
       expect(useChatStore.getState().isStreaming).toBe(true);
     });
 
     it("multiple tokens accumulate", () => {
-      useChatStore.getState().appendToken("m1", "a");
-      useChatStore.getState().appendToken("m1", "b");
-      useChatStore.getState().appendToken("m1", "c");
-      expect(useChatStore.getState().messages[0]?.content).toBe("abc");
+      useChatStore.getState().setActiveSession("s1");
+      useChatStore.getState().appendToken("m1", "a", "s1");
+      useChatStore.getState().appendToken("m1", "b", "s1");
+      useChatStore.getState().appendToken("m1", "c", "s1");
+      expect(msgs("s1")[0]?.content).toBe("abc");
     });
   });
 
   describe("markComplete", () => {
     it("sets message status to sent", () => {
+      useChatStore.getState().setActiveSession("s1");
       const msg = makeMessage({ id: "x", status: "streaming" });
-      useChatStore.getState().addMessage(msg);
-      useChatStore.getState().markComplete("x");
-      expect(useChatStore.getState().messages[0]?.status).toBe("sent");
+      useChatStore.getState().addMessage(msg, "s1");
+      useChatStore.getState().markComplete("x", undefined, "s1");
+      expect(msgs("s1")[0]?.status).toBe("sent");
     });
 
     it("sets isStreaming to false", () => {
+      useChatStore.getState().setActiveSession("s1");
       useChatStore.getState().addMessage(
         makeMessage({ id: "x", status: "streaming" }),
+        "s1",
       );
-      useChatStore.getState().markComplete("x");
+      useChatStore.getState().markComplete("x", undefined, "s1");
       expect(useChatStore.getState().isStreaming).toBe(false);
     });
 
-    it("does not affect other messages", () => {
-      useChatStore.getState().addMessage(makeMessage({ id: "a", content: "a" }));
-      useChatStore.getState().addMessage(makeMessage({ id: "b", content: "b" }));
-      useChatStore.getState().markComplete("a");
-      expect(useChatStore.getState().messages[1]?.content).toBe("b");
+    it("does not affect other sessions", () => {
+      useChatStore.getState().addMessage(makeMessage({ id: "a" }), "s1");
+      useChatStore.getState().addMessage(makeMessage({ id: "b" }), "s2");
+      useChatStore.getState().markComplete("a", undefined, "s1");
+      expect(msgs("s2")).toHaveLength(1);
     });
   });
 
   describe("markError", () => {
     it("sets message status to error with message", () => {
+      useChatStore.getState().setActiveSession("s1");
       const msg = makeMessage({ id: "e1", status: "streaming" });
-      useChatStore.getState().addMessage(msg);
-      useChatStore.getState().markError("e1", "timeout");
-      const updated = useChatStore.getState().messages[0];
+      useChatStore.getState().addMessage(msg, "s1");
+      useChatStore.getState().markError("e1", "timeout", "s1");
+      const updated = msgs("s1")[0];
       expect(updated?.status).toBe("error");
       expect(updated?.error).toBe("timeout");
     });
 
     it("sets isStreaming to false", () => {
+      useChatStore.getState().setActiveSession("s1");
       useChatStore.getState().addMessage(
         makeMessage({ id: "e1", status: "streaming" }),
+        "s1",
       );
-      useChatStore.getState().markError("e1", "err");
+      useChatStore.getState().markError("e1", "err", "s1");
       expect(useChatStore.getState().isStreaming).toBe(false);
     });
   });
@@ -172,57 +195,127 @@ describe("ChatStore", () => {
     });
   });
 
-  describe("setSessionId", () => {
-    it("sets sessionId", () => {
-      useChatStore.getState().setSessionId("session-1");
-      expect(useChatStore.getState().sessionId).toBe("session-1");
+  describe("setActiveSession", () => {
+    it("sets activeSessionId", () => {
+      useChatStore.getState().setActiveSession("session-1");
+      expect(useChatStore.getState().activeSessionId).toBe("session-1");
     });
 
-    it("clears sessionId with null", () => {
-      useChatStore.getState().setSessionId("session-1");
-      useChatStore.getState().setSessionId(null);
-      expect(useChatStore.getState().sessionId).toBeNull();
+    it("clears activeSessionId with null", () => {
+      useChatStore.getState().setActiveSession("session-1");
+      useChatStore.getState().setActiveSession(null);
+      expect(useChatStore.getState().activeSessionId).toBeNull();
+    });
+
+    it("sets isStreaming based on whether active session is streaming", () => {
+      useChatStore.getState().setActiveSession("s1");
+      useChatStore.getState().addMessage(
+        makeMessage({ id: "x", status: "streaming" }),
+        "s1",
+      );
+      useChatStore.getState().setActiveSession("s2");
+      expect(useChatStore.getState().isStreaming).toBe(false);
     });
   });
 
   describe("loadMessages", () => {
-    it("replaces messages array", () => {
-      useChatStore.getState().addMessage(makeMessage({ id: "old" }));
+    it("stores messages for session and sets activeSessionId", () => {
+      useChatStore.getState().addMessage(makeMessage({ id: "old" }), "s1");
       const history = [
         makeMessage({ id: "h1", role: "user", content: "question" }),
         makeMessage({ id: "h2", role: "assistant", content: "answer" }),
       ];
-      useChatStore.getState().loadMessages(history);
-      expect(useChatStore.getState().messages).toEqual(history);
+      useChatStore.getState().loadMessages("s2", history);
+      expect(msgs("s2")).toEqual(history);
+      expect(useChatStore.getState().activeSessionId).toBe("s2");
     });
 
     it("handles empty array", () => {
-      useChatStore.getState().addMessage(makeMessage());
-      useChatStore.getState().loadMessages([]);
-      expect(useChatStore.getState().messages).toEqual([]);
+      useChatStore.getState().addMessage(makeMessage(), "s1");
+      useChatStore.getState().loadMessages("s1", []);
+      expect(msgs("s1")).toEqual([]);
     });
 
     it("stops streaming when loading history", () => {
-      useChatStore.getState().addMessage(makeMessage({ status: "streaming" }));
-      useChatStore.getState().loadMessages([makeMessage({ status: "sent" })]);
+      useChatStore.getState().setActiveSession("s1");
+      useChatStore.getState().addMessage(makeMessage({ status: "streaming" }), "s1");
+      expect(useChatStore.getState().isStreaming).toBe(true);
+      useChatStore.getState().loadMessages("s1", [makeMessage({ status: "sent" })]);
       expect(useChatStore.getState().isStreaming).toBe(false);
+    });
+  });
+
+  describe("per-session streaming", () => {
+    it("streaming in session A does not block session B", () => {
+      useChatStore.getState().setActiveSession("A");
+      useChatStore.getState().addMessage(
+        makeMessage({ id: "a1", status: "streaming" }),
+        "A",
+      );
+      expect(useChatStore.getState().isStreaming).toBe(true);
+
+      useChatStore.getState().setActiveSession("B");
+      expect(useChatStore.getState().isStreaming).toBe(false);
+    });
+
+    it("streamingSessionIds tracks multiple sessions", () => {
+      useChatStore.getState().setActiveSession("A");
+      useChatStore.getState().addMessage(
+        makeMessage({ id: "a1", status: "streaming" }),
+        "A",
+      );
+      useChatStore.getState().setActiveSession("B");
+      useChatStore.getState().addMessage(
+        makeMessage({ id: "b1", status: "streaming" }),
+        "B",
+      );
+      expect(useChatStore.getState().streamingSessionIds).toContain("A");
+      expect(useChatStore.getState().streamingSessionIds).toContain("B");
+    });
+
+    it("markComplete removes session from streaming", () => {
+      useChatStore.getState().setActiveSession("A");
+      useChatStore.getState().addMessage(
+        makeMessage({ id: "a1", status: "streaming" }),
+        "A",
+      );
+      expect(useChatStore.getState().streamingSessionIds).toContain("A");
+      useChatStore.getState().markComplete("a1", undefined, "A");
+      expect(useChatStore.getState().streamingSessionIds).not.toContain("A");
+    });
+
+    it("switching sessions preserves messages", () => {
+      useChatStore.getState().addMessage(
+        makeMessage({ id: "a1", content: "msg-a" }),
+        "A",
+      );
+      useChatStore.getState().addMessage(
+        makeMessage({ id: "b1", content: "msg-b" }),
+        "B",
+      );
+      useChatStore.getState().setActiveSession("A");
+      expect(msgs("A")).toHaveLength(1);
+      expect(msgs("A")[0]!.content).toBe("msg-a");
+      useChatStore.getState().setActiveSession("B");
+      expect(msgs("B")).toHaveLength(1);
+      expect(msgs("B")[0]!.content).toBe("msg-b");
     });
   });
 
   describe("reset", () => {
     it("restores initial state", () => {
-      useChatStore.getState().addMessage(makeMessage());
+      useChatStore.getState().addMessage(makeMessage(), "s1");
       useChatStore.getState().setInput("text");
       useChatStore.getState().setConnectionStatus("connected");
-      useChatStore.getState().setSessionId("session-1");
+      useChatStore.getState().setActiveSession("session-1");
       useChatStore.getState().reset();
 
       const s = useChatStore.getState();
-      expect(s.messages).toEqual([]);
+      expect(s.sessionMessages).toEqual({});
       expect(s.input).toBe("");
       expect(s.connectionStatus).toBe("disconnected");
       expect(s.isStreaming).toBe(false);
-      expect(s.sessionId).toBeNull();
+      expect(s.activeSessionId).toBeNull();
     });
   });
 });
