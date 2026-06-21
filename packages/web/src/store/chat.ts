@@ -10,6 +10,7 @@ export interface ChatStore {
   input: string;
   connectionStatus: ConnectionStatus;
   isStreaming: boolean;
+  sessionId: string | null;
 
   addMessage: (message: Message) => void;
   appendToken: (id: string, token: string) => void;
@@ -18,6 +19,8 @@ export interface ChatStore {
   setInput: (input: string) => void;
   clearInput: () => void;
   setConnectionStatus: (status: ConnectionStatus) => void;
+  setSessionId: (sessionId: string | null) => void;
+  loadMessages: (messages: Message[]) => void;
   reset: () => void;
 }
 
@@ -36,6 +39,7 @@ export const useChatStore = create<ChatStore>((set) => ({
   input: "",
   connectionStatus: "disconnected",
   isStreaming: false,
+  sessionId: null,
 
   addMessage: (message) =>
     set((state) => ({
@@ -82,11 +86,20 @@ export const useChatStore = create<ChatStore>((set) => ({
 
   setConnectionStatus: (connectionStatus) => set({ connectionStatus }),
 
+  setSessionId: (sessionId) => set({ sessionId }),
+
+  loadMessages: (messages) =>
+    set({
+      messages,
+      isStreaming: false,
+    }),
+
   reset: () =>
     set({
       messages: [],
       input: "",
       connectionStatus: "disconnected",
       isStreaming: false,
+      sessionId: null,
     }),
 }));

@@ -34,6 +34,10 @@ describe("ChatStore", () => {
     it("is not streaming", () => {
       expect(useChatStore.getState().isStreaming).toBe(false);
     });
+
+    it("has null sessionId", () => {
+      expect(useChatStore.getState().sessionId).toBeNull();
+    });
   });
 
   describe("addMessage", () => {
@@ -168,11 +172,49 @@ describe("ChatStore", () => {
     });
   });
 
+  describe("setSessionId", () => {
+    it("sets sessionId", () => {
+      useChatStore.getState().setSessionId("session-1");
+      expect(useChatStore.getState().sessionId).toBe("session-1");
+    });
+
+    it("clears sessionId with null", () => {
+      useChatStore.getState().setSessionId("session-1");
+      useChatStore.getState().setSessionId(null);
+      expect(useChatStore.getState().sessionId).toBeNull();
+    });
+  });
+
+  describe("loadMessages", () => {
+    it("replaces messages array", () => {
+      useChatStore.getState().addMessage(makeMessage({ id: "old" }));
+      const history = [
+        makeMessage({ id: "h1", role: "user", content: "question" }),
+        makeMessage({ id: "h2", role: "assistant", content: "answer" }),
+      ];
+      useChatStore.getState().loadMessages(history);
+      expect(useChatStore.getState().messages).toEqual(history);
+    });
+
+    it("handles empty array", () => {
+      useChatStore.getState().addMessage(makeMessage());
+      useChatStore.getState().loadMessages([]);
+      expect(useChatStore.getState().messages).toEqual([]);
+    });
+
+    it("stops streaming when loading history", () => {
+      useChatStore.getState().addMessage(makeMessage({ status: "streaming" }));
+      useChatStore.getState().loadMessages([makeMessage({ status: "sent" })]);
+      expect(useChatStore.getState().isStreaming).toBe(false);
+    });
+  });
+
   describe("reset", () => {
     it("restores initial state", () => {
       useChatStore.getState().addMessage(makeMessage());
       useChatStore.getState().setInput("text");
       useChatStore.getState().setConnectionStatus("connected");
+      useChatStore.getState().setSessionId("session-1");
       useChatStore.getState().reset();
 
       const s = useChatStore.getState();
@@ -180,6 +222,7 @@ describe("ChatStore", () => {
       expect(s.input).toBe("");
       expect(s.connectionStatus).toBe("disconnected");
       expect(s.isStreaming).toBe(false);
+      expect(s.sessionId).toBeNull();
     });
   });
 });
