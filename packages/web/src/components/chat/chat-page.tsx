@@ -13,6 +13,8 @@ export function ChatPage() {
   const markComplete = useChatStore((s) => s.markComplete);
   const markError = useChatStore((s) => s.markError);
   const setConnectionStatus = useChatStore((s) => s.setConnectionStatus);
+  const sessionId = useChatStore((s) => s.sessionId);
+  const setSessionId = useChatStore((s) => s.setSessionId);
 
   const { socket, status } = useSocket();
 
@@ -54,7 +56,10 @@ export function ChatPage() {
       if (!trimmed) return;
 
       const messageId = `user-${Date.now()}`;
-      const sessionId = "default";
+      const sid = sessionId ?? `session-${Date.now()}`;
+      if (!sessionId) {
+        setSessionId(sid);
+      }
 
       addMessage({
         id: messageId,
@@ -65,15 +70,15 @@ export function ChatPage() {
       });
 
       if (socket?.connected) {
-        socket.emit("client_message", {
+        socket.emit("client_send", {
           messageId,
-          sessionId,
+          sessionId: sid,
           content: trimmed,
           timestamp: Date.now(),
         });
       }
     },
-    [addMessage, socket],
+    [addMessage, socket, sessionId, setSessionId],
   );
 
   return (

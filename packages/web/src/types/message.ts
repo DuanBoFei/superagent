@@ -57,9 +57,13 @@ export interface ServerToClientEvents {
   stream_token: (payload: StreamTokenEvent) => void;
   message_complete: (payload: MessageCompleteEvent) => void;
   message_error: (payload: MessageErrorEvent) => void;
+  session_list: (payload: { sessions: unknown[] }) => void;
+  session_loaded: (payload: { sessionId: string; messages: unknown[] }) => void;
 }
 
 export interface ClientToServerEvents {
-  client_message: (payload: ClientMessageEvent) => void;
-  cancel_stream: (payload: CancelStreamEvent) => void;
+  client_send: (payload: ClientMessageEvent) => void;
+  abort_turn: (payload: { messageId: string }) => void;
+  get_sessions: () => void;
+  load_session: (payload: { sessionId: string }) => void;
 }
