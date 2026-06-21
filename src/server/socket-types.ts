@@ -4,7 +4,6 @@
 export interface SessionSummary {
   id: string;
   title: string;
-  firstMessagePreview: string;
   createdAt: string;
   updatedAt: string;
   messageCount: number;
@@ -17,6 +16,15 @@ export interface GetSessionsEvent {
 }
 
 export interface LoadSessionEvent {
+  sessionId: string;
+}
+
+export interface RenameSessionEvent {
+  sessionId: string;
+  title: string;
+}
+
+export interface DeleteSessionEvent {
   sessionId: string;
 }
 

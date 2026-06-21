@@ -1,5 +1,5 @@
 import Database from "better-sqlite3";
-import { initDb, upsertSession, getSession, listSessions } from "./store";
+import { initDb, upsertSession, getSession, listSessions, renameSession, deleteSession } from "./store";
 import { serialize, deserialize, SessionCorruptedError } from "./serializer";
 import type { SessionRecord, SessionSummary, SaveResult } from "./types";
 import type { SessionState } from "../runtime/types";
@@ -10,6 +10,8 @@ export interface SessionManager {
   save(state: SessionState): SaveResult;
   load(id: string): SessionState | null;
   list(): SessionSummary[];
+  renameSession(id: string, title: string): void;
+  deleteSession(id: string): void;
   close(): void;
 }
 
@@ -55,6 +57,14 @@ export function createSessionManager(dbPath: string): SessionManager {
 
     list(): SessionSummary[] {
       return listSessions(db);
+    },
+
+    renameSession(id: string, title: string): void {
+      renameSession(db, id, title);
+    },
+
+    deleteSession(id: string): void {
+      deleteSession(db, id);
     },
 
     close(): void {

@@ -64,6 +64,12 @@ function defaultCreateSessionProvider(): SessionDataProvider {
         content: m.content,
       }));
     },
+    renameSession(id: string, title: string) {
+      manager.renameSession(id, title);
+    },
+    deleteSession(id: string) {
+      manager.deleteSession(id);
+    },
   };
 }
 

@@ -31,6 +31,8 @@ export interface SessionDataProvider {
   loadSessionMessages(
     id: string,
   ): Array<{ role: "user" | "assistant" | "system"; content: string }> | null;
+  renameSession(id: string, title: string): void;
+  deleteSession(id: string): void;
 }
 
 function toSocketSessionSummary(entry: SessionListEntry): SocketSessionSummary {
@@ -113,6 +115,26 @@ export function registerSessionHandlers(
       socket.emit("session_loaded", payload);
     } catch {
       // Silently handle — the client-side store manages error state
+    }
+  });
+
+  socket.on("rename_session", (data: { sessionId: string; title: string }) => {
+    try {
+      provider.renameSession(data.sessionId, data.title);
+      const sessions = provider.listSessions(50).map(toSocketSessionSummary);
+      socket.emit("session_list", { sessions });
+    } catch {
+      // Silently handle
+    }
+  });
+
+  socket.on("delete_session", (data: { sessionId: string }) => {
+    try {
+      provider.deleteSession(data.sessionId);
+      const sessions = provider.listSessions(50).map(toSocketSessionSummary);
+      socket.emit("session_list", { sessions });
+    } catch {
+      // Silently handle
     }
   });
 }

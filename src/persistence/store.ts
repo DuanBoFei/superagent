@@ -31,6 +31,12 @@ ORDER BY updated_at DESC
 LIMIT ?
 `;
 
+const RENAME_SQL = `
+UPDATE sessions SET first_message = @title, updated_at = @updated_at WHERE id = @id
+`;
+
+const DELETE_SQL = `DELETE FROM sessions WHERE id = ?`;
+
 export function initDb(dbPath: string): Database.Database {
   const db = new Database(dbPath);
   db.pragma("journal_mode = WAL");
@@ -71,6 +77,18 @@ export function getSession(
     firstMessage: (row.first_message as string) ?? "",
     stateJson: row.state_json as string,
   };
+}
+
+export function renameSession(
+  db: Database.Database,
+  id: string,
+  title: string,
+): void {
+  db.prepare(RENAME_SQL).run({ id, title, updated_at: Date.now() });
+}
+
+export function deleteSession(db: Database.Database, id: string): void {
+  db.prepare(DELETE_SQL).run(id);
 }
 
 export function listSessions(

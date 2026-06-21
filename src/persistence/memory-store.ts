@@ -42,6 +42,17 @@ export function createMemoryStore(): SessionManager {
       return results;
     },
 
+    renameSession(id: string, title: string): void {
+      const state = sessions.get(id);
+      if (state && state.messages.length > 0) {
+        state.messages[0] = { ...state.messages[0]!, content: title };
+      }
+    },
+
+    deleteSession(id: string): void {
+      sessions.delete(id);
+    },
+
     close(): void {
       sessions.clear();
     },
