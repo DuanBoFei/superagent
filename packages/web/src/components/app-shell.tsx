@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "./ui/button";
+import { Header } from "./layout/header";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -43,7 +44,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
       {/* Main content */}
       <div className="flex flex-1 flex-col overflow-hidden">
-        {/* Top bar with mobile toggle */}
+        {/* Header: desktop token+cost, mobile hamburger */}
+        <div className="hidden lg:block">
+          <Header />
+        </div>
         <div className="flex items-center gap-3 border-b border-border px-4 py-2 lg:hidden">
           <Button
             variant="ghost"

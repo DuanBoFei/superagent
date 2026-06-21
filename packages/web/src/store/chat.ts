@@ -1,7 +1,7 @@
 "use client";
 
 import { create } from "zustand";
-import type { Message, TokenUsageStats } from "../types/message";
+import type { Message, TokenUsageStats, SessionStats } from "../types/message";
 
 export type ConnectionStatus = "connected" | "disconnected" | "connecting";
 
@@ -12,11 +12,13 @@ export interface ChatStore {
   input: string;
   connectionStatus: ConnectionStatus;
   isStreaming: boolean;
+  sessionStats: Record<string, SessionStats>;
 
   addMessage: (message: Message, sessionId?: string) => void;
   appendToken: (id: string, token: string, sessionId?: string) => void;
   markComplete: (id: string, stats?: TokenUsageStats, sessionId?: string) => void;
   markError: (id: string, error: string, sessionId?: string) => void;
+  estimateOutputToken: (sessionId: string, charCount: number) => void;
   setInput: (input: string) => void;
   clearInput: () => void;
   setConnectionStatus: (status: ConnectionStatus) => void;
@@ -68,6 +70,7 @@ export const useChatStore = create<ChatStore>((set) => ({
   input: "",
   connectionStatus: "disconnected",
   isStreaming: false,
+  sessionStats: {},
 
   addMessage: (message, sessionId) =>
     set((state) => {
@@ -108,7 +111,7 @@ export const useChatStore = create<ChatStore>((set) => ({
       };
     }),
 
-  markComplete: (id, _stats, sessionId) =>
+  markComplete: (id, stats, sessionId) =>
     set((state) => {
       const sid = sessionId ?? state.activeSessionId ?? "__default__";
       const current = state.sessionMessages[sid] ?? [];
@@ -116,10 +119,35 @@ export const useChatStore = create<ChatStore>((set) => ({
         m.id === id ? { ...m, status: "sent" as const } : m,
       );
       const streaming = removeFromStreaming(state.streamingSessionIds, sid);
+      const prevStats = state.sessionStats[sid] ?? { totalInputTokens: 0, totalOutputTokens: 0, estimatedOutputTokens: 0 };
+      const nextStats: Record<string, SessionStats> = stats
+        ? {
+            ...state.sessionStats,
+            [sid]: {
+              totalInputTokens: prevStats.totalInputTokens + stats.inputTokens,
+              totalOutputTokens: prevStats.totalOutputTokens + stats.outputTokens,
+              estimatedOutputTokens: 0,
+            },
+          }
+        : state.sessionStats;
       return {
         sessionMessages: { ...state.sessionMessages, [sid]: messages },
         streamingSessionIds: streaming,
+        sessionStats: nextStats,
         isStreaming: streaming.includes(state.activeSessionId ?? "__default__"),
+      };
+    }),
+
+  estimateOutputToken: (sessionId, charCount) =>
+    set((state) => {
+      const sid = sessionId ?? state.activeSessionId ?? "__default__";
+      const estimated = Math.ceil(charCount / 4);
+      const prev = state.sessionStats[sid] ?? { totalInputTokens: 0, totalOutputTokens: 0, estimatedOutputTokens: 0 };
+      return {
+        sessionStats: {
+          ...state.sessionStats,
+          [sid]: { ...prev, estimatedOutputTokens: prev.estimatedOutputTokens + estimated },
+        },
       };
     }),
 
@@ -166,6 +194,7 @@ export const useChatStore = create<ChatStore>((set) => ({
     set({
       sessionMessages: {},
       streamingSessionIds: [],
+      sessionStats: {},
       activeSessionId: null,
       input: "",
       connectionStatus: "disconnected",

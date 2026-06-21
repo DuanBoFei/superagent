@@ -21,6 +21,12 @@ export interface TokenUsageStats {
   durationMs: number;
 }
 
+export interface SessionStats {
+  totalInputTokens: number;
+  totalOutputTokens: number;
+  estimatedOutputTokens: number;
+}
+
 export interface ClientMessageEvent {
   messageId: string;
   sessionId: string;

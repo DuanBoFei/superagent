@@ -13,6 +13,7 @@ export function ChatPage() {
   const appendToken = useChatStore((s) => s.appendToken);
   const markComplete = useChatStore((s) => s.markComplete);
   const markError = useChatStore((s) => s.markError);
+  const estimateOutputToken = useChatStore((s) => s.estimateOutputToken);
   const setConnectionStatus = useChatStore((s) => s.setConnectionStatus);
   const setActiveSession = useChatStore((s) => s.setActiveSession);
   const loadMessages = useChatStore((s) => s.loadMessages);
@@ -32,6 +33,7 @@ export function ChatPage() {
 
     const onToken = (payload: { messageId: string; sessionId: string; token: string }) => {
       appendToken(payload.messageId, payload.token, payload.sessionId);
+      estimateOutputToken(payload.sessionId, payload.token.length);
     };
 
     const onComplete = (payload: { messageId: string; sessionId: string; stats?: { inputTokens: number; outputTokens: number; durationMs: number } }) => {
@@ -64,7 +66,7 @@ export function ChatPage() {
       socket.off("message_error", onError);
       socket.off("session_loaded", onSessionLoaded);
     };
-  }, [socket, appendToken, markComplete, markError, loadMessages]);
+  }, [socket, appendToken, markComplete, markError, loadMessages, estimateOutputToken]);
 
   const handleSend = useCallback(
     (content: string) => {
