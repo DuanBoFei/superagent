@@ -25,6 +25,7 @@ describe("startWebCommand", () => {
       port: 4567,
       verbose: true,
       noOpen: true,
+      noFrontend: true,
       logger: createLogger(output),
       createServer: (options) => {
         receivedPort = options.port;
@@ -39,13 +40,14 @@ describe("startWebCommand", () => {
     expect(result).toBe(0);
     expect(receivedPort).toBe(4567);
     expect(openCalled).toBe(false);
-    expect(output.join("\n")).toContain("Web server started at http://localhost:4567");
+    expect(output.join("\n")).toContain("Backend server started at http://localhost:4567");
     expect(output.join("\n")).toContain("Open http://localhost:4567 in your browser");
   });
 
   it("prints a manual URL hint when browser launch fails", async () => {
     const output: string[] = [];
     const result = await startWebCommand({
+      noFrontend: true,
       logger: createLogger(output),
       createServer: () => ({
         start: async () => ({ host: "127.0.0.1", port: 3456, url: "http://localhost:3456", pid: 123 }),

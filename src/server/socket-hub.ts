@@ -59,7 +59,7 @@ export class SocketHub {
 
     try {
       const parsed = new URL(origin);
-      return (parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1") && parsed.port === String(this.getPort());
+      return parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1";
     } catch {
       return false;
     }
