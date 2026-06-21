@@ -35,8 +35,7 @@ export interface WebCommandServer {
 
 function defaultCreateRuntimeBridge(): MessageRuntime {
   const configResult = getConfig();
-  const runtime = createRuntime({ config: configResult.config });
-  const bridge = new RuntimeBridge(runtime);
+  const bridge = new RuntimeBridge(() => createRuntime({ config: configResult.config }));
   return {
     startTurn(message) {
       return bridge.routeToRuntime(message);
