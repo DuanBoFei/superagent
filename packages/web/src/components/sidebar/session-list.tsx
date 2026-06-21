@@ -20,7 +20,7 @@ export interface SessionListProps {
 
 function SkeletonList() {
   return (
-    <div className="session-list--loading" role="listbox" aria-label="Session list" aria-busy="true">
+    <div className="session-list--loading" role="list" aria-label="Session list" aria-busy="true">
       {Array.from({ length: 5 }).map((_, i) => (
         <div key={i} className="flex items-center gap-3 px-3 py-2.5 animate-pulse">
           <div className="w-2 h-2 rounded-full bg-zinc-800 shrink-0" />
@@ -94,8 +94,7 @@ export function SessionList({
       <div
         ref={containerRef}
         className="session-list h-full overflow-y-auto"
-        role="listbox"
-        aria-multiselectable="true"
+        role="list"
         aria-label="Session list"
         data-session-count={sessions.length}
       >
@@ -121,8 +120,7 @@ export function SessionList({
     <div
       ref={containerRef}
       className="session-list h-full overflow-y-auto"
-      role="listbox"
-      aria-multiselectable="true"
+      role="list"
       aria-label="Session list"
       data-session-count={sessions.length}
     >
