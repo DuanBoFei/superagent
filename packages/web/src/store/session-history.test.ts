@@ -3,7 +3,6 @@ import {
   useSessionHistoryStore,
   selectSortedSessions,
   selectFilteredSessions,
-  selectSessionTags,
 } from "./session-history";
 import type { SessionSummary, SearchQuery } from "../types/session-history";
 
@@ -12,14 +11,9 @@ function makeSession(overrides?: Partial<SessionSummary>): SessionSummary {
     id: "s1",
     title: "Fix auth bug",
     firstMessagePreview: "Can you help me fix...",
-    createdAt: 1700000000000,
-    updatedAt: 1700000001000,
-    durationMs: 60000,
-    toolCallCount: 3,
+    createdAt: "2026-06-20T10:00:00.000Z",
+    updatedAt: "2026-06-20T10:05:00.000Z",
     messageCount: 10,
-    status: "completed",
-    tags: [],
-    forkedFrom: null,
     ...overrides,
   };
 }
@@ -42,8 +36,6 @@ describe("SessionHistoryStore", () => {
       const q = useSessionHistoryStore.getState().searchQuery;
       expect(q.text).toBe("");
       expect(q.dateRange).toBeNull();
-      expect(q.statusFilter).toBeNull();
-      expect(q.tagsFilter).toBeNull();
     });
 
     it("has sidebar open by default", () => {
@@ -89,15 +81,15 @@ describe("SessionHistoryStore", () => {
       useSessionHistoryStore.getState().setSearchQuery({ text: "bug" });
       const q = useSessionHistoryStore.getState().searchQuery;
       expect(q.text).toBe("bug");
-      expect(q.statusFilter).toBeNull();
+      expect(q.dateRange).toBeNull();
     });
 
     it("merges multiple partials", () => {
       useSessionHistoryStore.getState().setSearchQuery({ text: "fix" });
-      useSessionHistoryStore.getState().setSearchQuery({ statusFilter: ["active"] });
+      useSessionHistoryStore.getState().setSearchQuery({ dateRange: { start: 1700000000000, end: 1700000001000 } });
       const q = useSessionHistoryStore.getState().searchQuery;
       expect(q.text).toBe("fix");
-      expect(q.statusFilter).toEqual(["active"]);
+      expect(q.dateRange).toEqual({ start: 1700000000000, end: 1700000001000 });
     });
   });
 
@@ -105,12 +97,12 @@ describe("SessionHistoryStore", () => {
     it("resets to defaults", () => {
       useSessionHistoryStore.getState().setSearchQuery({
         text: "test",
-        statusFilter: ["error"],
+        dateRange: { start: 1, end: 2 },
       });
       useSessionHistoryStore.getState().resetSearchQuery();
       const q = useSessionHistoryStore.getState().searchQuery;
       expect(q.text).toBe("");
-      expect(q.statusFilter).toBeNull();
+      expect(q.dateRange).toBeNull();
     });
   });
 
@@ -164,16 +156,18 @@ describe("SessionHistoryStore", () => {
     });
   });
 
-  describe("updateSessionTags", () => {
-    it("updates tags of matching session", () => {
-      useSessionHistoryStore.getState().setSessions([
-        makeSession({ id: "s1", tags: ["old"] }),
-      ]);
-      useSessionHistoryStore.getState().updateSessionTags("s1", ["new", "bug"]);
-      expect(useSessionHistoryStore.getState().sessions[0].tags).toEqual([
-        "new",
-        "bug",
-      ]);
+  describe("addOrUpdateSession", () => {
+    it("adds new session at front", () => {
+      useSessionHistoryStore.getState().addOrUpdateSession(makeSession({ id: "s1" }));
+      expect(useSessionHistoryStore.getState().sessions).toHaveLength(1);
+      expect(useSessionHistoryStore.getState().sessions[0].id).toBe("s1");
+    });
+
+    it("updates existing session in place", () => {
+      useSessionHistoryStore.getState().addOrUpdateSession(makeSession({ id: "s1", title: "Old" }));
+      useSessionHistoryStore.getState().addOrUpdateSession(makeSession({ id: "s1", title: "New" }));
+      expect(useSessionHistoryStore.getState().sessions).toHaveLength(1);
+      expect(useSessionHistoryStore.getState().sessions[0].title).toBe("New");
     });
   });
 
@@ -234,18 +228,18 @@ describe("SessionHistoryStore", () => {
 });
 
 describe("selectSortedSessions", () => {
-  it("sorts by updatedAt descending", () => {
+  it("sorts by updatedAt descending (ISO strings)", () => {
     const sessions = [
-      makeSession({ id: "a", updatedAt: 1000 }),
-      makeSession({ id: "b", updatedAt: 3000 }),
-      makeSession({ id: "c", updatedAt: 2000 }),
+      makeSession({ id: "a", updatedAt: "2026-06-19T10:00:00.000Z" }),
+      makeSession({ id: "b", updatedAt: "2026-06-21T10:00:00.000Z" }),
+      makeSession({ id: "c", updatedAt: "2026-06-20T10:00:00.000Z" }),
     ];
     const sorted = selectSortedSessions(sessions);
     expect(sorted.map((s) => s.id)).toEqual(["b", "c", "a"]);
   });
 
   it("does not mutate input", () => {
-    const sessions = [makeSession({ id: "a", updatedAt: 1000 })];
+    const sessions = [makeSession({ id: "a", updatedAt: "2026-06-20T10:00:00.000Z" })];
     const copy = [...sessions];
     selectSortedSessions(sessions);
     expect(sessions).toEqual(copy);
@@ -256,8 +250,6 @@ describe("selectFilteredSessions", () => {
   const baseQuery: SearchQuery = {
     text: "",
     dateRange: null,
-    statusFilter: null,
-    tagsFilter: null,
   };
 
   it("filters by text in title", () => {
@@ -305,41 +297,18 @@ describe("selectFilteredSessions", () => {
 
   it("filters by date range", () => {
     const sessions = [
-      makeSession({ id: "old", createdAt: 1000 }),
-      makeSession({ id: "mid", createdAt: 2000 }),
-      makeSession({ id: "new", createdAt: 3000 }),
+      makeSession({ id: "old", createdAt: "2026-06-01T00:00:00.000Z" }),
+      makeSession({ id: "mid", createdAt: "2026-06-15T00:00:00.000Z" }),
+      makeSession({ id: "new", createdAt: "2026-06-21T00:00:00.000Z" }),
     ];
     const result = selectFilteredSessions(sessions, {
       ...baseQuery,
-      dateRange: { start: 1500, end: 2500 },
+      dateRange: {
+        start: new Date("2026-06-10").getTime(),
+        end: new Date("2026-06-18").getTime(),
+      },
     });
     expect(result.map((s) => s.id)).toEqual(["mid"]);
-  });
-
-  it("filters by status", () => {
-    const sessions = [
-      makeSession({ id: "a", status: "active" }),
-      makeSession({ id: "b", status: "completed" }),
-    ];
-    const result = selectFilteredSessions(sessions, {
-      ...baseQuery,
-      statusFilter: ["active"],
-    });
-    expect(result).toHaveLength(1);
-    expect(result[0].id).toBe("a");
-  });
-
-  it("filters by tags", () => {
-    const sessions = [
-      makeSession({ id: "a", tags: ["bug"] }),
-      makeSession({ id: "b", tags: ["feature"] }),
-    ];
-    const result = selectFilteredSessions(sessions, {
-      ...baseQuery,
-      tagsFilter: ["bug"],
-    });
-    expect(result).toHaveLength(1);
-    expect(result[0].id).toBe("a");
   });
 
   it("returns all when no filters active", () => {
@@ -357,19 +326,5 @@ describe("selectFilteredSessions", () => {
       text: "zzznotfound",
     });
     expect(result).toEqual([]);
-  });
-});
-
-describe("selectSessionTags", () => {
-  it("collects unique sorted tags", () => {
-    const sessions = [
-      makeSession({ id: "1", tags: ["bug", "frontend"] }),
-      makeSession({ id: "2", tags: ["bug", "backend"] }),
-    ];
-    expect(selectSessionTags(sessions)).toEqual(["backend", "bug", "frontend"]);
-  });
-
-  it("returns empty for no sessions", () => {
-    expect(selectSessionTags([])).toEqual([]);
   });
 });

@@ -1,31 +1,12 @@
 "use client";
 
 import { useCallback } from "react";
-import type { Session, SessionStatus } from "../../types/session-history";
+import type { Session } from "../../types/session-history";
 import type { Message } from "../../types/message";
 import type { ToolCardState } from "../../types/cards";
 
-const STATUS_LABELS: Record<SessionStatus, string> = {
-  active: "Active",
-  completed: "Completed",
-  error: "Error",
-};
-
-const STATUS_CLASSES: Record<SessionStatus, string> = {
-  active: "text-emerald-400 bg-emerald-400/10",
-  completed: "text-zinc-400 bg-zinc-400/10",
-  error: "text-red-400 bg-red-400/10",
-};
-
-function formatDuration(ms: number): string {
-  const totalSeconds = Math.floor(ms / 1000);
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = totalSeconds % 60;
-  return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
-}
-
-function formatTimestamp(ts: number): string {
-  return new Date(ts).toLocaleString("en-US", {
+function formatTimestamp(iso: string): string {
+  return new Date(iso).toLocaleString("en-US", {
     month: "short",
     day: "numeric",
     hour: "2-digit",
@@ -146,18 +127,14 @@ function ToolCallDetail({ tc }: { tc: ToolCardState }) {
 export interface SessionDetailPanelProps {
   session: Session;
   maxEntries?: number;
-  onFork?: (messageIndex: number) => void;
   onClose?: () => void;
-  onTagClick?: (tag: string) => void;
   onLoadMore?: () => void;
 }
 
 export function SessionDetailPanel({
   session,
   maxEntries = 50,
-  onFork,
   onClose,
-  onTagClick,
   onLoadMore,
 }: SessionDetailPanelProps) {
   const timeline = buildTimeline(session);
@@ -167,16 +144,6 @@ export function SessionDetailPanel({
 
   const handleClose = useCallback(() => onClose?.(), [onClose]);
   const handleLoadMore = useCallback(() => onLoadMore?.(), [onLoadMore]);
-  const handleFork = useCallback(
-    (idx: number) => () => onFork?.(idx),
-    [onFork],
-  );
-  const handleTagClick = useCallback(
-    (tag: string) => () => onTagClick?.(tag),
-    [onTagClick],
-  );
-
-  const hasForkedFrom = session.forkedFrom !== null;
 
   return (
     <div className="session-detail-panel flex flex-col h-full bg-neutral-950 border-l border-zinc-800 overflow-y-auto">
@@ -188,7 +155,7 @@ export function SessionDetailPanel({
             <div className="flex items-center gap-2 mt-1">
               <span className="text-[11px] text-zinc-500">{formatTimestamp(session.createdAt)}</span>
               <span className="text-[11px] text-zinc-600">&middot;</span>
-              <span className="text-[11px] text-zinc-500">{formatDuration(session.durationMs)}</span>
+              <span className="text-[11px] text-zinc-500">{session.messageCount} msgs</span>
             </div>
           </div>
           <button
@@ -207,37 +174,7 @@ export function SessionDetailPanel({
           <span className="text-[11px] px-1.5 py-0.5 rounded border border-zinc-800 text-zinc-400 uppercase">
             Read-only
           </span>
-          <span className={`text-[11px] px-1.5 py-0.5 rounded ${STATUS_CLASSES[session.status]}`}>
-            {STATUS_LABELS[session.status]}
-          </span>
-          <span className="text-[11px] text-zinc-500">{session.toolCallCount} tools</span>
-          <span className="text-[11px] text-zinc-500">{session.messageCount} msgs</span>
         </div>
-
-        {hasForkedFrom && (
-          <div className="mt-2 text-[11px] text-zinc-500">
-            Forked from{" "}
-            <button className="text-emerald-400 hover:underline" type="button">
-              parent session
-            </button>
-          </div>
-        )}
-
-        {session.tags.length > 0 && (
-          <div className="flex items-center gap-1 mt-2 flex-wrap">
-            {session.tags.map((tag) => (
-              <span
-                key={tag}
-                className="text-[11px] px-1.5 py-0.5 rounded border border-zinc-700 bg-zinc-900 text-zinc-400 cursor-pointer hover:border-zinc-600"
-                role="button"
-                tabIndex={0}
-                onClick={handleTagClick(tag)}
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-        )}
       </div>
 
       {/* Timeline */}
@@ -264,14 +201,6 @@ export function SessionDetailPanel({
                       {entry.message.content.length > 200 && "..."}
                     </div>
                   </div>
-                  <button
-                    className="text-[11px] text-zinc-600 hover:text-emerald-400 transition-colors ml-2 shrink-0"
-                    onClick={handleFork(entry.messageIndex!)}
-                    type="button"
-                    title="Fork from this message"
-                  >
-                    Fork
-                  </button>
                 </div>
               );
             }

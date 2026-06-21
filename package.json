@@ -37,6 +37,7 @@
     "diff-match-patch": "^1.0.5",
     "marked": "^18.0.5",
     "pino": "^10.3.1",
+    "socket.io": "^4.8.3",
     "zod": "^3.23"
   },
   "pnpm": {

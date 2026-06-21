@@ -11,24 +11,6 @@ export interface SessionListItemProps {
   onToggleSelect?: (id: string) => void;
 }
 
-function formatDuration(ms: number): string {
-  const totalSeconds = Math.max(0, Math.round(ms / 1000));
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = totalSeconds % 60;
-  return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
-}
-
-function statusClass(status: string): string {
-  switch (status) {
-    case "active":
-      return "bg-blue-500";
-    case "error":
-      return "bg-red-500";
-    case "completed":
-    default:
-      return "bg-emerald-500";
-  }
-}
 
 export function SessionListItem({
   session,
@@ -52,24 +34,9 @@ export function SessionListItem({
     >
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-1.5">
-            <span
-              className={`inline-block w-2 h-2 rounded-full shrink-0 ${statusClass(session.status)}`}
-              aria-hidden="true"
-            />
-            <span className="text-sm font-semibold text-zinc-200 truncate">
-              {session.title}
-            </span>
-            {session.forkedFrom && (
-              <span
-                className="ml-1 text-zinc-400"
-                title="Forked from another session"
-                aria-label="Forked session"
-              >
-                &#x2387;
-              </span>
-            )}
-          </div>
+          <span className="text-sm font-semibold text-zinc-200 truncate block">
+            {session.title}
+          </span>
           <p className="text-xs text-zinc-400 mt-0.5 line-clamp-2 overflow-hidden">
             {session.firstMessagePreview}
           </p>
@@ -101,29 +68,8 @@ export function SessionListItem({
         </div>
       </div>
       <div className="flex items-center gap-3 mt-1.5">
-        <span className="text-[11px] font-mono text-zinc-400">{formatDuration(session.durationMs)}</span>
-        <span className="text-[11px] font-mono text-zinc-400">
-          {session.toolCallCount} tool{session.toolCallCount !== 1 ? "s" : ""}
-        </span>
         <span className="text-[11px] font-mono text-zinc-400">{session.messageCount} msg</span>
       </div>
-      {session.tags.length > 0 && (
-        <div className="flex flex-wrap gap-1 mt-1">
-          {session.tags.slice(0, 3).map((tag) => (
-            <span
-              key={tag}
-              className="inline-block px-1.5 py-0.5 text-[10px] font-mono uppercase text-zinc-400 bg-zinc-800/50 rounded border border-zinc-700/50"
-            >
-              {tag}
-            </span>
-          ))}
-          {session.tags.length > 3 && (
-            <span className="inline-block px-1.5 py-0.5 text-[10px] font-mono text-zinc-400">
-              +{session.tags.length - 3}
-            </span>
-          )}
-        </div>
-      )}
     </div>
   );
 }

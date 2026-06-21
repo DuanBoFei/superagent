@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSessionHistoryStore } from "../../store/session-history";
-import type { SearchQuery, SessionStatus, DateRange } from "../../types/session-history";
+import type { DateRange } from "../../types/session-history";
 
 const DATE_PRESETS = [
   { label: "Today", value: "today" },
@@ -10,13 +10,6 @@ const DATE_PRESETS = [
   { label: "Last 30 days", value: "30days" },
   { label: "All time", value: "all" },
 ] as const;
-
-const STATUS_OPTIONS: { label: string; value: SessionStatus | "all" }[] = [
-  { label: "All", value: "all" },
-  { label: "Active", value: "active" },
-  { label: "Completed", value: "completed" },
-  { label: "Error", value: "error" },
-];
 
 function getTodayRange(): DateRange {
   const now = new Date();
@@ -74,14 +67,10 @@ export function SessionSearchFilter({ availableTags = [] }: SessionSearchFilterP
   );
 
   const activePreset = getActivePreset(searchQuery.dateRange);
-  const statusFilter = searchQuery.statusFilter ?? [];
-  const tagsFilter = searchQuery.tagsFilter ?? [];
 
   const isAnyFilterActive =
     searchQuery.text !== "" ||
-    searchQuery.dateRange !== null ||
-    searchQuery.statusFilter !== null ||
-    searchQuery.tagsFilter !== null;
+    searchQuery.dateRange !== null;
 
   return (
     <div className="session-search-filter px-3 py-2 border-b border-zinc-800 space-y-2" role="search">
@@ -136,68 +125,6 @@ export function SessionSearchFilter({ availableTags = [] }: SessionSearchFilterP
           </button>
         ))}
       </div>
-
-      {/* Status filters */}
-      <div className="flex gap-1">
-        {STATUS_OPTIONS.map((s) => {
-          const isActive =
-            (s.value === "all" && searchQuery.statusFilter === null) ||
-            statusFilter.includes(s.value as SessionStatus);
-          return (
-            <button
-              key={s.value}
-              className={`text-[11px] px-2 py-0.5 rounded border transition-colors ${
-                isActive
-                  ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-400"
-                  : "border-zinc-700 text-zinc-400 hover:border-zinc-600"
-              }`}
-              onClick={() => {
-                const newFilter: SessionStatus[] | null =
-                  s.value === "all" ? null : [s.value as SessionStatus];
-                setSearchQuery({ statusFilter: newFilter });
-              }}
-              type="button"
-            >
-              {s.label}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Tag chips */}
-      {availableTags.length > 0 && (
-        <div>
-          <span className="text-[10px] text-zinc-500 block mb-1">Tags</span>
-          <div className="flex flex-wrap gap-1">
-            {availableTags.map((tag) => {
-              const isTagActive = searchQuery.tagsFilter !== null && tagsFilter.includes(tag);
-              return (
-                <button
-                  key={tag}
-                  className={`text-[10px] px-1.5 py-0.5 rounded border transition-colors ${
-                    isTagActive
-                      ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-400"
-                      : "border-zinc-700 text-zinc-400 hover:border-zinc-600"
-                  }`}
-                  onClick={() => {
-                    if (isTagActive) {
-                      const next = tagsFilter.filter((t) => t !== tag);
-                      setSearchQuery({ tagsFilter: next.length > 0 ? next : null });
-                    } else {
-                      setSearchQuery({
-                        tagsFilter: searchQuery.tagsFilter === null ? [tag] : [...tagsFilter, tag],
-                      });
-                    }
-                  }}
-                  type="button"
-                >
-                  {tag}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      )}
 
       {/* Reset */}
       {isAnyFilterActive && (

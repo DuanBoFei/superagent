@@ -1,7 +1,7 @@
 "use client";
 
 import { create } from "zustand";
-import type { SessionSummary, SessionStatus, SearchQuery } from "../types/session-history";
+import type { SessionSummary, SearchQuery } from "../types/session-history";
 
 export interface SessionHistoryState {
   sessions: SessionSummary[];
@@ -24,7 +24,7 @@ export interface SessionHistoryState {
   setSidebarWidth: (width: number) => void;
   setSidebarMode: (mode: "dock" | "overlay") => void;
   updateSessionTitle: (id: string, title: string) => void;
-  updateSessionTags: (id: string, tags: string[]) => void;
+  addOrUpdateSession: (session: SessionSummary) => void;
   removeSession: (id: string) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
@@ -34,8 +34,6 @@ export interface SessionHistoryState {
 const DEFAULT_SEARCH: SearchQuery = {
   text: "",
   dateRange: null,
-  statusFilter: null,
-  tagsFilter: null,
 };
 
 const MIN_WIDTH = 280;
@@ -94,12 +92,16 @@ export const useSessionHistoryStore = create<SessionHistoryState>((set) => ({
       ),
     })),
 
-  updateSessionTags: (id, tags) =>
-    set((s) => ({
-      sessions: s.sessions.map((ses) =>
-        ses.id === id ? { ...ses, tags } : ses,
-      ),
-    })),
+  addOrUpdateSession: (session) =>
+    set((s) => {
+      const idx = s.sessions.findIndex((ses) => ses.id === session.id);
+      if (idx >= 0) {
+        const next = [...s.sessions];
+        next[idx] = session;
+        return { sessions: next };
+      }
+      return { sessions: [session, ...s.sessions] };
+    }),
 
   removeSession: (id) =>
     set((s) => ({
@@ -129,7 +131,9 @@ export const useSessionHistoryStore = create<SessionHistoryState>((set) => ({
 export function selectSortedSessions(
   sessions: SessionSummary[],
 ): SessionSummary[] {
-  return [...sessions].sort((a, b) => b.updatedAt - a.updatedAt);
+  return [...sessions].sort(
+    (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+  );
 }
 
 export function selectFilteredSessions(
@@ -147,27 +151,12 @@ export function selectFilteredSessions(
     }
     if (query.dateRange) {
       const { start, end } = query.dateRange;
-      if (start != null && s.createdAt < start) return false;
-      if (end != null && s.createdAt > end) return false;
-    }
-    if (query.statusFilter && query.statusFilter.length > 0) {
-      if (!query.statusFilter.includes(s.status)) return false;
-    }
-    if (query.tagsFilter && query.tagsFilter.length > 0) {
-      if (!query.tagsFilter.some((t) => s.tags.includes(t))) return false;
+      const ms = new Date(s.createdAt).getTime();
+      if (start != null && ms < start) return false;
+      if (end != null && ms > end) return false;
     }
     return true;
   });
 }
 
-export function selectSessionTags(sessions: SessionSummary[]): string[] {
-  const tagSet = new Set<string>();
-  for (const s of sessions) {
-    for (const tag of s.tags) {
-      tagSet.add(tag);
-    }
-  }
-  return [...tagSet].sort();
-}
-
-export type { SessionStatus, SearchQuery };
+export type { SearchQuery };

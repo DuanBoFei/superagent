@@ -9,14 +9,9 @@ function makeSummary(overrides?: Partial<SessionSummary>): SessionSummary {
     id: "s1",
     title: "Fix auth bug",
     firstMessagePreview: "Can you help me fix the login?",
-    createdAt: 1700000000000,
-    updatedAt: 1700000001000,
-    durationMs: 125000,
-    toolCallCount: 3,
+    createdAt: "2026-06-21T10:00:00.000Z",
+    updatedAt: "2026-06-21T10:05:00.000Z",
     messageCount: 10,
-    status: "completed",
-    tags: [],
-    forkedFrom: null,
     ...overrides,
   };
 }
@@ -34,16 +29,6 @@ describe("SessionListItem", () => {
   it("renders first message preview", () => {
     render(<SessionListItem session={makeSummary()} />);
     expect(screen.getByText("Can you help me fix the login?")).toBeDefined();
-  });
-
-  it("renders duration in MM:SS format", () => {
-    render(<SessionListItem session={makeSummary({ durationMs: 125000 })} />);
-    expect(screen.getByText("02:05")).toBeDefined();
-  });
-
-  it("renders tool call count", () => {
-    render(<SessionListItem session={makeSummary({ toolCallCount: 3 })} />);
-    expect(screen.getByText("3 tools")).toBeDefined();
   });
 
   it("renders message count", () => {
@@ -65,21 +50,6 @@ describe("SessionListItem", () => {
     expect(item).toBeNull();
   });
 
-  it("renders tag chips for tagged sessions", () => {
-    render(<SessionListItem session={makeSummary({ tags: ["bug", "frontend"] })} />);
-    expect(screen.getByText("bug")).toBeDefined();
-    expect(screen.getByText("frontend")).toBeDefined();
-  });
-
-  it("renders overflow count when more than 3 tags", () => {
-    render(
-      <SessionListItem
-        session={makeSummary({ tags: ["a", "b", "c", "d", "e"] })}
-      />,
-    );
-    expect(screen.getByText("+2")).toBeDefined();
-  });
-
   it("calls onSelect when clicked", () => {
     const onSelect = vi.fn();
     render(<SessionListItem session={makeSummary()} onSelect={onSelect} />);
@@ -95,9 +65,4 @@ describe("SessionListItem", () => {
     expect(onDelete).toHaveBeenCalledWith("s1");
   });
 
-  it("shows fork indicator when session is a fork", () => {
-    render(<SessionListItem session={makeSummary({ forkedFrom: "parent-id" })} />);
-    const forkIndicator = document.querySelector("[class*='fork']");
-    expect(forkIndicator).toBeDefined();
-  });
 });

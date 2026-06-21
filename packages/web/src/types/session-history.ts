@@ -1,24 +1,15 @@
 import type { Message } from "./message";
 import type { ToolCardState } from "./cards";
 
-// ── Session Status ──────────────────────────────────────
-
-export type SessionStatus = "active" | "completed" | "error";
-
-// ── Session Summary (list item) ─────────────────────────
+// ── Session Summary (list item, aligned with socket SessionSummary) ──
 
 export interface SessionSummary {
   id: string;
   title: string;
   firstMessagePreview: string;
-  createdAt: number;
-  updatedAt: number;
-  durationMs: number;
-  toolCallCount: number;
+  createdAt: string;
+  updatedAt: string;
   messageCount: number;
-  status: SessionStatus;
-  tags: string[];
-  forkedFrom: string | null;
 }
 
 // ── Session (full data for playback/export) ─────────────
@@ -26,15 +17,9 @@ export interface SessionSummary {
 export interface Session {
   id: string;
   title: string;
-  createdAt: number;
-  updatedAt: number;
-  durationMs: number;
-  toolCallCount: number;
+  createdAt: string;
+  updatedAt: string;
   messageCount: number;
-  status: SessionStatus;
-  tags: string[];
-  forkedFrom: string | null;
-  forkedAtMessageIndex: number | null;
   messages: Message[];
   toolCalls: ToolCardState[];
 }
@@ -49,8 +34,6 @@ export interface DateRange {
 export interface SearchQuery {
   text: string;
   dateRange: DateRange | null;
-  statusFilter: SessionStatus[] | null;
-  tagsFilter: string[] | null;
 }
 
 // ── Export Format V1 ────────────────────────────────────
