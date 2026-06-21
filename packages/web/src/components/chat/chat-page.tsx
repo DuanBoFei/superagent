@@ -7,18 +7,21 @@ import { MessageList } from "./message-list";
 import { InputBox } from "./input-box";
 
 export function ChatPage() {
-  const messages = useChatStore((s) => s.messages);
+  const sessionMessages = useChatStore((s) => s.sessionMessages);
+  const activeSessionId = useChatStore((s) => s.activeSessionId);
   const addMessage = useChatStore((s) => s.addMessage);
   const appendToken = useChatStore((s) => s.appendToken);
   const markComplete = useChatStore((s) => s.markComplete);
   const markError = useChatStore((s) => s.markError);
   const setConnectionStatus = useChatStore((s) => s.setConnectionStatus);
-  const sessionId = useChatStore((s) => s.sessionId);
-  const setSessionId = useChatStore((s) => s.setSessionId);
+  const setActiveSession = useChatStore((s) => s.setActiveSession);
+  const loadMessages = useChatStore((s) => s.loadMessages);
 
   const { socket, status } = useSocket();
 
-  // Sync socket status to store for InputBox disabled state
+  const messages = activeSessionId ? (sessionMessages[activeSessionId] ?? []) : [];
+
+  // Sync socket status to store
   useEffect(() => {
     setConnectionStatus(status === "connected" ? "connected" : "disconnected");
   }, [status, setConnectionStatus]);
@@ -27,28 +30,41 @@ export function ChatPage() {
   useEffect(() => {
     if (!socket) return;
 
-    const onToken = (payload: { messageId: string; token: string }) => {
-      appendToken(payload.messageId, payload.token);
+    const onToken = (payload: { messageId: string; sessionId: string; token: string }) => {
+      appendToken(payload.messageId, payload.token, payload.sessionId);
     };
 
-    const onComplete = (payload: { messageId: string; stats?: { inputTokens: number; outputTokens: number; durationMs: number } }) => {
-      markComplete(payload.messageId, payload.stats);
+    const onComplete = (payload: { messageId: string; sessionId: string; stats?: { inputTokens: number; outputTokens: number; durationMs: number } }) => {
+      markComplete(payload.messageId, payload.stats, payload.sessionId);
     };
 
-    const onError = (payload: { messageId: string; message: string }) => {
-      markError(payload.messageId, payload.message);
+    const onError = (payload: { messageId: string; sessionId: string; message: string }) => {
+      markError(payload.messageId, payload.message, payload.sessionId);
+    };
+
+    const onSessionLoaded = (payload: { sessionId: string; messages: Array<{ id: string; role: "user" | "assistant"; content: string }> }) => {
+      loadMessages(
+        payload.sessionId,
+        payload.messages.map((m) => ({
+          ...m,
+          timestamp: Date.now(),
+          status: "sent" as const,
+        })),
+      );
     };
 
     socket.on("stream_token", onToken);
     socket.on("message_complete", onComplete);
     socket.on("message_error", onError);
+    socket.on("session_loaded", onSessionLoaded);
 
     return () => {
       socket.off("stream_token", onToken);
       socket.off("message_complete", onComplete);
       socket.off("message_error", onError);
+      socket.off("session_loaded", onSessionLoaded);
     };
-  }, [socket, appendToken, markComplete, markError]);
+  }, [socket, appendToken, markComplete, markError, loadMessages]);
 
   const handleSend = useCallback(
     (content: string) => {
@@ -56,18 +72,21 @@ export function ChatPage() {
       if (!trimmed) return;
 
       const messageId = `user-${Date.now()}`;
-      const sid = sessionId ?? `session-${Date.now()}`;
-      if (!sessionId) {
-        setSessionId(sid);
+      const sid = activeSessionId ?? crypto.randomUUID();
+      if (!activeSessionId) {
+        setActiveSession(sid);
       }
 
-      addMessage({
-        id: messageId,
-        role: "user",
-        content: trimmed,
-        timestamp: Date.now(),
-        status: "sent",
-      });
+      addMessage(
+        {
+          id: messageId,
+          role: "user",
+          content: trimmed,
+          timestamp: Date.now(),
+          status: "sent",
+        },
+        sid,
+      );
 
       if (socket?.connected) {
         socket.emit("client_send", {
@@ -78,7 +97,7 @@ export function ChatPage() {
         });
       }
     },
-    [addMessage, socket, sessionId, setSessionId],
+    [addMessage, socket, activeSessionId, setActiveSession],
   );
 
   return (

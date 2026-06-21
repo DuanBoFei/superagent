@@ -27,6 +27,12 @@ vi.mock("socket.io-client", () => ({
   io: vi.fn(() => makeFakeSocket()),
 }));
 
+function defaultMsgs() {
+  const state = useChatStore.getState();
+  const sid = state.activeSessionId ?? "__default__";
+  return state.sessionMessages[sid] ?? [];
+}
+
 beforeEach(() => {
   mockSocketState.connected = true;
   socketHandlers = {};
@@ -46,7 +52,7 @@ describe("ChatPage", () => {
 
     await user.type(screen.getByPlaceholderText("Ask SuperAgent..."), "hello{Enter}");
 
-    const msgs = useChatStore.getState().messages;
+    const msgs = defaultMsgs();
     expect(msgs.length).toBe(1);
     expect(msgs[0].role).toBe("user");
     expect(msgs[0].content).toBe("hello");
@@ -58,7 +64,7 @@ describe("ChatPage", () => {
 
     await user.type(screen.getByPlaceholderText("Ask SuperAgent..."), "{Enter}");
 
-    expect(useChatStore.getState().messages.length).toBe(0);
+    expect(defaultMsgs().length).toBe(0);
   });
 
   it("shows reconnection banner when socket is disconnected", () => {
@@ -75,11 +81,17 @@ describe("ChatPage", () => {
 });
 
 describe("ChatPage streaming integration", () => {
-  it("appendToken creates streaming assistant message", () => {
-    useChatStore.getState().appendToken("assist-1", "Hello");
-    useChatStore.getState().appendToken("assist-1", " world");
+  const sid = "test-session";
 
-    const msgs = useChatStore.getState().messages;
+  beforeEach(() => {
+    useChatStore.getState().setActiveSession(sid);
+  });
+
+  it("appendToken creates streaming assistant message", () => {
+    useChatStore.getState().appendToken("assist-1", "Hello", sid);
+    useChatStore.getState().appendToken("assist-1", " world", sid);
+
+    const msgs = defaultMsgs();
     expect(msgs.length).toBe(1);
     expect(msgs[0].id).toBe("assist-1");
     expect(msgs[0].role).toBe("assistant");
@@ -89,28 +101,28 @@ describe("ChatPage streaming integration", () => {
   });
 
   it("markComplete finalizes streaming message", () => {
-    useChatStore.getState().appendToken("assist-1", "Hello");
-    useChatStore.getState().markComplete("assist-1", { inputTokens: 100, outputTokens: 50, durationMs: 2000 });
+    useChatStore.getState().appendToken("assist-1", "Hello", sid);
+    useChatStore.getState().markComplete("assist-1", { inputTokens: 100, outputTokens: 50, durationMs: 2000 }, sid);
 
-    const msgs = useChatStore.getState().messages;
+    const msgs = defaultMsgs();
     expect(msgs[0].status).toBe("sent");
     expect(useChatStore.getState().isStreaming).toBe(false);
   });
 
   it("markError sets message to error state", () => {
-    useChatStore.getState().appendToken("assist-1", "partial");
-    useChatStore.getState().markError("assist-1", "timeout");
+    useChatStore.getState().appendToken("assist-1", "partial", sid);
+    useChatStore.getState().markError("assist-1", "timeout", sid);
 
-    const msgs = useChatStore.getState().messages;
+    const msgs = defaultMsgs();
     expect(msgs[0].status).toBe("error");
     expect(msgs[0].error).toBe("timeout");
     expect(useChatStore.getState().isStreaming).toBe(false);
   });
 
   it("appendToken for unknown id creates placeholder", () => {
-    useChatStore.getState().appendToken("new-msg", "first token");
+    useChatStore.getState().appendToken("new-msg", "first token", sid);
 
-    const msgs = useChatStore.getState().messages;
+    const msgs = defaultMsgs();
     expect(msgs.length).toBe(1);
     expect(msgs[0].id).toBe("new-msg");
     expect(msgs[0].role).toBe("assistant");
@@ -119,16 +131,16 @@ describe("ChatPage streaming integration", () => {
   });
 
   it("full streaming lifecycle: append → complete → verify final state", () => {
-    useChatStore.getState().appendToken("msg-1", "Hello");
-    useChatStore.getState().appendToken("msg-1", " world");
+    useChatStore.getState().appendToken("msg-1", "Hello", sid);
+    useChatStore.getState().appendToken("msg-1", " world", sid);
 
-    let msgs = useChatStore.getState().messages;
+    let msgs = defaultMsgs();
     expect(msgs[0].status).toBe("streaming");
     expect(useChatStore.getState().isStreaming).toBe(true);
 
-    useChatStore.getState().markComplete("msg-1", { inputTokens: 50, outputTokens: 10, durationMs: 500 });
+    useChatStore.getState().markComplete("msg-1", { inputTokens: 50, outputTokens: 10, durationMs: 500 }, sid);
 
-    msgs = useChatStore.getState().messages;
+    msgs = defaultMsgs();
     expect(msgs[0].status).toBe("sent");
     expect(msgs[0].content).toBe("Hello world");
     expect(useChatStore.getState().isStreaming).toBe(false);

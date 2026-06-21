@@ -170,7 +170,8 @@ describe("① Full send → stream → complete", () => {
     fireEvent.change(textarea, { target: { value: "Fix the bug in auth.ts" } });
     fireEvent.keyDown(textarea, { key: "Enter", shiftKey: false });
 
-    const msgs = useChatStore.getState().messages;
+    const sid = useChatStore.getState().activeSessionId ?? "__default__";
+    const msgs = useChatStore.getState().sessionMessages[sid] ?? [];
     expect(msgs.length).toBe(1);
     expect(msgs[0].role).toBe("user");
     expect(msgs[0].content).toBe("Fix the bug in auth.ts");
@@ -178,12 +179,13 @@ describe("① Full send → stream → complete", () => {
 
   it("streams assistant tokens into a message via appendToken", () => {
     const store = useChatStore.getState();
-    store.appendToken("assist-1", "I");
-    store.appendToken("assist-1", " found");
-    store.appendToken("assist-1", " the");
-    store.appendToken("assist-1", " bug");
+    store.setActiveSession("int-session");
+    store.appendToken("assist-1", "I", "int-session");
+    store.appendToken("assist-1", " found", "int-session");
+    store.appendToken("assist-1", " the", "int-session");
+    store.appendToken("assist-1", " bug", "int-session");
 
-    const msgs = useChatStore.getState().messages;
+    const msgs = useChatStore.getState().sessionMessages["int-session"] ?? [];
     expect(msgs.length).toBe(1);
     expect(msgs[0].id).toBe("assist-1");
     expect(msgs[0].role).toBe("assistant");
@@ -194,10 +196,11 @@ describe("① Full send → stream → complete", () => {
 
   it("marks message complete and stops streaming", () => {
     const store = useChatStore.getState();
-    store.appendToken("assist-1", "Done");
-    store.markComplete("assist-1", { inputTokens: 200, outputTokens: 50, durationMs: 1500 });
+    store.setActiveSession("int-session");
+    store.appendToken("assist-1", "Done", "int-session");
+    store.markComplete("assist-1", { inputTokens: 200, outputTokens: 50, durationMs: 1500 }, "int-session");
 
-    const msgs = useChatStore.getState().messages;
+    const msgs = useChatStore.getState().sessionMessages["int-session"] ?? [];
     expect(msgs[0].status).toBe("sent");
     expect(useChatStore.getState().isStreaming).toBe(false);
   });

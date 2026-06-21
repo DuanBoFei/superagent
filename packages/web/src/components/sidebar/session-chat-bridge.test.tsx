@@ -104,7 +104,7 @@ describe("useSessionChatBridge", () => {
 
     result.current.loadSessionIntoChat(session);
 
-    const messages = useChatStore.getState().messages;
+    const messages = useChatStore.getState().sessionMessages["__default__"] ?? [];
     expect(messages).toHaveLength(3);
     expect(messages[0].role).toBe("user");
     expect(messages[0].content).toBe("msg1");
@@ -120,7 +120,7 @@ describe("useSessionChatBridge", () => {
 
     expect(result.current.getViewMode()).toBe("live");
     expect(playback.pause).toHaveBeenCalled();
-    expect(useChatStore.getState().messages).toEqual([]);
+    expect(useChatStore.getState().sessionMessages).toEqual({});
   });
 
   it("handleSendMessage returns forked:false in live mode", () => {
